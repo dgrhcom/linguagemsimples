@@ -1,0 +1,86 @@
+[
+  {
+    "termoInadequado": "denegrir",
+    "alternativas": ["difamar", "prejudicar", "manchar a reputação"],
+    "explicacao": "Termo de origem racista que associa a cor negra a algo depreciativo.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "judiar",
+    "alternativas": ["maltratar", "tratar com crueldade", "prejudicar"],
+    "explicacao": "Termo preconceituoso associado à discriminação religiosa/étnica.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Escreva"
+  },
+  {
+    "termoInadequado": "lista negra",
+    "alternativas": ["lista restrita", "lista proibida", "lista de bloqueio"],
+    "explicacao": "Termo que reforça estigmas raciais associando o preto/negro ao negativo.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "mercado negro",
+    "alternativas": ["mercado clandestino", "mercado ilegal"],
+    "explicacao": "Substitua por termos que expressam o conceito real (ilegalidade, clandestinidade).",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "humor negro",
+    "alternativas": ["humor ácido", "humor sarcástico"],
+    "explicacao": "Expressão que associa a negritude a algo mórbido ou impróprio.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "cor de pele",
+    "alternativas": ["rosa-claro", "bege", "tom de pele específico"],
+    "explicacao": "Generalização excludente, pois há múltiplos tons e cores de pele humana.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "mulata",
+    "alternativas": ["parda", "negra", "mulher negra"],
+    "explicacao": "Termo com carga histórica pejorativa. Prefira 'parda' ou 'negra'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "mulato",
+    "alternativas": ["pardo", "negro", "homem negro"],
+    "explicacao": "Termo com carga histórica pejorativa. Prefira 'pardo' ou 'negro'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "aleijado",
+    "alternativas": ["pessoa com deficiência"],
+    "explicacao": "Termo capacitista e ofensivo. Use a terminologia correta: 'pessoa com deficiência'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "aleijada",
+    "alternativas": ["pessoa com deficiência"],
+    "explicacao": "Termo capacitista e ofensivo. Use 'pessoa com deficiência'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "o deficiente",
+    "alternativas": ["a pessoa com deficiência"],
+    "explicacao": "Coloque a pessoa em primeiro lugar: 'pessoa com deficiência', não reduzindo o indivíduo à sua condição.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  },
+  {
+    "termoInadequado": "deficiente mental",
+    "alternativas": ["pessoa com deficiência intelectual"],
+    "explicacao": "A terminologia correta e respeitosa é 'pessoa com deficiência intelectual'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Exemplos de termos não ofensivos"
+  }
+]

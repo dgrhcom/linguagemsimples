@@ -1,0 +1,220 @@
+[
+  {
+    "id": "unicamp-sentence-length",
+    "title": "Frases excessivamente longas (limite de 20 palavras)",
+    "category": "sentence",
+    "description": "A metodologia da Unicamp recomenda evitar frases com mais de 20 palavras. Frases longas sobrecarregam a memória de trabalho do leitor e dificultam a compreensão na primeira leitura.",
+    "recommendation": "Divida o período em frases menores, usando pontos finais e organizando uma ideia principal por frase.",
+    "severity": "warning",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Escreva",
+      "url": "https://linguagemsimples.unicamp.br/escreva/",
+      "section": "Prefira frases curtas",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Considerando a necessidade premente de modernização dos procedimentos operacionais e tendo em vista os relatórios emitidos pela auditoria no exercício passado, informamos que a sistemática de compras será integralmente alterada a partir do próximo mês.",
+        "after": "Informamos que o sistema de compras vai mudar a partir do próximo mês. A medida atende aos relatórios da auditoria e busca modernizar os processos da instituição.",
+        "explanation": "A frase longa foi dividida em duas frases curtas com ordem direta."
+      }
+    ],
+    "deterministic": {
+      "type": "word-count",
+      "threshold": 20
+    }
+  },
+  {
+    "id": "unicamp-direct-order",
+    "title": "Ordem direta da oração (Sujeito + Verbo + Complemento)",
+    "category": "clarity",
+    "description": "Frases na ordem direta facilitam a identificação imediata de quem realiza a ação e do que está sendo comunicado, reduzindo o esforço cognitivo.",
+    "recommendation": "Reestruture a frase colocando primeiro quem faz a ação (sujeito), seguido do verbo de ação e dos complementos.",
+    "severity": "suggestion",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Escreva",
+      "url": "https://linguagemsimples.unicamp.br/escreva/",
+      "section": "Escreva frases em ordem direta",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "O Curso de Linguagem Simples será oferecido pela Educorp.",
+        "after": "A Educorp oferecerá o curso de Linguagem Simples.",
+        "explanation": "A voz passiva analítica foi convertida para ordem direta e voz ativa."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-nominalizations",
+    "title": "Nominalizações e substantivos no lugar de verbos",
+    "category": "vocabulary",
+    "description": "Substantivos abstratos que atuam como verbos (ex: 'fazer a realização', 'proceder à análise') tornam o texto burocrático e pesado.",
+    "recommendation": "Substitua a locução por um verbo de ação direta ('realizar', 'analisar', 'preencher').",
+    "severity": "warning",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Escreva",
+      "url": "https://linguagemsimples.unicamp.br/escreva/",
+      "section": "Substitua substantivos por verbos diretos",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Esses equipamentos são muito bons para a descoberta e o tratamento de doenças.",
+        "after": "Esses equipamentos são muito bons para descobrir e tratar doenças.",
+        "explanation": "Substituição de substantivos por verbos que expressam a ação diretamente."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-verbosity",
+    "title": "Verbosidade e expressões arcaicas",
+    "category": "concision",
+    "description": "Ocorre quando se diz de forma complexa e rebuscada o que pode ser dito de maneira simples, criando falsa impressão de ostentação da linguagem culta.",
+    "recommendation": "Substitua expressões como 'supracitado', 'o assunto em epígrafe', 'para dirimir dúvidas', 'destarte' por alternativas comuns e diretas.",
+    "severity": "warning",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Verbosidade",
+      "url": "https://linguagemsimples.unicamp.br/verbosidade/",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Levamos a seu conhecimento que a reunião aprazada visa atingir o desiderato colimado para dirimir dúvidas.",
+        "after": "Informamos que a reunião marcada tem como objetivo esclarecer dúvidas.",
+        "explanation": "Eliminação de arcaísmos e vocabulário rebuscado."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-cliches",
+    "title": "Chavões e fórmulas desgastadas",
+    "category": "official-standard",
+    "description": "Chavões como 'vimos através desta solicitar', 'acusamos o recebimento', 'reiteramos protestos de estima' tornam o texto antiquado e reduzem sua eficácia comunicativa.",
+    "recommendation": "Vá direto ao ponto. Use 'Solicitamos', 'Confirmamos o recebimento' e fechos padronizados como 'Atenciosamente'.",
+    "severity": "warning",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Chavões",
+      "url": "https://linguagemsimples.unicamp.br/chavoes/",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Vimos, através desta, solicitar a emissão do documento. Sem mais para o momento.",
+        "after": "Solicitamos a emissão do documento. Atenciosamente.",
+        "explanation": "Remoção de fórmulas burocráticas desgastadas e fecho rude."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-inclusive-language",
+    "title": "Linguagem inclusiva e não-sexista",
+    "category": "inclusivity",
+    "description": "O uso exclusivo do masculino genérico apaga a diversidade de servidoras, colaboradoras, alunas e cidadãs.",
+    "recommendation": "Empregue a dupla forma ('servidoras e servidores'), substantivos coletivos ('a diretoria', 'a comunidade estudantil', 'o corpo funcional') ou estruturas neutras ('quem tiver interesse').",
+    "severity": "suggestion",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Linguagem Não-Sexista",
+      "url": "https://linguagemsimples.unicamp.br/exemplos-praticos-de-linguagem-nao-sexista/",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Os diretores convocam todos os servidores para o evento.",
+        "after": "A diretoria convoca todas as servidoras e servidores para o evento.",
+        "explanation": "Uso de coletivo institucional e dupla forma inclusiva."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-non-offensive-terms",
+    "title": "Termos não discriminatórios e respeitosos",
+    "category": "inclusivity",
+    "description": "Expressões pejorativas com raízes racistas, capacitistas ou excludentes devem ser rigorosamente eliminadas das comunicações públicas.",
+    "recommendation": "Substitua termos inadequados ('denegrir' -> 'difamar', 'judiar' -> 'maltratar', 'aleijado'/'deficiente' -> 'pessoa com deficiência', 'lista negra' -> 'lista restrita').",
+    "severity": "critical",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Termos Não Ofensivos",
+      "url": "https://linguagemsimples.unicamp.br/exemplos-de-termos-nao-ofensivos/",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "A decisão acabou por denegrir a imagem do setor e prejudicar os deficientes.",
+        "after": "A decisão acabou por difamar a imagem do setor e prejudicar as pessoas com deficiência.",
+        "explanation": "Substituição por terminologia respeitosa e inclusiva."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-acronym-expansion",
+    "title": "Explicitação de siglas na primeira citação",
+    "category": "acronym",
+    "description": "Toda sigla deve ter seu significado por extenso na primeira menção, antes da sigla e separado por travessão (ex: 'Universidade Estadual de Campinas – Unicamp').",
+    "recommendation": "Escreva o nome completo antes da sigla na primeira vez em que ela aparece no texto.",
+    "severity": "warning",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Siglas",
+      "url": "https://linguagemsimples.unicamp.br/siglas/",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "O processo foi remetido para a DGA.",
+        "after": "O processo foi remetido para a Diretoria Geral de Administração – DGA.",
+        "explanation": "Identificação completa da sigla para leitores que desconhecem o órgão."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-treatment-standards",
+    "title": "Padronização de pronomes de tratamento e abolição de DD./Ilmo.",
+    "category": "official-standard",
+    "description": "As formas de tratamento devem seguir rigorosamente o padrão oficial. O uso de 'Digníssimo (DD.)' e 'Ilustríssimo (Ilmo.)' foi expressamente extinto.",
+    "recommendation": "Use 'Vossa Excelência' para altas autoridades e 'Vossa Senhoria' / 'Senhor(a)' para demais autoridades e servidores.",
+    "severity": "warning",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Formas de tratamento",
+      "url": "https://linguagemsimples.unicamp.br/formas-de-tratamento/",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Ao Ilmo. Sr. Diretor da Faculdade.",
+        "after": "Ao Senhor Diretor da Faculdade.",
+        "explanation": "Eliminação do tratamento obsoleto 'Ilustríssimo'."
+      }
+    ]
+  },
+  {
+    "id": "unicamp-bullet-points-lists",
+    "title": "Uso de marcadores de tópicos para listas de itens",
+    "category": "formatting",
+    "description": "Parágrafos que contêm múltiplos requisitos, documentos ou passos devem ser estruturados em listas com marcadores para facilitar a leitura visual rápida.",
+    "recommendation": "Separe itens em tópicos com hifens ou marcadores.",
+    "severity": "suggestion",
+    "enabled": true,
+    "source": {
+      "title": "Linguagem Simples Unicamp - Escreva",
+      "url": "https://linguagemsimples.unicamp.br/escreva/",
+      "section": "Use marcadores de tópicos",
+      "type": "unicamp"
+    },
+    "examples": [
+      {
+        "before": "Você vai precisar do seu documento de identificação e comprovante de residência e histórico escolar e certidão de nascimento.",
+        "after": "Você vai precisar de:\n- Documento de identificação;\n- Comprovante de residência;\n- Histórico escolar;\n- Certidão de nascimento.",
+        "explanation": "Apresentação em lista estruturada melhora o encontro e o uso da informação."
+      }
+    ]
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "ex-01",
+    "titulo": "Declaração de Residência e Procedimento",
+    "tipoDocumento": "general",
+    "publicoAlvo": "População em geral",
+    "textoOriginal": "É preciso entregar uma manifestação escrita a próprio punho declarando seu endereço de residência domiciliar. O requerente deverá proceder ao preenchimento do formulário para fins de solicitação do benefício supracitado.",
+    "problemasIdentificados": [
+      "Expressão prolixa e arcaica: 'manifestação escrita a próprio punho declarando seu endereço de residência domiciliar'",
+      "Nominalização burocrática: 'proceder ao preenchimento'",
+      "Arcaísmo: 'supracitado'",
+      "Falta de foco na ação do cidadão"
+    ],
+    "textoSimplificado": "Você pode entregar uma declaração de residência escrita à mão. Preencha o formulário para solicitar o benefício informado.",
+    "explicacao": "A versão simplificada substituiu construções rebuscadas por verbos de ação direta ('preencha', 'para solicitar') e reduziu a extensão do período, tornando o procedimento fácil de executar.",
+    "fonte": "Linguagem Simples Unicamp - Exemplos Práticos"
+  },
+  {
+    "id": "ex-02",
+    "titulo": "Comunicação Jurídica e Demandas",
+    "tipoDocumento": "notice",
+    "publicoAlvo": "Comunidade interna e cidadãos",
+    "textoOriginal": "A entidade chegou a peticionar contra a operação. Concomitantemente, o TCESP enviou a demanda de informações à DGA, que deverá realizar a entrega dos documentos no prazo de 5 dias.",
+    "problemasIdentificados": [
+      "Jargão jurídico: 'peticionar'",
+      "Palavra rebuscada: 'concomitantemente'",
+      "Siglas não explicadas na 1ª menção: 'TCESP' e 'DGA'",
+      "Nominalização: 'realizar a entrega'"
+    ],
+    "textoSimplificado": "A entidade entrou com uma ação judicial contra a operação. Ao mesmo tempo, o Tribunal de Contas do Estado de São Paulo – TCESP pediu informações à Diretoria Geral de Administração – DGA, que deve entregar os documentos em 5 dias.",
+    "explicacao": "Substituição do jargão 'peticionar' por 'entrou com uma ação judicial', explicitação das siglas com seus nomes por extenso e substituição de 'concomitantemente' por 'ao mesmo tempo'.",
+    "fonte": "Linguagem Simples Unicamp - Exemplos Práticos"
+  },
+  {
+    "id": "ex-03",
+    "titulo": "Convocação e Linguagem Inclusiva",
+    "tipoDocumento": "email",
+    "publicoAlvo": "Servidoras, servidores e comunidade universitária",
+    "textoOriginal": "Prezados Senhores, vimos através desta comunicar que todos os servidores devem comparecer à reunião com os diretores para tratar da perícia dos deficientes. Sem mais para o momento.",
+    "problemasIdentificados": [
+      "Vocativo exclusivamente masculino: 'Prezados Senhores'",
+      "Chavão de abertura: 'vimos através desta comunicar'",
+      "Masculino genérico: 'os servidores', 'os diretores'",
+      "Termo capacitista: 'os deficientes'",
+      "Fecho rude e anacrônico: 'Sem mais para o momento'"
+    ],
+    "textoSimplificado": "Prezadas servidoras e prezados servidores,\n\nConvidamos todas e todos para a reunião com a diretoria sobre a perícia das pessoas com deficiência.\n\nAtenciosamente,\nCoordenação",
+    "explicacao": "Substituição do vocativo e gênero por formas inclusivas e coletivas, eliminação de chavões de abertura e encerramento, e substituição por terminologia respeitosa ('pessoas com deficiência').",
+    "fonte": "Linguagem Simples Unicamp - Linguagem Não-Sexista e Termos Não Ofensivos"
+  },
+  {
+    "id": "ex-04",
+    "titulo": "Lista de Requisitos para Matrícula",
+    "tipoDocumento": "general",
+    "publicoAlvo": "Estudantes e candidatos",
+    "textoOriginal": "Para fins de efetivação da inscrição, os candidatos deverão proceder à apresentação do documento de identificação oficial com foto e comprovante de residência atualizado e histórico escolar com notas autenticadas.",
+    "problemasIdentificados": [
+      "Nominalização: 'proceder à apresentação'",
+      "Masculino genérico: 'os candidatos'",
+      "Frase longa sem divisão visual de itens"
+    ],
+    "textoSimplificado": "Para confirmar sua inscrição, apresente os seguintes documentos:\n- Documento de identidade com foto;\n- Comprovante de residência atualizado;\n- Histórico escolar com notas autenticadas.",
+    "explicacao": "Estruturação em lista com marcadores, uso de ordem direta ('apresente') e comunicação centrada no leitor ('sua inscrição').",
+    "fonte": "Linguagem Simples Unicamp - Escreva (Uso de marcadores)"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "termoExcludente": "Prezados Senhores",
+    "alternativas": ["Prezadas Senhoras e Prezados Senhores", "Prezada comunidade", "Prezados e prezadas"],
+    "explicacao": "O uso exclusivo do masculino no vocativo invisibiliza as mulheres.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os servidores",
+    "alternativas": ["As servidoras e os servidores", "O corpo funcional", "A equipe de servidores"],
+    "explicacao": "Utilize a dupla forma (feminino e masculino) ou substantivos coletivos para incluir todas as pessoas.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os alunos",
+    "alternativas": ["A comunidade estudantil", "Estudantes", "As alunas e os alunos"],
+    "explicacao": "Substitua o masculino genérico por termos neutros como 'estudantes' ou 'comunidade estudantil'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os diretores",
+    "alternativas": ["A diretoria", "As diretoras e os diretores"],
+    "explicacao": "Prefira termos coletivos como 'a diretoria'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os coordenadores",
+    "alternativas": ["A coordenação", "As coordenadoras e os coordenadores"],
+    "explicacao": "Prefira o termo coletivo institucional.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os líderes da empresa",
+    "alternativas": ["Lideranças da empresa", "As pessoas que lideram a empresa"],
+    "explicacao": "Use termos neutros como 'lideranças'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os candidatos",
+    "alternativas": ["Pessoas candidatas", "As candidatas e os candidatos"],
+    "explicacao": "Inclua a forma feminina ou use 'pessoas candidatas'.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Os cidadãos",
+    "alternativas": ["A cidadania", "Todas as pessoas", "As cidadãs e os cidadãos"],
+    "explicacao": "Prefira termos coletivos ou formas duplas.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Funcionários",
+    "alternativas": ["Pessoas que trabalham na instituição", "Corpo funcional", "Equipe"],
+    "explicacao": "Substitua por coletivos ou estruturas que não usem apenas o gênero masculino.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Desenvolvedores",
+    "alternativas": ["Pessoas desenvolvedoras", "Equipe de desenvolvimento"],
+    "explicacao": "Prefira formulações inclusivas.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Ficou interessado?",
+    "alternativas": ["Tem interesse?", "Quer saber mais?"],
+    "explicacao": "Evite concordância unicamente masculina em perguntas diretas ao público.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  },
+  {
+    "termoExcludente": "Mantenha-se atualizado",
+    "alternativas": ["Continue se atualizando", "Acompanhe as atualizações"],
+    "explicacao": "Prefira estruturas verbais que não marquem gênero.",
+    "categoria": "inclusivity",
+    "fonte": "Unicamp - Linguagem Não-Sexista"
+  }
+]

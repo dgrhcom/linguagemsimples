@@ -1,0 +1,92 @@
+[
+  {
+    "type": "general",
+    "label": "Texto Geral / Comunicação Pública",
+    "category": "geral",
+    "description": "Comunicações gerais para o público amplo, informes, posts informativos ou orientações de serviços.",
+    "expectedSections": ["Título Claro", "Objetivo / Mensagem Central", "Informações Práticas / Instruções", "Canais de Dúvidas"],
+    "mandatoryElements": ["Linguagem direta", "Frases curtas (<= 20 palavras)", "Informação acionável"],
+    "competenceNote": "Aplicável a qualquer servidor, comunicador ou setor."
+  },
+  {
+    "type": "email",
+    "label": "Mensagem Eletrônica (E-mail Institucional)",
+    "category": "digital",
+    "description": "Comunicação oficial por correio eletrônico com validade administrativa.",
+    "expectedSections": ["Assunto Claro e Específico", "Saudação / Vocativo Formal", "Mensagem Central Direta", "Próximos Passos / Prazos", "Fecho Padrão (Atenciosamente/Cordialmente)", "Assinatura Institucional Completa"],
+    "mandatoryElements": ["Assunto conciso", "Fecho oficial", "Assinatura com nome, cargo e órgão"],
+    "competenceNote": "Todos os servidores com e-mail institucional."
+  },
+  {
+    "type": "notice",
+    "label": "Comunicado",
+    "category": "administrativo",
+    "description": "Comunicação de ordem geral emitida para prestar informações ou esclarecimentos a uma comunidade.",
+    "expectedSections": ["Cabeçalho Institucional", "Título do Comunicado", "Introdução com Motivo", "Detalhamento e Prazos", "Local e Data", "Identificação do Emissor"],
+    "mandatoryElements": ["Objetivo no primeiro parágrafo", "Prazos em destaque"],
+    "competenceNote": "Diretoria, Coordenadorias e Órgãos da Instituição."
+  },
+  {
+    "type": "official-letter",
+    "label": "Ofício / Ofício Circular",
+    "category": "administrativo",
+    "description": "Comunicação oficial externa ou entre órgãos autônomos para tratar de assuntos administrativos.",
+    "expectedSections": ["Identificação do Documento (Tipo, Número, Ano)", "Local e Data", "Endereçamento com Vocativo Adequado", "Assunto Resumido", "Texto em Ordem Direta", "Fecho Oficial", "Assinatura e Cargo"],
+    "mandatoryElements": ["Vocativo e Pronome corretos (V. Exa. ou V. Sa.)", "Fecho Atenciosamente", "Numeração oficial"],
+    "competenceNote": "Dirigentes, Diretores e Coordenadores."
+  },
+  {
+    "type": "memo",
+    "label": "Memorando",
+    "category": "administrativo",
+    "description": "Comunicação exclusivamente interna entre unidades administrativas de uma mesma instituição.",
+    "expectedSections": ["Identificação (Para, De, Assunto, Data)", "Texto Conciso e Objetivo", "Assinatura"],
+    "mandatoryElements": ["Agilidade e concisão"],
+    "competenceNote": "Chefias e servidores no fluxo interno."
+  },
+  {
+    "type": "report",
+    "label": "Relatório",
+    "category": "administrativo",
+    "description": "Documento que relata circunstanciadamente atividades, fatos, projetos ou auditorias.",
+    "expectedSections": ["Título e Período", "Objetivo / Introdução", "Metodologia / Atividades Realizadas", "Resultados e Análise", "Conclusões / Recomendações", "Local, Data e Assinaturas"],
+    "mandatoryElements": ["Tabelas e gráficos quando aplicável", "Tópicos e subtítulos"],
+    "competenceNote": "Comissões, GTs, pesquisadores e servidores."
+  },
+  {
+    "type": "opinion",
+    "label": "Parecer",
+    "category": "administrativo",
+    "description": "Manifestação técnica ou jurídica fundamentada sobre determinada matéria sujeita a decisão.",
+    "expectedSections": ["Relatório dos Fatos", "Fundamentação Legal / Técnica", "Conclusão / Voto", "Local, Data e Assinatura do Parecerista"],
+    "mandatoryElements": ["Fundamentação clara sem excesso de jargões"],
+    "competenceNote": "Assessores jurídicos, técnicos e comissões."
+  },
+  {
+    "type": "ordinance",
+    "label": "Portaria",
+    "category": "normativo",
+    "description": "Ato normativo interno que expede determinações, designa servidores ou institui comissões e grupos de trabalho.",
+    "expectedSections": ["Epígrafe e Ementa", "Preâmbulo / Fundamento de Competência", "Texto Articulado (Artigos, Parágrafos, Incisos)", "Cláusula de Vigência", "Data e Assinatura da Autoridade"],
+    "mandatoryElements": ["Ementa clara", "Artigos em ordem direta", "Preservação estrita das atribuições"],
+    "competenceNote": "Reitor, Coordenador Geral, Pró-Reitores e Diretores."
+  },
+  {
+    "type": "resolution",
+    "label": "Resolução",
+    "category": "normativo",
+    "description": "Ato normativo expedido pela autoridade executiva máxima (Reitora/Reitor).",
+    "expectedSections": ["Epígrafe e Ementa", "Preâmbulo com Atribuição Estatutária", "Disposições Normativas Articuladas", "Cláusula de Vigência", "Data e Assinatura"],
+    "mandatoryElements": ["Articulação legal clara", "Cláusula revocatória se houver"],
+    "competenceNote": "Competência privativa de Reitora ou Reitor."
+  },
+  {
+    "type": "instruction",
+    "label": "Instrução Normativa",
+    "category": "normativo",
+    "description": "Ordem escrita e geral sobre o modo e forma de executar serviços públicos regulamentados.",
+    "expectedSections": ["Identificação e Ementa", "Fundamentação", "Procedimentos Operacionais Passo a Passo", "Disposições Finais"],
+    "mandatoryElements": ["Passo a passo acionável", "Clareza operacional"],
+    "competenceNote": "Dirigentes e Pró-Reitores."
+  }
+]

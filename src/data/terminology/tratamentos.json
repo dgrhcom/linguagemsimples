@@ -1,0 +1,51 @@
+{
+  "abolidos": [
+    {
+      "termo": "Digníssimo",
+      "abreviatura": "DD.",
+      "motivo": "O Manual de Redação da Presidência da República aboliu expressamente essa forma de tratamento cerimoniosa e anacrônica.",
+      "recomendacao": "Eliminar o uso. Utilize apenas o pronome correspondente ao cargo (V. Exa. ou V. Sa.)."
+    },
+    {
+      "termo": "Ilustríssimo",
+      "abreviatura": "Ilmo.",
+      "motivo": "O Manual de Redação da Presidência da República aboliu expressamente essa fórmula cerimoniosa.",
+      "recomendacao": "Eliminar o uso. Utilize 'Senhor' ou 'Senhora' e o pronome 'Vossa Senhoria'."
+    },
+    {
+      "termo": "Ilma.",
+      "abreviatura": "Ilma.",
+      "motivo": "Fórmula cerimoniosa abolida pela redação oficial moderna.",
+      "recomendacao": "Eliminar o uso. Utilize 'Senhora' e 'Vossa Senhoria'."
+    },
+    {
+      "termo": "DD",
+      "abreviatura": "DD",
+      "motivo": "Abreviatura de Digníssimo abolida na administração pública.",
+      "recomendacao": "Eliminar o uso."
+    }
+  ],
+  "regras": [
+    {
+      "cargo": "Presidente da República, Ministros, Governadores, Prefeitos, Deputados, Senadores, Vice-Reitor, Coordenador Geral",
+      "vocativo": "Excelentíssimo Senhor / Excelentíssima Senhora",
+      "pronome": "Vossa Excelência",
+      "abreviatura": "V. Exa.",
+      "enderecamento": "A Sua Excelência o Senhor / A Sua Excelência a Senhora"
+    },
+    {
+      "cargo": "Reitor / Reitora",
+      "vocativo": "Magnífico Reitor / Magnífica Reitora",
+      "pronome": "Vossa Magnificência",
+      "abreviatura": "V. Maga.",
+      "enderecamento": "A Sua Magnificência o Senhor / A Sua Magnificência a Senhora"
+    },
+    {
+      "cargo": "Pró-Reitores, Diretores, Coordenadores, Servidores e Cidadãos em geral",
+      "vocativo": "Senhor [Cargo/Nome] / Senhora [Cargo/Nome]",
+      "pronome": "Vossa Senhoria",
+      "abreviatura": "V. Sa.",
+      "enderecamento": "Ao Senhor / À Senhora"
+    }
+  ]
+}

@@ -1,26 +1,171 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  /* Escala global de fontes no elemento raiz HTML */
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  html[data-font-size="sm"] {
+    font-size: 14px !important;
+  }
+  html[data-font-size="md"] {
+    font-size: 16px !important;
+  }
+  html[data-font-size="lg"] {
+    font-size: 19px !important;
+  }
+  html[data-font-size="xl"] {
+    font-size: 22px !important;
+  }
 
-@media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 210 33% 98%;
+    --foreground: 216 38% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 216 38% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 38% 18%;
+    --primary: 211 75% 35%; /* Azul institucional Unicamp #164e87 */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 35% 94%;
+    --secondary-foreground: 216 38% 18%;
+    --muted: 210 30% 95%;
+    --muted-foreground: 215 20% 45%;
+    --accent: 199 89% 48%; /* Ciano/Teal Unicamp #0ea5e9 */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 357 56% 49%; /* Vermelho institucional Unicamp #c2383f */
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+    --ring: 211 75% 35%;
+    --radius: 0.75rem;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Foco visível acessível universal */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid #164e87 !important;
+  outline-offset: 2px !important;
+}
+
+/* ==========================================================================
+   ALTO CONTRASTE (WCAG AAA - PRETO & AMARELO / BRANCO DE ALTO CONTRASTE)
+   ========================================================================== */
+html[data-high-contrast="true"],
+html[data-high-contrast="true"] body {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+}
+
+html[data-high-contrast="true"] header,
+html[data-high-contrast="true"] footer,
+html[data-high-contrast="true"] nav,
+html[data-high-contrast="true"] main,
+html[data-high-contrast="true"] section,
+html[data-high-contrast="true"] div,
+html[data-high-contrast="true"] article,
+html[data-high-contrast="true"] aside {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #ffff00 !important;
+}
+
+html[data-high-contrast="true"] h1,
+html[data-high-contrast="true"] h2,
+html[data-high-contrast="true"] h3,
+html[data-high-contrast="true"] h4,
+html[data-high-contrast="true"] strong,
+html[data-high-contrast="true"] b {
+  color: #ffff00 !important;
+}
+
+html[data-high-contrast="true"] p,
+html[data-high-contrast="true"] span,
+html[data-high-contrast="true"] label,
+html[data-high-contrast="true"] li {
+  color: #ffffff !important;
+}
+
+html[data-high-contrast="true"] a,
+html[data-high-contrast="true"] button,
+html[data-high-contrast="true"] input,
+html[data-high-contrast="true"] textarea,
+html[data-high-contrast="true"] select {
+  background-color: #121212 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+html[data-high-contrast="true"] a:focus-visible,
+html[data-high-contrast="true"] button:focus-visible,
+html[data-high-contrast="true"] input:focus-visible,
+html[data-high-contrast="true"] textarea:focus-visible {
+  outline: 3px solid #00ffff !important;
+  outline-offset: 2px !important;
+}
+
+html[data-high-contrast="true"] mark,
+html[data-high-contrast="true"] .diff-inserted {
+  background-color: #003300 !important;
+  color: #55ff55 !important;
+  border: 1px solid #55ff55 !important;
+}
+
+html[data-high-contrast="true"] .diff-deleted {
+  background-color: #330000 !important;
+  color: #ff5555 !important;
+  border: 1px solid #ff5555 !important;
+}
+
+/* ==========================================================================
+   ESTILO DE REVISÕES WORDPRESS (DIFF HIGHLIGHTS)
+   ========================================================================== */
+.diff-deleted {
+  background-color: #fee2e2;
+  color: #991b1b;
+  text-decoration: line-through;
+  padding: 0.125rem 0.35rem;
+  border-radius: 0.25rem;
+  margin: 0 0.125rem;
+  font-weight: 500;
+  border: 1px solid #fca5a5;
+}
+
+.diff-inserted {
+  background-color: #dcfce7;
+  color: #166534;
+  padding: 0.125rem 0.35rem;
+  border-radius: 0.25rem;
+  margin: 0 0.125rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #86efac;
+}
+
+/* Print CSS */
+@media print {
+  header, footer, nav, .no-print, button {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt !important;
+  }
+  .print-only {
+    display: block !important;
+  }
 }

@@ -1,0 +1,82 @@
+[
+  {
+    "expressao": "outrossim",
+    "problema": "Vocábulo anacrônico e desgastado.",
+    "substituicoes": ["igualmente", "também", "além disso", "da mesma forma"],
+    "categoria": "vocabulary",
+    "posicao": "geral",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "vimos, através desta, solicitar",
+    "problema": "Chavão de uso contínuo, absolutamente dispensável.",
+    "substituicoes": ["Solicitamos", "Pedimos"],
+    "categoria": "concision",
+    "posicao": "introducao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "vimos por meio desta",
+    "problema": "Fórmula burocrática prolixa e óbvia.",
+    "substituicoes": ["Informamos", "Solicitamos", "Comunicamos"],
+    "categoria": "concision",
+    "posicao": "introducao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "venho, pelo presente, solicitar",
+    "problema": "Já que ausente não se solicita nada, 'pelo presente' torna-se óbvio e dispensável.",
+    "substituicoes": ["Solicito"],
+    "categoria": "concision",
+    "posicao": "introducao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "acusamos o recebimento de",
+    "problema": "Atualmente não se utiliza mais o verbo 'acusar' nesse contexto na redação oficial.",
+    "substituicoes": ["Confirmamos o recebimento de", "Recebemos"],
+    "categoria": "vocabulary",
+    "posicao": "introducao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "acusamos o recebimento",
+    "problema": "Atualmente não se utiliza mais o verbo 'acusar' nesse contexto na redação oficial.",
+    "substituicoes": ["Confirmamos o recebimento", "Recebemos"],
+    "categoria": "vocabulary",
+    "posicao": "introducao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "reiteramos os protestos de elevada estima e consideração",
+    "problema": "Clássico chavão anacrônico, abolido pelas normas modernas de redação oficial.",
+    "substituicoes": ["Agradecemos a colaboração", "Contamos com seu apoio", "Atenciosamente"],
+    "categoria": "official-standard",
+    "posicao": "conclusao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "protestos de elevada estima e consideração",
+    "problema": "Fecho anacrônico e desgastado.",
+    "substituicoes": ["Atenciosamente", "Cordialmente"],
+    "categoria": "official-standard",
+    "posicao": "conclusao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "sem mais para o momento",
+    "problema": "Indica de maneira rude e brusca que não se tem mais nada a acrescentar.",
+    "substituicoes": ["Atenciosamente", "Cordialmente"],
+    "categoria": "official-standard",
+    "posicao": "conclusao",
+    "fonte": "Unicamp - Chavões"
+  },
+  {
+    "expressao": "sendo só o que se apresenta para o momento",
+    "problema": "Frase de fecho antiquada e inadequada.",
+    "substituicoes": ["Atenciosamente", "Cordialmente"],
+    "categoria": "official-standard",
+    "posicao": "conclusao",
+    "fonte": "Unicamp - Chavões"
+  }
+]

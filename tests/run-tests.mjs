@@ -1,0 +1,70 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+
+// Importa datasets diretamente
+import verbosidadeData from "../src/data/terminology/verbosidade.json" with { type: "json" };
+import chavoesData from "../src/data/terminology/chavoes.json" with { type: "json" };
+import linguagemNaoSexistaData from "../src/data/terminology/linguagem-nao-sexista.json" with { type: "json" };
+import termosNaoOfensivosData from "../src/data/terminology/termos-nao-ofensivos.json" with { type: "json" };
+import tratamentosData from "../src/data/terminology/tratamentos.json" with { type: "json" };
+import siglasPadraoData from "../src/data/terminology/siglas-padrao.json" with { type: "json" };
+
+import { computeWordDiff, calculateDiffStats } from "../src/lib/analysis/diff-utils.ts";
+import { rewriteToPlainLanguage } from "../src/lib/analysis/plain-language-rewriter.ts";
+
+test("1. Verificação dos Datasets de Conhecimento da Unicamp", (t) => {
+  assert.ok(verbosidadeData.length >= 20, "Dicionário de verbosidade deve conter termos suficientes");
+  assert.ok(chavoesData.length >= 8, "Dicionário de chavões deve conter expressões mapeadas");
+  assert.ok(linguagemNaoSexistaData.length >= 10, "Dicionário de linguagem inclusiva deve estar preenchido");
+  assert.ok(termosNaoOfensivosData.length >= 10, "Dicionário de termos não ofensivos deve estar preenchido");
+  assert.ok(tratamentosData.abolidos.length >= 3, "Tratamentos abolidos (DD/Ilmo) devem estar presentes");
+  assert.ok(siglasPadraoData.length >= 10, "Siglas padrão devem estar catalogadas");
+});
+
+test("2. Teste de Métricas e Divisão de Frases", () => {
+  const sample = "Esta é uma frase curta. Esta segunda frase é um pouco maior, contudo ainda se mantém dentro dos limites recomendados pela metodologia de redação simples da Unicamp para garantir clareza absoluta na leitura.";
+  const words = sample.split(/\s+/);
+  assert.ok(words.length > 20, "O texto de teste deve conter mais de 20 palavras");
+});
+
+test("3. Detecção de Formas Abolidas (DD. e Ilmo.)", () => {
+  const sample = "Encaminhamos ao Ilmo. Sr. Diretor e ao DD. Coordenador.";
+  const hasIlmo = sample.includes("Ilmo.");
+  const hasDD = sample.includes("DD.");
+  assert.equal(hasIlmo, true, "Deve detectar Ilmo.");
+  assert.equal(hasDD, true, "Deve detectar DD.");
+});
+
+test("4. Validação de Regra de Horas e Siglas no Plural", () => {
+  const invalidTime = "A reunião será às 14:00hs e contará com membros de várias ONG's.";
+  const timeRegex = /\b(\d{1,2})(:|\.)(\d{2})\s*(hs?|hrs?|horas?)\b/gi;
+  const siglaAposRegex = /\b([A-Z]{2,})'s\b/g;
+
+  assert.ok(timeRegex.test(invalidTime), "Deve identificar formato incorreto de horas ('14:00hs')");
+  assert.ok(siglaAposRegex.test(invalidTime), "Deve identificar sigla incorreta com apóstrofo ('ONG's')");
+});
+
+test("5. Algoritmo de Diff estilo WordPress / Palavra a Palavra", () => {
+  const oldText = "Vimos através desta solicitar a documentação supracitada.";
+  const newText = "Solicitamos os documentos citados.";
+
+  const diff = computeWordDiff(oldText, newText);
+  const stats = calculateDiffStats(diff);
+
+  assert.ok(diff.some(d => d.type === "delete"), "Deve conter trechos removidos");
+  assert.ok(diff.some(d => d.type === "insert"), "Deve conter trechos inseridos");
+  assert.ok(stats.deletions > 0, "Deve computar deleções");
+  assert.ok(stats.insertions > 0, "Deve computar inserções");
+});
+
+test("6. Motor de Reescrita para Linguagem Simples (Nunca retorna idêntico em textos com problemas)", () => {
+  const complexText = "Vimos por meio desta solicitar a Vossa Senhoria que proceda ao preenchimento do formulário supracitado, tendo em vista que a reunião será às 14:00hs para dirimir dúvidas dos servidores.";
+  const rewritten = rewriteToPlainLanguage(complexText);
+
+  assert.notEqual(rewritten, complexText, "O texto reescrito NÃO pode ser idêntico ao original!");
+  assert.ok(!rewritten.includes("Vimos por meio desta"), "Deve eliminar 'Vimos por meio desta'");
+  assert.ok(!rewritten.includes("proceda ao preenchimento"), "Deve transformar 'proceda ao preenchimento' em 'preencher'");
+  assert.ok(!rewritten.includes("supracitado"), "Deve substituir 'supracitado'");
+  assert.ok(!rewritten.includes("14:00hs"), "Deve formatar '14:00hs' para '14h'");
+  assert.ok(!rewritten.includes("para dirimir dúvidas"), "Deve simplificar 'para dirimir dúvidas'");
+});

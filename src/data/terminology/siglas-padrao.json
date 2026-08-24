@@ -1,0 +1,86 @@
+[
+  {
+    "sigla": "Unicamp",
+    "extenso": "Universidade Estadual de Campinas",
+    "tipo": "acronimo",
+    "grafiaCorreta": "Unicamp",
+    "observacao": "Mais de 3 letras pronunciáveis como palavra: apenas inicial maiúscula."
+  },
+  {
+    "sigla": "Educorp",
+    "extenso": "Escola de Educação Corporativa",
+    "tipo": "acronimo",
+    "grafiaCorreta": "Educorp",
+    "observacao": "Pronunciável: inicial maiúscula."
+  },
+  {
+    "sigla": "Anvisa",
+    "extenso": "Agência Nacional de Vigilância Sanitária",
+    "tipo": "acronimo",
+    "grafiaCorreta": "Anvisa",
+    "observacao": "Mais de 3 letras pronunciáveis como palavra."
+  },
+  {
+    "sigla": "Anac",
+    "extenso": "Agência Nacional de Aviação Civil",
+    "tipo": "acronimo",
+    "grafiaCorreta": "Anac",
+    "observacao": "Pronunciável: inicial maiúscula."
+  },
+  {
+    "sigla": "DGA",
+    "extenso": "Diretoria Geral de Administração",
+    "tipo": "sigla",
+    "grafiaCorreta": "DGA",
+    "observacao": "Até 3 letras: todas maiúsculas."
+  },
+  {
+    "sigla": "CGU",
+    "extenso": "Coordenadoria Geral da Universidade",
+    "tipo": "sigla",
+    "grafiaCorreta": "CGU",
+    "observacao": "Até 3 letras: todas maiúsculas."
+  },
+  {
+    "sigla": "DAC",
+    "extenso": "Diretoria Acadêmica",
+    "tipo": "sigla",
+    "grafiaCorreta": "DAC",
+    "observacao": "Até 3 letras: todas maiúsculas."
+  },
+  {
+    "sigla": "IBGE",
+    "extenso": "Instituto Brasileiro de Geografia e Estatística",
+    "tipo": "sigla",
+    "grafiaCorreta": "IBGE",
+    "observacao": "Mais de 3 letras soletradas: todas maiúsculas."
+  },
+  {
+    "sigla": "INSS",
+    "extenso": "Instituto Nacional do Seguro Social",
+    "tipo": "sigla",
+    "grafiaCorreta": "INSS",
+    "observacao": "Mais de 3 letras soletradas: todas maiúsculas."
+  },
+  {
+    "sigla": "TCESP",
+    "extenso": "Tribunal de Contas do Estado de São Paulo",
+    "tipo": "sigla",
+    "grafiaCorreta": "TCESP",
+    "observacao": "Soletrada: todas maiúsculas."
+  },
+  {
+    "sigla": "IPTU",
+    "extenso": "Imposto Predial e Territorial Urbano",
+    "tipo": "sigla",
+    "grafiaCorreta": "IPTU",
+    "observacao": "Soletrada: todas maiúsculas."
+  },
+  {
+    "sigla": "CNPq",
+    "extenso": "Conselho Nacional de Desenvolvimento Científico e Tecnológico",
+    "tipo": "sigla",
+    "grafiaCorreta": "CNPq",
+    "observacao": "Grafia mista consagrada para evitar conflito."
+  }
+]

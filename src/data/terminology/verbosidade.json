@@ -1,0 +1,226 @@
+[
+  {
+    "termo": "supracitado",
+    "alternativas": ["citado", "mencionado anteriormente"],
+    "explicacao": "Uso de vocabulário rebuscado que pode ser simplificado.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "acima citado",
+    "alternativas": ["citado", "mencionado"],
+    "explicacao": "Expressão redundante e excessivamente formal.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "encarecemos a V.S.ª",
+    "alternativas": ["solicitamos", "pedimos"],
+    "explicacao": "Fórmula cerimoniosa e arcaica.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "encarecemos a Vossa Senhoria",
+    "alternativas": ["solicitamos", "pedimos"],
+    "explicacao": "Fórmula cerimoniosa e arcaica.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "somos de opinião que",
+    "alternativas": ["acreditamos que", "consideramos que", "entendemos que"],
+    "explicacao": "Expressão prolixa para emitir posicionamento.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "temos em nosso poder",
+    "alternativas": ["recebemos", "temos"],
+    "explicacao": "Expressão antiquada que denota posse desnecessariamente formal.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "temos a informar que",
+    "alternativas": ["informamos que"],
+    "explicacao": "Verbosidade desnecessária; use diretamente o verbo principal.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "o assunto em epígrafe",
+    "alternativas": ["o assunto citado", "o tema em questão", "o assunto"],
+    "explicacao": "Jargão burocrático de difícil compreensão para o público geral.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "levamos a seu conhecimento",
+    "alternativas": ["informamos", "comunicamos"],
+    "explicacao": "Construção indireta que pode ser simplificada.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "causou-nos espécie",
+    "alternativas": ["causou-nos estranheza", "surpreendeu-nos"],
+    "explicacao": "Expressão arcaica pouco compreensível.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "consternou-nos profundamente",
+    "alternativas": ["lamentamos profundamente"],
+    "explicacao": "Expressão rebuscada que pode ser dita com maior naturalidade.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "devido ao fato de que",
+    "alternativas": ["porque", "já que", "como", "devido a"],
+    "explicacao": "Locução conjuntiva prolixa.",
+    "categoria": "concision",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "para dirimir dúvidas",
+    "alternativas": ["para esclarecer dúvidas", "para tirar dúvidas"],
+    "explicacao": "Uso de verbo rebuscado ('dirimir') dispensável.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "precípua",
+    "alternativas": ["principal", "fundamental", "essencial"],
+    "explicacao": "Palavra rara e rebuscada.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "precípuo",
+    "alternativas": ["principal", "fundamental", "essencial"],
+    "explicacao": "Palavra rara e rebuscada.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "destarte",
+    "alternativas": ["desta forma", "assim", "portanto"],
+    "explicacao": "Conectivo arcaico.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "dessarte",
+    "alternativas": ["desta forma", "assim", "portanto"],
+    "explicacao": "Conectivo arcaico.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "aprazada",
+    "alternativas": ["no prazo", "fixada", "limite"],
+    "explicacao": "Termo formal dispensável.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "aprazado",
+    "alternativas": ["no prazo", "fixado", "limite"],
+    "explicacao": "Termo formal dispensável.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "desiderato colimado",
+    "alternativas": ["objetivo", "meta pretendida"],
+    "explicacao": "Expressão de extremo rebuscamento que prejudica a clareza.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "aproveitando o ensejo, anexamos",
+    "alternativas": ["anexamos"],
+    "explicacao": "Fórmula introdutória desnecessária.",
+    "categoria": "concision",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "via de regra",
+    "alternativas": ["geralmente", "em geral"],
+    "explicacao": "Pode ser substituído por expressão mais direta.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "antecipadamente somos gratos",
+    "alternativas": ["agradecemos", "agradeço"],
+    "explicacao": "Fórmula prolixa de agradecimento.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Verbosidade"
+  },
+  {
+    "termo": "proceder ao preenchimento",
+    "alternativas": ["preencher"],
+    "explicacao": "Nominalização desnecessária. Prefira o verbo de ação direta.",
+    "categoria": "clarity",
+    "fonte": "Unicamp - Escreva"
+  },
+  {
+    "termo": "proceder à verificação",
+    "alternativas": ["verificar"],
+    "explicacao": "Nominalização desnecessária. Prefira o verbo de ação direta.",
+    "categoria": "clarity",
+    "fonte": "Unicamp - Escreva"
+  },
+  {
+    "termo": "proceder à análise",
+    "alternativas": ["analisar"],
+    "explicacao": "Nominalização desnecessária. Prefira o verbo de ação direta.",
+    "categoria": "clarity",
+    "fonte": "Unicamp - Escreva"
+  },
+  {
+    "termo": "proceder com a entrega",
+    "alternativas": ["entregar"],
+    "explicacao": "Nominalização desnecessária. Prefira o verbo de ação direta.",
+    "categoria": "clarity",
+    "fonte": "Unicamp - Escreva"
+  },
+  {
+    "termo": "fazer a realização",
+    "alternativas": ["realizar"],
+    "explicacao": "Substantivo que atua como verbo. Use o verbo direto.",
+    "categoria": "clarity",
+    "fonte": "Unicamp - Escreva"
+  },
+  {
+    "termo": "concomitantemente",
+    "alternativas": ["ao mesmo tempo", "simultaneamente"],
+    "explicacao": "Palavra longa e complexa; prefira formas simples.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Exemplos práticos"
+  },
+  {
+    "termo": "subsidiariamente",
+    "alternativas": ["de forma secundária", "em segundo plano"],
+    "explicacao": "Jargão técnico-jurídico que dificulta a leitura leiga.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Exemplos práticos"
+  },
+  {
+    "termo": "peticionar",
+    "alternativas": ["entrar com uma ação", "solicitar formalmente"],
+    "explicacao": "Jargão jurídico pouco conhecido pelo público geral.",
+    "categoria": "jargon",
+    "fonte": "Unicamp - Exemplos práticos"
+  },
+  {
+    "termo": "expertise",
+    "alternativas": ["especialista", "conhecimento técnico", "experiência"],
+    "explicacao": "Estrangeirismo dispensável quando há termo equivalente em português.",
+    "categoria": "vocabulary",
+    "fonte": "Unicamp - Exemplos práticos"
+  }
+]
