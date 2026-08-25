@@ -1,101 +1,221 @@
 import { AnalysisInput, Finding } from "@/types/analysis";
-import { AIAnalysisOutput, AIExplainOutput, AIRewriteOutput, LanguageModelProvider } from "./provider";
-import { SYSTEM_PROMPT_ANALYSIS, buildAnalysisUserPrompt, buildRewriteUserPrompt } from "./prompts";
+import { AIAnalysisOutput, AIExplainOutput, AIRewriteOutput, LanguageModelProvider, RewriteOptions } from "./provider";
+import {
+  SYSTEM_PROMPT_ANALYSIS,
+  buildAnalysisUserPrompt,
+  buildRewriteUserPrompt,
+  buildSegmentRewritePrompt
+} from "./prompts";
 import { MockLanguageModelProvider } from "./mock-provider";
-import { rewriteToPlainLanguage } from "@/lib/analysis/plain-language-rewriter";
+import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "@/lib/analysis/plain-language-rewriter";
 
 export class GeminiLanguageModelProvider implements LanguageModelProvider {
   private apiKey: string;
-  private model: string;
+  private primaryModel: string;
   private fallback: MockLanguageModelProvider;
+  private candidateModels: string[];
 
-  constructor(apiKey: string, model: string = "gemini-1.5-flash") {
+  constructor(apiKey: string, model: string = "gemini-2.0-flash") {
     this.apiKey = apiKey;
-    this.model = model;
+    this.primaryModel = model;
+    this.candidateModels = Array.from(new Set([model, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]));
     this.fallback = new MockLanguageModelProvider();
   }
 
-  async analyzeText(input: AnalysisInput, deterministicFindings: Finding[]): Promise<AIAnalysisOutput> {
+  private cleanJsonResponse(rawText: string): any {
     try {
-      const prompt = `${SYSTEM_PROMPT_ANALYSIS}\n\n${buildAnalysisUserPrompt(input)}\n\nFormato de Resposta (JSON estrito):\n{\n  "additionalFindings": [\n    {\n      "category": "clarity" | "concision" | "sentence" | "vocabulary" | "inclusivity" | "instruction" | "formatting",\n      "severity": "info" | "suggestion" | "warning" | "critical",\n      "originalText": "trecho exato do texto",\n      "explanation": "por que precisa melhorar segundo a Unicamp",\n      "recommendation": "o que fazer",\n      "suggestedText": "sugestão de substituição"\n    }\n  ],\n  "rewrittenText": "versão integral em linguagem simples"\n}`;
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.3
-          }
-        })
-      });
-
-      if (!response.ok) {
-        console.warn("Gemini API error, falling back to mock provider:", response.statusText);
-        return this.fallback.analyzeText(input, deterministicFindings);
+      let cleaned = rawText.trim();
+      // Remove delimitadores de código markdown (```json ... ```)
+      if (cleaned.startsWith("```")) {
+        cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
       }
-
-      const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) return this.fallback.analyzeText(input, deterministicFindings);
-
-      const parsed = JSON.parse(rawText);
-      const findings: Finding[] = (parsed.additionalFindings || []).map((f: any, idx: number) => ({
-        id: `ai-${idx + 1}`,
-        category: f.category || "clarity",
-        severity: f.severity || "suggestion",
-        originalText: f.originalText || "",
-        explanation: f.explanation || "",
-        recommendation: f.recommendation || "",
-        suggestedText: f.suggestedText,
-        source: {
-          title: "Análise por IA (baseada nas diretrizes Unicamp)",
-          url: "https://linguagemsimples.unicamp.br/",
-          type: "ai"
-        }
-      }));
-
-      // Se a IA retornar texto idêntico, aplica o motor de reescrita da Unicamp
-      const aiRewritten = parsed.rewrittenText;
-      const finalRewritten = (aiRewritten && aiRewritten.trim() !== input.text.trim())
-        ? aiRewritten.trim()
-        : rewriteToPlainLanguage(input.text);
-
-      return {
-        findings,
-        rewrittenText: finalRewritten
-      };
+      return JSON.parse(cleaned);
     } catch (e) {
-      console.error("Error in GeminiLanguageModelProvider, using fallback:", e);
-      return this.fallback.analyzeText(input, deterministicFindings);
+      // Tenta encontrar o primeiro objeto JSON no texto
+      const firstBrace = rawText.indexOf("{");
+      const lastBrace = rawText.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        try {
+          return JSON.parse(rawText.substring(firstBrace, lastBrace + 1));
+        } catch (inner) {}
+      }
+      throw e;
     }
   }
 
-  async rewriteText(input: AnalysisInput): Promise<AIRewriteOutput> {
+  private async callGemini(systemPrompt: string, userPrompt: string, isJson: boolean = false): Promise<string> {
+    let lastError: any = null;
+
+    for (const model of this.candidateModels) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              system_instruction: {
+                parts: [{ text: systemPrompt }]
+              },
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: userPrompt }]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                ...(isJson ? { responseMimeType: "application/json" } : {})
+              }
+            })
+          }
+        );
+
+        if (!response.ok) {
+          const errBody = await response.text();
+          console.warn(`[Gemini API] Falha no modelo ${model} (${response.status}):`, errBody);
+          lastError = new Error(`Gemini API ${response.status}: ${errBody}`);
+          continue; // Tenta o próximo modelo candidato
+        }
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text && text.trim()) {
+          return text.trim();
+        }
+      } catch (err: any) {
+        console.warn(`[Gemini API] Erro de conexão com ${model}:`, err.message);
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error("Não foi possível obter resposta de nenhum modelo Gemini");
+  }
+
+  async analyzeText(
+    input: AnalysisInput,
+    deterministicFindings: Finding[],
+    unicampBaseRewrite?: string
+  ): Promise<AIAnalysisOutput> {
+    const baseRewrite = unicampBaseRewrite || rewriteToPlainLanguage(input.text);
+
     try {
-      const prompt = `${SYSTEM_PROMPT_ANALYSIS}\n\n${buildRewriteUserPrompt(input)}`;
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3 }
-        })
-      });
+      const userPrompt = buildAnalysisUserPrompt(input, deterministicFindings, baseRewrite);
+      const rawResponse = await this.callGemini(SYSTEM_PROMPT_ANALYSIS, userPrompt, true);
+      const parsed = this.cleanJsonResponse(rawResponse);
 
-      if (!response.ok) return this.fallback.rewriteText(input);
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (text && text.trim() !== input.text.trim()) {
-        return { rewrittenText: text.trim() };
+      // 1. Mapeamento e refinamento de sugestões para os achados determinísticos da Unicamp
+      const deterministicMap = new Map<string, string>();
+      if (Array.isArray(parsed.deterministicSuggestions)) {
+        for (const ds of parsed.deterministicSuggestions) {
+          if (ds.originalText && ds.suggestedText) {
+            deterministicMap.set(ds.originalText.trim().toLowerCase(), ds.suggestedText.trim());
+          }
+        }
       }
 
-      return { rewrittenText: rewriteToPlainLanguage(input.text) };
+      for (const df of deterministicFindings) {
+        const key = df.originalText.trim().toLowerCase();
+        let aiSuggestion = deterministicMap.get(key);
+
+        // Se não houver correspondência exata, busca por inclusão em deterministicSuggestions
+        if (!aiSuggestion && deterministicMap.size > 0) {
+          for (const [dKey, dVal] of deterministicMap.entries()) {
+            if (key.includes(dKey) || dKey.includes(key)) {
+              aiSuggestion = dVal;
+              break;
+            }
+          }
+        }
+
+        // Se ainda não encontrou, busca em additionalFindings
+        if (!aiSuggestion && Array.isArray(parsed.additionalFindings)) {
+          const match = parsed.additionalFindings.find((af: any) =>
+            af && af.originalText && (
+              af.originalText.trim().toLowerCase() === key ||
+              key.includes(af.originalText.trim().toLowerCase()) ||
+              af.originalText.trim().toLowerCase().includes(key)
+            )
+          );
+          if (match && match.suggestedText) {
+            aiSuggestion = match.suggestedText.trim();
+          }
+        }
+
+        if (aiSuggestion && aiSuggestion !== df.originalText) {
+          df.suggestedText = aiSuggestion;
+        } else if (!df.suggestedText || df.suggestedText === df.originalText) {
+          df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
+        }
+      }
+
+
+      // 2. Achados adicionais identificados contextualmente pela IA
+      const rawAdditional: any[] = Array.isArray(parsed.additionalFindings) ? parsed.additionalFindings : [];
+      const additionalFindings: Finding[] = rawAdditional
+        .filter(f => f && f.originalText && f.originalText.trim())
+        .map((f: any, idx: number) => {
+          const original = f.originalText.trim();
+          const candidateSuggestion = (f.suggestedText || "").trim();
+          const suggestedText = guaranteeDifferentSuggestion(original, candidateSuggestion);
+
+          return {
+            id: `ai-${idx + 1}`,
+            category: f.category || "clarity",
+            severity: f.severity || "suggestion",
+            originalText: original,
+            explanation: f.explanation || "Construção que pode ser simplificada segundo as diretrizes da Unicamp.",
+            recommendation: f.recommendation || "Utilize ordem direta e termos simples e diretos.",
+            suggestedText,
+            source: {
+              title: "Análise Neural (baseada nas diretrizes Unicamp)",
+              url: "https://linguagemsimples.unicamp.br/",
+              type: "ai" as const
+            }
+          };
+        });
+
+      // 3. Reescrita integral com garantia de simplificação
+      let aiRewritten = (parsed.rewrittenText || "").trim();
+      const finalRewritten = guaranteeDifferentSuggestion(input.text, aiRewritten || baseRewrite);
+
+      return {
+        findings: additionalFindings,
+        rewrittenText: finalRewritten
+      };
     } catch (e) {
-      return this.fallback.rewriteText(input);
+      console.error("[Gemini Provider] Erro no analyzeText, utilizando motor Unicamp enriquecido:", e);
+      return this.fallback.analyzeText(input, deterministicFindings, baseRewrite);
+    }
+  }
+
+  async rewriteText(input: AnalysisInput, options?: RewriteOptions): Promise<AIRewriteOutput> {
+    const isSegmentMode = options?.mode === "segment";
+    const baseRewrite = options?.unicampBase || rewriteToPlainLanguage(input.text);
+
+    try {
+      let prompt: string;
+      if (isSegmentMode) {
+        prompt = buildSegmentRewritePrompt(
+          input.text,
+          options?.segmentIssue,
+          options?.targetAudience || input.targetAudience,
+          options?.unicampBase
+        );
+      } else {
+        prompt = buildRewriteUserPrompt(input, baseRewrite);
+      }
+
+      const rawText = await this.callGemini(SYSTEM_PROMPT_ANALYSIS, prompt, false);
+      let cleaned = rawText.replace(/^["']|["']$/g, "").trim();
+
+      const finalRewritten = guaranteeDifferentSuggestion(input.text, cleaned || baseRewrite);
+      return { rewrittenText: finalRewritten };
+    } catch (e) {
+      console.error("[Gemini Provider] Erro no rewriteText, utilizando motor Unicamp enriquecido:", e);
+      return this.fallback.rewriteText(input, options);
     }
   }
 
@@ -103,3 +223,4 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
     return this.fallback.explainFinding(finding);
   }
 }
+

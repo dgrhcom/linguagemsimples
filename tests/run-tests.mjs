@@ -10,8 +10,9 @@ import tratamentosData from "../src/data/terminology/tratamentos.json" with { ty
 import siglasPadraoData from "../src/data/terminology/siglas-padrao.json" with { type: "json" };
 
 import { computeWordDiff, calculateDiffStats } from "../src/lib/analysis/diff-utils.ts";
-import { rewriteToPlainLanguage } from "../src/lib/analysis/plain-language-rewriter.ts";
+import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "../src/lib/analysis/plain-language-rewriter.ts";
 import { runDeterministicAnalysis } from "../src/lib/analysis/deterministic-engine.ts";
+import { MockLanguageModelProvider } from "../src/lib/ai/mock-provider.ts";
 
 test("1. Verificação dos Datasets de Conhecimento da Unicamp", (t) => {
   assert.ok(verbosidadeData.length >= 20, "Dicionário de verbosidade deve conter termos suficientes");
@@ -64,7 +65,7 @@ test("6. Motor de Reescrita para Linguagem Simples (Nunca retorna idêntico em t
 
   assert.notEqual(rewritten, complexText, "O texto reescrito NÃO pode ser idêntico ao original!");
   assert.ok(!rewritten.includes("Vimos por meio desta"), "Deve eliminar 'Vimos por meio desta'");
-  assert.ok(!rewritten.includes("proceda ao preenchimento"), "Deve transformar 'proceda ao preenchimento' em 'preencher'");
+  assert.ok(!rewritten.includes("proceda ao preenchimento"), "Deve transformar 'proceda ao preenchimento' em 'preencha'");
   assert.ok(!rewritten.includes("supracitado"), "Deve substituir 'supracitado'");
   assert.ok(!rewritten.includes("14:00hs"), "Deve formatar '14:00hs' para '14h'");
   assert.ok(!rewritten.includes("para dirimir dúvidas"), "Deve simplificar 'para dirimir dúvidas'");
@@ -90,3 +91,47 @@ test("8. Geração Automática de Sugestões para Frases Longas", () => {
   assert.ok(lengthFinding.suggestedText, "Deve fornecer suggestedText automático para frase longa");
   assert.notEqual(lengthFinding.suggestedText, lengthFinding.originalText, "A sugestão deve ser diferente da frase original longa");
 });
+
+test("9. Garantia de Sugestão Diferente e Inversão de Voz Passiva", () => {
+  const passive = "Esta reunião foi convocada pela diretoria a fim de que os colaboradores pudessem discutir.";
+  const suggestion = guaranteeDifferentSuggestion(passive);
+
+  assert.notEqual(suggestion, passive, "A sugestão deve ser diferente do original passivo");
+  assert.ok(suggestion.includes("a diretoria convocou") || suggestion.includes("para que"), "Deve aplicar voz ativa e conectivo simples");
+});
+
+test("10. Complementaridade do Motor Unicamp + Provedor em Modo Segmento", async () => {
+  const provider = new MockLanguageModelProvider();
+  const segment = "É preciso entregar uma manifestação escrita a próprio punho declarando seu endereço de residência domiciliar.";
+  
+  const result = await provider.rewriteText(
+    { text: segment, documentType: "general" },
+    { mode: "segment", segmentIssue: "Expressão prolixa e arcaica" }
+  );
+
+  assert.ok(result.rewrittenText, "Deve retornar reescrita");
+  assert.notEqual(result.rewrittenText, segment, "A reescrita de trecho NÃO pode ser idêntica ao original");
+  assert.ok(result.rewrittenText.includes("declaração") || result.rewrittenText.includes("residência"), "Deve conter termos simplificados");
+});
+
+test("11. Preservação Estrita de URLs, Domínios e E-mails", () => {
+  const sampleWithUrls = "Mais informações no site www.dgrh.unicamp.br ou pelo e-mail dgrh@unicamp.br e arquivo anexo.pdf.";
+  const rewritten = rewriteToPlainLanguage(sampleWithUrls);
+
+  assert.ok(rewritten.includes("www.dgrh.unicamp.br"), "A URL www.dgrh.unicamp.br deve permanecer intacta sem espaços ou maiúsculas internas");
+  assert.ok(!rewritten.includes("www. Dgrh"), "NÃO pode conter 'www. Dgrh'");
+  assert.ok(rewritten.includes("dgrh@unicamp.br"), "O e-mail deve permanecer intacto");
+  assert.ok(rewritten.includes("anexo.pdf"), "A extensão do arquivo deve permanecer intacta");
+});
+
+test("12. Reescrita de Preâmbulos Normativos e Frases Longas de Instrução Normativa", () => {
+  const preamble = "Considerando que o reconhecimento pela Unicamp do tempo de serviço público exercido pelos servidores estatutários subordinados ao Regime Próprio sob condições especiais dependerá de comprovação, o Coordenador da Diretoria Geral de Recursos Humanos, no uso de suas atribuições, baixa a seguinte Instrução Normativa:";
+  const rewritten = rewriteToPlainLanguage(preamble);
+
+  assert.notEqual(rewritten, preamble, "O preâmbulo reescrito NÃO pode ser idêntico ao original!");
+  assert.ok(!rewritten.includes("no uso de suas atribuições"), "Deve eliminar a fórmula burocrática 'no uso de suas atribuições'");
+  assert.ok(rewritten.includes("publica"), "Deve conter verbo direto como 'publica'");
+  assert.ok(!rewritten.includes("dependerá de comprovação"), "Deve simplificar 'dependerá de comprovação'");
+});
+
+

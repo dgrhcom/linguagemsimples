@@ -16,8 +16,16 @@ export interface AIExplainOutput {
   sourceReference: string;
 }
 
+export interface RewriteOptions {
+  mode?: "full" | "segment";
+  segmentIssue?: string;
+  unicampBase?: string;
+  targetAudience?: string;
+}
+
 export interface LanguageModelProvider {
-  analyzeText(input: AnalysisInput, deterministicFindings: Finding[]): Promise<AIAnalysisOutput>;
-  rewriteText(input: AnalysisInput): Promise<AIRewriteOutput>;
+  analyzeText(input: AnalysisInput, deterministicFindings: Finding[], unicampBaseRewrite?: string): Promise<AIAnalysisOutput>;
+  rewriteText(input: AnalysisInput, options?: RewriteOptions): Promise<AIRewriteOutput>;
   explainFinding(finding: Finding): Promise<AIExplainOutput>;
 }
+

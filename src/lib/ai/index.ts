@@ -27,5 +27,35 @@ export function getLanguageModelProvider(customConfig?: { provider?: "gemini" | 
   return new MockLanguageModelProvider();
 }
 
+export function getStoredAiHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    const provider = localStorage.getItem("preferred_ai_provider");
+    const geminiKey = localStorage.getItem("custom_gemini_api_key");
+    const openaiKey = localStorage.getItem("custom_openai_api_key");
+
+    if (provider === "openai" && openaiKey && openaiKey.trim()) {
+      return { "x-ai-provider": "openai", "x-ai-api-key": openaiKey.trim() };
+    }
+
+    if (provider === "gemini" && geminiKey && geminiKey.trim()) {
+      return { "x-ai-provider": "gemini", "x-ai-api-key": geminiKey.trim() };
+    }
+
+    // Se houver chave do Gemini salva, prioriza Gemini
+    if (geminiKey && geminiKey.trim()) {
+      return { "x-ai-provider": "gemini", "x-ai-api-key": geminiKey.trim() };
+    }
+
+    // Se houver chave da OpenAI salva
+    if (openaiKey && openaiKey.trim()) {
+      return { "x-ai-provider": "openai", "x-ai-api-key": openaiKey.trim() };
+    }
+  } catch (e) {}
+  return {};
+}
+
+
 export * from "./provider";
 export * from "./prompts";
+

@@ -31,7 +31,14 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
 
   const handleSave = () => {
     try {
-      localStorage.setItem("preferred_ai_provider", provider);
+      let finalProvider = provider;
+      if (geminiKey.trim() && provider === "offline") {
+        finalProvider = "gemini";
+      } else if (openaiKey.trim() && provider === "offline") {
+        finalProvider = "openai";
+      }
+
+      localStorage.setItem("preferred_ai_provider", finalProvider);
       if (geminiKey.trim()) {
         localStorage.setItem("custom_gemini_api_key", geminiKey.trim());
       } else {
@@ -45,6 +52,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
       }
 
       setSavedSuccess(true);
+
       if (onSaved) onSaved();
       setTimeout(() => {
         setSavedSuccess(false);

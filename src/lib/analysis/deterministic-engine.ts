@@ -1,6 +1,6 @@
 import type { Finding, FindingLocation, AnalysisInput } from "../../types/analysis";
 import { splitSentences } from "./text-metrics";
-import { rewriteToPlainLanguage } from "./plain-language-rewriter";
+import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "./plain-language-rewriter";
 
 // Importação dos datasets de conhecimento
 import verbosidadeData from "../../data/terminology/verbosidade.json" with { type: "json" };
@@ -21,31 +21,27 @@ function generateShortSentenceSuggestion(sentence: string): string {
   }
 
   const conjunctions: [RegExp, string][] = [
-    [/,\s*(pois|porque|uma vez que|haja vista que|tendo em vista que)\s+/gi, ". Isso porque "],
+    [/,\s*(pois|porque|uma vez que|haja vista que|tendo em vista que|visto que)\s+/gi, ". Isso ocorreu porque "],
     [/,\s*(mas|porém|contudo|todavia|entretanto)\s+/gi, ". No entanto, "],
     [/,\s*(sendo que|de modo que|de forma que)\s+/gi, ". Assim, "],
-    [/,\s*(portanto|por conseguinte)\s+/gi, ". Portanto, "],
-    [/,\s*(bem como|além do mais)\s+/gi, ". Além disso, "],
+    [/,\s*(portanto|por conseguinte|logo)\s+/gi, ". Portanto, "],
+    [/,\s*(bem como|além do mais|e também)\s+/gi, ". Além disso, "],
+    [/,\s*(a fim de que|para que)\s+/gi, ". Para isso, "],
+    [/,\s*cabendo\s+a[o|a]?\s+/gi, ". Essa tarefa cabe a "],
     [/;\s*/g, ". "]
   ];
 
   for (const [conj, replacement] of conjunctions) {
-    if (conj.test(sentence)) {
-      rewritten = sentence.replace(conj, replacement);
+    if (conj.test(rewritten)) {
+      rewritten = rewritten.replace(conj, replacement);
       break;
-    }
-  }
-
-  if (rewritten === sentence && sentence.includes(",")) {
-    const commaIndex = sentence.indexOf(",");
-    if (commaIndex > 15 && commaIndex < sentence.length - 15) {
-      rewritten = sentence.slice(0, commaIndex) + "." + sentence.slice(commaIndex + 1);
     }
   }
 
   rewritten = rewritten.replace(/([.!?])\s*([a-záéíóúç])/g, (m, p, l) => `${p} ${l.toUpperCase()}`);
   return rewriteToPlainLanguage(rewritten);
 }
+
 
 /**
  * Motor determinístico de análise de regras da Unicamp.
@@ -82,7 +78,7 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
         location: startIndex >= 0 ? { startIndex, endIndex, sentenceIndex: sIndex } : undefined,
         explanation: `Esta frase possui ${s.wordCount} palavras. A recomendação da Unicamp é evitar frases com mais de 20 palavras para não sobrecarregar a leitura.`,
         recommendation: "Divida este período em duas ou mais frases curtas com ordem direta (sujeito + verbo + complemento).",
-        suggestedText: suggested !== s.sentence ? suggested : undefined,
+        suggestedText: suggested,
         source: {
           title: "Linguagem Simples Unicamp - Escreva",
           url: "https://linguagemsimples.unicamp.br/escreva/",
@@ -92,6 +88,7 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
       });
     }
   }
+
 
   // 2. REGRA: Verbosidade e Expressões Arcaicas
   for (const item of verbosidadeData) {

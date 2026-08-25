@@ -43,14 +43,15 @@ export async function POST(req: NextRequest) {
     // 1. Métricas de texto
     const metrics = calculateTextMetrics(input.text);
 
-    // 2. Motor Determinístico
+    // 2. Motor Determinístico Unicamp e Base de Reescrita
     const deterministicFindings = runDeterministicAnalysis(input);
+    const unicampBaseRewrite = rewriteToPlainLanguage(input.text);
 
-    // 3. Análise e Reescrita por IA
+    // 3. Análise e Reescrita Complementar por IA (utilizando a base da Unicamp)
     const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
-    const aiOutput = await aiProvider.analyzeText(input, deterministicFindings);
+    const aiOutput = await aiProvider.analyzeText(input, deterministicFindings, unicampBaseRewrite);
 
-    // 4. Consolidação de Findings (evitando duplicatas exatas)
+    // 4. Consolidação de Findings (evitando duplicatas exatas e garantindo sugestões em todas)
     const combinedFindings: Finding[] = [...deterministicFindings];
     for (const af of aiOutput.findings) {
       const alreadyExists = combinedFindings.some(
@@ -61,13 +62,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Garante que todo apontamento possua suggestedText preenchido e simplificado
+    for (const f of combinedFindings) {
+      if (!f.suggestedText || f.suggestedText === f.originalText) {
+        f.suggestedText = rewriteToPlainLanguage(f.originalText);
+      }
+    }
+
     // 5. Cálculo do Score Multidimensional
     const score = calculateAnalysisScore(metrics, combinedFindings);
 
-    // 6. Validação Semântica e Garantia de Reescrita
-    let rewritten = aiOutput.rewrittenText;
-    if (!rewritten || rewritten.trim() === input.text.trim()) {
-      rewritten = rewriteToPlainLanguage(input.text);
+    // 6. Validação Semântica e Garantia de Reescrita Integral
+    let rewritten = (aiOutput.rewrittenText || "").trim();
+    if (!rewritten || rewritten === input.text.trim()) {
+      rewritten = unicampBaseRewrite;
     }
     const semanticValidation = validateSemanticPreservation(input.text, rewritten);
 
@@ -82,6 +90,7 @@ export async function POST(req: NextRequest) {
       semanticValidation,
       appliedRuleVersion: "Unicamp-LSI-v1.0"
     };
+
 
     return NextResponse.json(result);
   } catch (error: any) {

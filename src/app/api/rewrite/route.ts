@@ -34,16 +34,21 @@ export async function POST(req: NextRequest) {
     const customProvider = (req.headers.get("x-ai-provider") as any) || undefined;
 
     const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
+    const unicampBase = rewriteToPlainLanguage(text);
+    const input: AnalysisInput = { text, documentType, targetAudience, textGoal };
 
     if (mode === "segment") {
-      // Reescrita de trecho específico
-      const prompt = buildSegmentRewritePrompt(text, segmentIssue || "Tornar o trecho simples, direto e inclusivo", targetAudience);
-      const input: AnalysisInput = { text, documentType, targetAudience, textGoal };
-      const output = await aiProvider.rewriteText(input);
+      // Reescrita de trecho/frase específica com IA utilizando a base da Unicamp
+      const output = await aiProvider.rewriteText(input, {
+        mode: "segment",
+        segmentIssue,
+        unicampBase,
+        targetAudience
+      });
 
       let rewritten = output.rewrittenText.trim();
       if (!rewritten || rewritten === text.trim()) {
-        rewritten = rewriteToPlainLanguage(text);
+        rewritten = unicampBase;
       }
 
       return NextResponse.json({
@@ -52,13 +57,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Reescrita Completa
-    const input: AnalysisInput = { text, documentType, targetAudience, textGoal };
-    const output = await aiProvider.rewriteText(input);
+    // Reescrita Completa com IA utilizando a base da Unicamp
+    const output = await aiProvider.rewriteText(input, {
+      mode: "full",
+      unicampBase,
+      targetAudience
+    });
     
     let rewritten = output.rewrittenText.trim();
-    if (!rewritten || rewritten === text.trim()) {
-      rewritten = rewriteToPlainLanguage(input.text);
+    if (!rewritten || rewritten === input.text.trim()) {
+      rewritten = unicampBase;
     }
     const semanticValidation = validateSemanticPreservation(input.text, rewritten);
 
@@ -68,6 +76,8 @@ export async function POST(req: NextRequest) {
       mode: "full"
     });
   } catch (error: any) {
+    console.error("API /api/rewrite error:", error);
     return NextResponse.json({ error: "Erro ao gerar reescrita", message: error.message }, { status: 500 });
   }
 }
+

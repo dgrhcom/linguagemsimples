@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Finding } from "@/types/analysis";
 import { AlertTriangle, AlertCircle, Info, Check, Undo2, BookOpen, HelpCircle, Sparkles, EyeOff } from "lucide-react";
+import { getStoredAiHeaders } from "@/lib/ai";
 
 interface FindingCardProps {
   finding: Finding;
@@ -51,7 +52,10 @@ export function FindingCard({
       try {
         const res = await fetch("/api/explain", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...getStoredAiHeaders()
+          },
           body: JSON.stringify({ finding })
         });
         if (res.ok) {
@@ -70,27 +74,12 @@ export function FindingCard({
     if (aiRewriting) return;
     setAiRewriting(true);
     try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      try {
-        const provider = localStorage.getItem("preferred_ai_provider") || "offline";
-        if (provider === "gemini") {
-          const key = localStorage.getItem("custom_gemini_api_key");
-          if (key) {
-            headers["x-ai-provider"] = "gemini";
-            headers["x-ai-api-key"] = key;
-          }
-        } else if (provider === "openai") {
-          const key = localStorage.getItem("custom_openai_api_key");
-          if (key) {
-            headers["x-ai-provider"] = "openai";
-            headers["x-ai-api-key"] = key;
-          }
-        }
-      } catch (e) {}
-
       const res = await fetch("/api/rewrite", {
         method: "POST",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+          ...getStoredAiHeaders()
+        },
         body: JSON.stringify({
           text: finding.originalText,
           mode: "segment",
@@ -111,6 +100,7 @@ export function FindingCard({
       setAiRewriting(false);
     }
   };
+
 
   return (
     <div
@@ -171,7 +161,7 @@ export function FindingCard({
           </div>
         </div>
 
-        {finding.suggestedText ? (
+        {finding.suggestedText && finding.suggestedText.trim() !== finding.originalText.trim() ? (
           <div className="flex items-start gap-2 text-xs">
             <span className="text-black font-black shrink-0 w-24">Como ficará:</span>
             <div className="font-mono text-black bg-[#fef7eb] border border-[#FBB040] px-2.5 py-1.5 rounded-xl flex-1 font-bold">
