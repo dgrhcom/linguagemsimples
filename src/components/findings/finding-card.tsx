@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Finding } from "@/types/analysis";
 import { AlertTriangle, AlertCircle, Info, Check, Undo2, BookOpen, HelpCircle, Sparkles, EyeOff, Pencil, X, RotateCcw, CheckCheck, SpellCheck } from "lucide-react";
 import { getStoredAiHeaders } from "@/lib/ai";
+import { generateShortSentenceSuggestion } from "@/lib/analysis/deterministic-engine";
 
 interface FindingCardProps {
   finding: Finding;
@@ -31,16 +32,24 @@ export function FindingCard({
   const [detailedData, setDetailedData] = useState<{ whyItMatters?: string; pedagogicalTip?: string } | null>(null);
   const [aiRewriting, setAiRewriting] = useState(false);
 
+  // Calcula a sugestão efetiva com fallback garantido para sentenças longas
+  const effectiveSuggestion = (finding.suggestedText && finding.suggestedText.trim() !== finding.originalText.trim())
+    ? finding.suggestedText
+    : (finding.category === "sentence" || finding.originalText.split(/\s+/).filter(Boolean).length > 20)
+      ? generateShortSentenceSuggestion(finding.originalText)
+      : (finding.suggestedText || "");
+
   // Estados para edição personalizada da sugestão
   const [isEditing, setIsEditing] = useState(false);
-  const [customDraft, setCustomDraft] = useState(finding.suggestedText || "");
+  const [customDraft, setCustomDraft] = useState(effectiveSuggestion || "");
   const [isCustomized, setIsCustomized] = useState(false);
 
   useEffect(() => {
     if (!isEditing) {
-      setCustomDraft(finding.suggestedText || "");
+      setCustomDraft(effectiveSuggestion || "");
     }
-  }, [finding.suggestedText, isEditing]);
+  }, [effectiveSuggestion, isEditing]);
+
 
   const isApplied = finding.status === "applied";
   const isIgnored = finding.status === "ignored";
@@ -258,27 +267,42 @@ export function FindingCard({
               </button>
             </div>
           </div>
-        ) : finding.suggestedText && finding.suggestedText.trim() !== finding.originalText.trim() ? (
+        ) : effectiveSuggestion ? (
           <div className="flex items-start gap-2 text-xs">
             <div className="shrink-0 w-24 pt-1 flex items-center justify-between">
               <span className="text-black font-black">Como ficará:</span>
             </div>
             <div className="font-mono text-black bg-[#fef7eb] border border-[#FBB040] px-2.5 py-1.5 rounded-xl flex-1 font-bold flex items-start justify-between gap-2 group">
-              <span className="flex-1">{finding.suggestedText}</span>
+              <span className="flex-1">{effectiveSuggestion}</span>
               {!isApplied && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCustomDraft(finding.suggestedText || "");
-                    setIsEditing(true);
-                  }}
-                  className="text-[11px] font-bold text-zinc-700 hover:text-black bg-white hover:bg-zinc-100 border border-zinc-300 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-all shrink-0 shadow-2xs"
-                  title="Editar ou personalizar o texto desta sugestão"
-                >
-                  <Pencil className="w-3 h-3 text-zinc-700" />
-                  <span>Editar</span>
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCustomDraft(effectiveSuggestion);
+                      setIsEditing(true);
+                    }}
+                    className="text-[11px] font-bold text-zinc-700 hover:text-black bg-white hover:bg-zinc-100 border border-zinc-300 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-all shadow-2xs"
+                    title="Editar ou personalizar o texto desta sugestão"
+                  >
+                    <Pencil className="w-3 h-3 text-zinc-700" />
+                    <span>Editar</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAiRewriteSegment();
+                    }}
+                    disabled={aiRewriting}
+                    className="text-[11px] font-black bg-[#18181b] text-[#FBB040] hover:bg-black px-2.5 py-0.5 rounded-lg flex items-center gap-1 transition-all shadow-2xs disabled:opacity-50"
+                    title="Reescrever com Inteligência Artificial"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#FBB040]" />
+                    <span>{aiRewriting ? "Gerando..." : "IA"}</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -352,12 +376,12 @@ export function FindingCard({
             </button>
           )}
 
-          {!isApplied && !isEditing && finding.suggestedText && (
+          {!isApplied && !isEditing && effectiveSuggestion && (
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                setCustomDraft(finding.suggestedText || "");
+                setCustomDraft(effectiveSuggestion);
                 setIsEditing(true);
               }}
               className="text-xs text-zinc-700 hover:text-black font-bold flex items-center gap-1 transition-colors"
@@ -398,12 +422,12 @@ export function FindingCard({
             </button>
           )}
 
-          {!isApplied && !isEditing && finding.suggestedText && onApplySuggestion && (
+          {!isApplied && !isEditing && effectiveSuggestion && onApplySuggestion && (
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onApplySuggestion(finding);
+                onApplySuggestion({ ...finding, suggestedText: effectiveSuggestion });
               }}
               className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-[#111111] px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all border border-[#d98a1a]"
             >
@@ -413,6 +437,7 @@ export function FindingCard({
           )}
         </div>
       </div>
+
 
 
       {/* Fundamentação Pedagógica Expandida */}
