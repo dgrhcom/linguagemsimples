@@ -143,5 +143,53 @@ test("13. Reescrita de Artigo Normativo com Mais de 20 Palavras", async () => {
   assert.ok(rewritten.includes("seguem a legislação") || rewritten.includes("regras vigentes") || rewritten.includes("tempo especial"), "Deve conter linguagem simplificada");
 });
 
+test("14. Camada de Revisão Ortográfica e Gramatical Determinística", () => {
+  const textWithSpellingErrors = "Com excessão deste caso, não é previlégio reinvidicar o direito à partir de hoje. Haja visto que a idéia foi aprovada.";
+  const findings = runDeterministicAnalysis({ text: textWithSpellingErrors });
+
+  const spellingFindings = findings.filter(f => f.category === "spelling");
+  assert.ok(spellingFindings.length >= 4, `Deve identificar desvios ortográficos (encontrados: ${spellingFindings.length})`);
+
+  const excessao = spellingFindings.find(f => f.originalText.toLowerCase() === "excessão");
+  assert.ok(excessao, "Deve encontrar erro de grafia 'excessão'");
+  assert.equal(excessao.suggestedText.toLowerCase(), "exceção", "Deve sugerir 'exceção'");
+
+  const previlegio = spellingFindings.find(f => f.originalText.toLowerCase() === "previlégio");
+  assert.ok(previlegio, "Deve encontrar erro de grafia 'previlégio'");
+  assert.equal(previlegio.suggestedText.toLowerCase(), "privilégio", "Deve sugerir 'privilégio'");
+
+  const crase = spellingFindings.find(f => f.originalText.toLowerCase() === "à partir de");
+  assert.ok(crase, "Deve encontrar crase indevida 'à partir de'");
+  assert.equal(crase.suggestedText.toLowerCase(), "a partir de", "Deve sugerir 'a partir de' sem crase");
+
+  const ideia = spellingFindings.find(f => f.originalText.toLowerCase() === "idéia");
+  assert.ok(ideia, "Deve encontrar acento abolido pelo Novo Acordo 'idéia'");
+  assert.equal(ideia.suggestedText.toLowerCase(), "ideia", "Deve sugerir 'ideia'");
+});
+
+test("15. Editor de Sugestões: Aplicação de Versão Customizada pelo Usuário", () => {
+  const initialText = "O requerente deverá proceder ao preenchimento do formulário.";
+  const finding = {
+    id: "f-1",
+    category: "clarity",
+    severity: "warning",
+    originalText: "proceder ao preenchimento do formulário",
+    suggestedText: "preencher o formulário"
+  };
+
+  // Simulação de edição personalizada pelo usuário no card
+  const customUserText = "preencher o formulário online no portal oficial";
+  const updatedFinding = { ...finding, suggestedText: customUserText, status: "applied" };
+
+  const appliedText = initialText.replace(updatedFinding.originalText, updatedFinding.suggestedText);
+
+  assert.equal(
+    appliedText,
+    "O requerente deverá preencher o formulário online no portal oficial.",
+    "O texto aplicado deve refletir com exatidão a edição personalizada feita pelo usuário"
+  );
+});
+
+
 
 

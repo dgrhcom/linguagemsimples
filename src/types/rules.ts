@@ -27,7 +27,10 @@ export type FindingCategory =
   | "jargon"
   | "official-standard"
   | "instruction"
-  | "formatting";
+  | "formatting"
+  | "spelling"
+  | "grammar";
+
 
 export interface Rule {
   id: string;

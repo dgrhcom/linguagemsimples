@@ -1,0 +1,194 @@
+[
+  {
+    "termoIncorreto": "excessão",
+    "correcao": "exceção",
+    "motivo": "Grafia incorreta. A palavra 'exceção' é grafada com 'xc' e 'ç'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "excessões",
+    "correcao": "exceções",
+    "motivo": "Grafia incorreta. O plural é 'exceções'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "previlégio",
+    "correcao": "privilégio",
+    "motivo": "Grafia incorreta. A forma padrão no VOLP é 'privilégio' (com 'i').",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "previlégios",
+    "correcao": "privilégios",
+    "motivo": "Grafia incorreta. O plural é 'privilégios'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "reinvidicar",
+    "correcao": "reivindicar",
+    "motivo": "Grafia incorreta. A forma correta é 'reivindicar' (sem 'n' na primeira sílaba).",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "reinvidicação",
+    "correcao": "reivindicação",
+    "motivo": "Grafia incorreta. A forma correta é 'reivindicação'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "reinvidicações",
+    "correcao": "reivindicações",
+    "motivo": "Grafia incorreta. A forma correta é 'reivindicações'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "beneficiente",
+    "correcao": "beneficente",
+    "motivo": "Grafia incorreta. A forma correta é 'beneficente' (sem 'i' após o 'c').",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "subscritado",
+    "correcao": "subscrito",
+    "motivo": "Particípio incorreto. O particípio do verbo subscrever é 'subscrito'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "paralizar",
+    "correcao": "paralisar",
+    "motivo": "Grafia incorreta. Palavras derivadas de 'paralisia' mantêm 's'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "paralisação",
+    "correcao": "paralisação",
+    "motivo": "Grafia padrão.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "analizar",
+    "correcao": "analisar",
+    "motivo": "Grafia incorreta. Palavras derivadas de 'análise' mantêm 's'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "pesquiza",
+    "correcao": "pesquisa",
+    "motivo": "Grafia incorreta. A forma correta é 'pesquisa' com 's'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "concerteza",
+    "correcao": "com certeza",
+    "motivo": "A locução adverbial deve ser escrita separadamente: 'com certeza'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "porisso",
+    "correcao": "por isso",
+    "motivo": "A locução conjuntiva deve ser escrita separadamente: 'por isso'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "derrepente",
+    "correcao": "de repente",
+    "motivo": "A locução adverbial deve ser escrita separadamente: 'de repente'.",
+    "categoria": "ortografia"
+  },
+  {
+    "termoIncorreto": "à partir de",
+    "correcao": "a partir de",
+    "motivo": "Crase indevida antes de verbo no infinitivo. Escreva 'a partir de' sem acento grave.",
+    "categoria": "crase"
+  },
+  {
+    "termoIncorreto": "à prazo",
+    "correcao": "a prazo",
+    "motivo": "Não ocorre crase antes de palavras masculinas. Escreva 'a prazo'.",
+    "categoria": "crase"
+  },
+  {
+    "termoIncorreto": "à todos",
+    "correcao": "a todos",
+    "motivo": "Não ocorre crase antes de pronome indefinido masculino. Escreva 'a todos'.",
+    "categoria": "crase"
+  },
+  {
+    "termoIncorreto": "à qualquer",
+    "correcao": "a qualquer",
+    "motivo": "Não ocorre crase antes de pronome indefinido. Escreva 'a qualquer'.",
+    "categoria": "crase"
+  },
+  {
+    "termoIncorreto": "a nível de",
+    "correcao": "em nível de",
+    "motivo": "Expressão incorreta na norma culta. Prefira 'em nível de' ou 'no âmbito de'.",
+    "categoria": "regencia"
+  },
+  {
+    "termoIncorreto": "haja visto",
+    "correcao": "haja vista",
+    "motivo": "A expressão invariável correta é 'haja vista'.",
+    "categoria": "concordancia"
+  },
+  {
+    "termoIncorreto": "menas",
+    "correcao": "menos",
+    "motivo": "A palavra 'menos' é invariável na língua portuguesa.",
+    "categoria": "concordancia"
+  },
+  {
+    "termoIncorreto": "meio dia e meio",
+    "correcao": "meio-dia e meia",
+    "motivo": "O numeral concorda com 'hora': 'meio-dia e meia (hora)'.",
+    "categoria": "concordancia"
+  },
+  {
+    "termoIncorreto": "fazem anos que",
+    "correcao": "faz anos que",
+    "motivo": "O verbo 'fazer' indicando tempo decorrido é impessoal e fica no singular ('faz anos').",
+    "categoria": "concordancia"
+  },
+  {
+    "termoIncorreto": "fazem meses que",
+    "correcao": "faz meses que",
+    "motivo": "O verbo 'fazer' indicando tempo decorrido é impessoal: 'faz meses'.",
+    "categoria": "concordancia"
+  },
+  {
+    "termoIncorreto": "haviam muitas pessoas",
+    "correcao": "havia muitas pessoas",
+    "motivo": "O verbo 'haver' no sentido de existir é impessoal e não flexiona no plural ('havia muitas pessoas').",
+    "categoria": "concordancia"
+  },
+  {
+    "termoIncorreto": "idéia",
+    "correcao": "ideia",
+    "motivo": "O Novo Acordo Ortográfico aboliu o acento dos ditongos abertos 'ei' e 'oi' em palavras paroxítonas.",
+    "categoria": "acentuacao"
+  },
+  {
+    "termoIncorreto": "jibóia",
+    "correcao": "jiboia",
+    "motivo": "O Novo Acordo Ortográfico aboliu o acento do ditongo aberto 'oi' em paroxítonas.",
+    "categoria": "acentuacao"
+  },
+  {
+    "termoIncorreto": "vôo",
+    "correcao": "voo",
+    "motivo": "O Novo Acordo Ortográfico aboliu o acento circunflexo nos hiatos 'oo'.",
+    "categoria": "acentuacao"
+  },
+  {
+    "termoIncorreto": "lêem",
+    "correcao": "leem",
+    "motivo": "O Novo Acordo Ortográfico aboliu o acento circunflexo nos verbos com 'ee' dobrado.",
+    "categoria": "acentuacao"
+  },
+  {
+    "termoIncorreto": "vêem",
+    "correcao": "veem",
+    "motivo": "O Novo Acordo Ortográfico aboliu o acento circunflexo nos verbos com 'ee' dobrado.",
+    "categoria": "acentuacao"
+  }
+]

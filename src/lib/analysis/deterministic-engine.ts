@@ -9,10 +9,16 @@ import linguagemNaoSexistaData from "../../data/terminology/linguagem-nao-sexist
 import termosNaoOfensivosData from "../../data/terminology/termos-nao-ofensivos.json" with { type: "json" };
 import tratamentosData from "../../data/terminology/tratamentos.json" with { type: "json" };
 import siglasPadraoData from "../../data/terminology/siglas-padrao.json" with { type: "json" };
+import ortografiaData from "../../data/terminology/ortografia.json" with { type: "json" };
 
 function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
+
+function createPortugueseWordRegex(term: string): RegExp {
+  return new RegExp(`(?<=^|[^a-záéíóúçãõâêîôûA-ZÁÉÍÓÚÇÃÕÂÊÎÔÛ])${escapeRegExp(term)}(?=[^a-záéíóúçãõâêîôûA-ZÁÉÍÓÚÇÃÕÂÊÎÔÛ]|$)`, "gi");
+}
+
 
 function generateShortSentenceSuggestion(sentence: string): string {
   let rewritten = rewriteToPlainLanguage(sentence);
@@ -294,5 +300,41 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
     });
   }
 
+  // 9. REGRA: Revisão Ortográfica, Gramatical, Acentuação e Crase
+  for (const item of ortografiaData) {
+    const regex = createPortugueseWordRegex(item.termoIncorreto);
+    let match: RegExpExecArray | null;
+
+
+    while ((match = regex.exec(text)) !== null) {
+      const matchText = match[0];
+      const startIndex = match.index;
+      const endIndex = startIndex + matchText.length;
+
+      // Preserva maiúscula inicial se o texto original estiver em maiúscula
+      let suggestion = item.correcao;
+      if (matchText[0] === matchText[0].toUpperCase() && matchText[0] !== matchText[0].toLowerCase()) {
+        suggestion = suggestion.charAt(0).toUpperCase() + suggestion.slice(1);
+      }
+
+      addFinding({
+        ruleId: "unicamp-spelling",
+        category: "spelling",
+        severity: "warning",
+        originalText: matchText,
+        location: { startIndex, endIndex },
+        explanation: item.motivo,
+        recommendation: `Substitua '${matchText}' pela forma correta '${suggestion}'.`,
+        suggestedText: suggestion,
+        source: {
+          title: "Vocabulário Ortográfico da Língua Portuguesa (VOLP) & ABNT",
+          url: "https://linguagemsimples.unicamp.br/escreva/",
+          type: "unicamp"
+        }
+      });
+    }
+  }
+
   return findings;
 }
+

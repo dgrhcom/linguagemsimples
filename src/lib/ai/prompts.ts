@@ -14,7 +14,8 @@ DIRETRIZES FUNDAMENTAIS DA METODOLOGIA UNICAMP:
 7. Termos não discriminatórios e não capacitistas: "pessoa com deficiência" (nunca "portador" ou "deficiente"), "reunião sem pauta" (nunca "samba do crioulo doido"), "difamar" (nunca "denegrir").
 8. Padronização oficial: Use "Senhor(a)" ou "Vossa Senhoria". NUNCA use "DD." ou "Ilmo." (abolidos). Horas no padrão "14h" ou "14h30". Siglas no plural como "ONGs" (sem apóstrofo).
 9. Estruturação visual: Use listas com marcadores para enumerações, prazos ou requisitos.
-10. PRESERVAÇÃO SEMÂNTICA ABSOLUTA: NUNCA altere ou invente números, datas, prazos, leis, valores monetários, nomes próprios ou obrigações do texto original.
+10. Revisão Ortográfica e Gramatical: Identifique desvios gramaticais, erros de grafia pelo VOLP, concordância verbal/nominal, acentuação gráfica (Novo Acordo) e uso indevido de crase. Classifique esses apontamentos como 'spelling'.
+11. PRESERVAÇÃO SEMÂNTICA ABSOLUTA: NUNCA altere ou invente números, datas, prazos, leis, valores monetários, nomes próprios ou obrigações do texto original.
 
 REGRA MANDATÓRIA DE COMPLEMENTARIDADE E QUALIDADE:
 - As sugestões de reescrita ('suggestedText') e a reescrita integral ('rewrittenText') DEVEM ser reescritas completas e gramaticais, com sentido próprio, e NUNCA cortes abruptos ou idênticas às frases originais.`;
@@ -50,8 +51,10 @@ ${findingsSummary || "Nenhum apontamento determinístico inicial."}
 
 --- SUAS TAREFAS COMO IA COMPLEMENTAR ---
 1. Para cada problema da Unicamp listado acima, forneça uma sugestão clara e direta de reescrita ('suggestedText') diferente do original.
-2. Identifique problemas contextuais adicionais que o motor de regras não detectou (ex: voz passiva complexa, inversões sintáticas, tom distante ou burocrático, parágrafos densos sem marcadores).
-3. Produza a versão integral reescrita ('rewrittenText') em Linguagem Simples e Inclusiva, refinando o rascunho da Unicamp para torná-lo natural, fluido, com frases curtas (<=20 palavras), ordem direta e voz ativa.
+2. Identifique problemas contextuais adicionais que o motor de regras não detectou:
+   - Voz passiva complexa, inversões sintáticas, tom burocrático.
+   - Desvios ortográficos, concordância verbal/nominal, crase e acentuação (categoria 'spelling').
+3. Produza a versão integral reescrita ('rewrittenText') em Linguagem Simples e Inclusiva, refinando o rascunho da Unicamp para torná-lo natural, correto ortograficamente, fluido, com frases curtas (<=20 palavras), ordem direta e voz ativa.
 
 Formato de Resposta (JSON estrito):
 {
@@ -63,17 +66,18 @@ Formato de Resposta (JSON estrito):
   ],
   "additionalFindings": [
     {
-      "category": "clarity" | "concision" | "sentence" | "vocabulary" | "inclusivity" | "instruction" | "formatting",
+      "category": "clarity" | "concision" | "sentence" | "vocabulary" | "inclusivity" | "instruction" | "formatting" | "spelling" | "grammar",
       "severity": "info" | "suggestion" | "warning" | "critical",
       "originalText": "trecho exato do texto original",
-      "explanation": "por que precisa melhorar segundo a metodologia Unicamp",
-      "recommendation": "o que fazer de acordo com as regras Unicamp",
-      "suggestedText": "proposta simplificada de reescrita (NUNCA idêntica ao original)"
+      "explanation": "por que precisa melhorar segundo a metodologia Unicamp e normas cultas",
+      "recommendation": "o que fazer de acordo com as regras Unicamp e gramaticais",
+      "suggestedText": "proposta simplificada e correta de reescrita (NUNCA idêntica ao original)"
     }
   ],
   "rewrittenText": "versão integral reescrita em linguagem simples, fluida e inclusiva"
 }`;
 }
+
 
 export function buildRewriteUserPrompt(input: AnalysisInput, unicampBaseRewrite?: string): string {
   return `Reescreva o texto a seguir aplicando rigorosamente os princípios de Linguagem Simples e Inclusiva da Unicamp.

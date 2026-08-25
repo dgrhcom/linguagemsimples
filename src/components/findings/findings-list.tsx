@@ -109,23 +109,46 @@ export function FindingsList({
                 : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
             }`}
           >
-            Todas as Categorias
+            Todas ({findings.length})
           </button>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`text-xs px-3 py-1.5 rounded-xl capitalize transition-colors shrink-0 font-bold ${
-                selectedCategory === cat
-                  ? "bg-[#18181b] text-[#FBB040]"
-                  : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-              }`}
-            >
-              {cat} ({findings.filter(f => f.category === cat).length})
-            </button>
-          ))}
+          {categories.map(cat => {
+            const count = findings.filter(f => f.category === cat).length;
+            const categoryLabels: Record<string, string> = {
+              spelling: "Ortografia & Gramática",
+              grammar: "Gramática",
+              clarity: "Clareza",
+              concision: "Concisão",
+              sentence: "Frases Longas",
+              vocabulary: "Vocabulário",
+              inclusivity: "Inclusão",
+              formatting: "Padronização",
+              jargon: "Jargões",
+              acronym: "Siglas",
+              organization: "Organização",
+              instruction: "Instruções"
+            };
+            const label = categoryLabels[cat] || cat;
+
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`text-xs px-3 py-1.5 rounded-xl transition-colors shrink-0 font-bold flex items-center gap-1 ${
+                  selectedCategory === cat
+                    ? "bg-[#18181b] text-[#FBB040]"
+                    : cat === "spelling"
+                    ? "bg-[#fef7eb] border border-[#FBB040] text-black hover:bg-[#fdecd0]"
+                    : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                }`}
+              >
+                <span>{label}</span>
+                <span className="text-[11px] opacity-80">({count})</span>
+              </button>
+            );
+          })}
         </div>
       </div>
+
 
       {/* Lista de Cards */}
       <div className="space-y-3">
