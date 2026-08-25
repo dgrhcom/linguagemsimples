@@ -1,4 +1,10 @@
-import { EssentialFact, SemanticValidation } from "@/types/analysis";
+import { SemanticValidation } from "@/types/analysis";
+
+export interface EssentialFact {
+  type: "date" | "number" | "legal_ref" | "deadline";
+  value: string;
+  context: string;
+}
 
 /**
  * Extrai fatos essenciais do texto (datas, valores monetários, percentuais, leis, prazos).
@@ -40,7 +46,7 @@ export function extractEssentialFacts(text: string): EssentialFact[] {
     });
   }
 
-  // 4. Prazos específicos (ex: "5 dias", "30 dias úteis", "48 horas")
+  // 4. Prazos específicos
   const deadlineRegex = /\b(\d+\s+(?:dias|dias\s+úteis|meses|anos|horas))\b/gi;
   let dMatch: RegExpExecArray | null;
   while ((dMatch = deadlineRegex.exec(text)) !== null) {
@@ -60,50 +66,90 @@ export function extractEssentialFacts(text: string): EssentialFact[] {
 export function validateSemanticPreservation(originalText: string, rewrittenText: string): SemanticValidation {
   if (!originalText || !rewrittenText) {
     return {
+      isSemanticPreserved: true,
       isValid: true,
       preservationScore: 100,
-      preservedFacts: [],
-      missingFacts: [],
-      warnings: []
+      preservedEntities: [],
+      missingEntities: [],
+      preservedDates: [],
+      missingDates: [],
+      preservedDeadlines: [],
+      missingDeadlines: [],
+      warnings: [],
+      summary: "Todas as entidades e prazos essenciais foram mantidos."
     };
   }
 
   const originalFacts = extractEssentialFacts(originalText);
   if (originalFacts.length === 0) {
     return {
+      isSemanticPreserved: true,
       isValid: true,
       preservationScore: 100,
-      preservedFacts: [],
-      missingFacts: [],
-      warnings: []
+      preservedEntities: [],
+      missingEntities: [],
+      preservedDates: [],
+      missingDates: [],
+      preservedDeadlines: [],
+      missingDeadlines: [],
+      warnings: [],
+      summary: "Todas as informações e referências foram validadas."
     };
   }
 
-  const preservedFacts: EssentialFact[] = [];
-  const missingFacts: EssentialFact[] = [];
+  const preservedDates: string[] = [];
+  const missingDates: string[] = [];
+  const preservedDeadlines: string[] = [];
+  const missingDeadlines: string[] = [];
+  const preservedEntities: string[] = [];
+  const missingEntities: string[] = [];
   const warnings: string[] = [];
 
   const lowerRewritten = rewrittenText.toLowerCase();
 
   for (const fact of originalFacts) {
-    // Limpa pontuação para comparação segura
     const cleanValue = fact.value.toLowerCase().replace(/[^\w\d]/g, " ").replace(/\s+/g, " ").trim();
-    if (lowerRewritten.includes(cleanValue) || lowerRewritten.includes(fact.value.toLowerCase())) {
-      preservedFacts.push(fact);
+    const isPresent = lowerRewritten.includes(cleanValue) || lowerRewritten.includes(fact.value.toLowerCase());
+
+    if (fact.type === "date") {
+      if (isPresent) preservedDates.push(fact.value);
+      else {
+        missingDates.push(fact.value);
+        warnings.push(`A data '${fact.value}' pode ter sido alterada ou omitida na versão simplificada.`);
+      }
+    } else if (fact.type === "deadline") {
+      if (isPresent) preservedDeadlines.push(fact.value);
+      else {
+        missingDeadlines.push(fact.value);
+        warnings.push(`O prazo '${fact.value}' pode ter sido alterado ou omitido.`);
+      }
     } else {
-      missingFacts.push(fact);
-      warnings.push(`O fato essencial '${fact.value}' (${fact.type}) pode ter sido omitido ou alterado na simplificação.`);
+      if (isPresent) preservedEntities.push(fact.value);
+      else {
+        missingEntities.push(fact.value);
+        warnings.push(`A referência '${fact.value}' pode ter sido alterada ou omitida.`);
+      }
     }
   }
 
-  const preservationScore = Math.round((preservedFacts.length / originalFacts.length) * 100);
-  const isValid = missingFacts.length === 0;
+  const totalFacts = originalFacts.length;
+  const missingTotal = missingDates.length + missingDeadlines.length + missingEntities.length;
+  const preservationScore = Math.round(((totalFacts - missingTotal) / totalFacts) * 100);
+  const isValid = missingTotal === 0;
 
   return {
+    isSemanticPreserved: isValid,
     isValid,
     preservationScore,
-    preservedFacts,
-    missingFacts,
-    warnings
+    preservedEntities,
+    missingEntities,
+    preservedDates,
+    missingDates,
+    preservedDeadlines,
+    missingDeadlines,
+    warnings,
+    summary: isValid
+      ? "Preservação Semântica Verificada: todas as datas, prazos e referências essenciais foram mantidos."
+      : `Atenção na Preservação de Fatos (${preservationScore}%): verifique as referências e prazos destacados.`
   };
 }

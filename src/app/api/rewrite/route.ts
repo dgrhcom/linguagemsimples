@@ -28,7 +28,12 @@ export async function POST(req: NextRequest) {
     }
 
     const { text, mode, segmentIssue, documentType, targetAudience, textGoal } = parsed.data;
-    const aiProvider = getLanguageModelProvider();
+
+    // Headers opcionais de API Key enviados pelo cliente
+    const customApiKey = req.headers.get("x-ai-api-key") || undefined;
+    const customProvider = (req.headers.get("x-ai-provider") as any) || undefined;
+
+    const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
 
     if (mode === "segment") {
       // Reescrita de trecho específico
@@ -53,7 +58,7 @@ export async function POST(req: NextRequest) {
     
     let rewritten = output.rewrittenText.trim();
     if (!rewritten || rewritten === text.trim()) {
-      rewritten = rewriteToPlainLanguage(text);
+      rewritten = rewriteToPlainLanguage(input.text);
     }
     const semanticValidation = validateSemanticPreservation(input.text, rewritten);
 

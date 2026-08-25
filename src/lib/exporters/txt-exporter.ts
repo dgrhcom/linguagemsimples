@@ -25,9 +25,9 @@ export function exportToTxt(result: AnalysisResult, mode: "simplified_only" | "f
   lines.push(`3. USAR: ${result.score.pillars.usar.score}/100 - ${result.score.pillars.usar.summary}`);
   lines.push("");
   lines.push("--- MÉTRICAS DO TEXTO ---");
-  lines.push(`Total de Palavras: ${result.metrics.wordCount}`);
-  lines.push(`Total de Frases: ${result.metrics.sentenceCount}`);
-  lines.push(`Média de Palavras por Frase: ${result.metrics.avgWordsPerSentence}`);
+  lines.push(`Total de Palavras: ${result.metrics.wordsCount ?? result.metrics.wordCount ?? 0}`);
+  lines.push(`Total de Frases: ${result.metrics.sentencesCount ?? result.metrics.sentenceCount ?? 0}`);
+  lines.push(`Média de Palavras por Frase: ${result.metrics.avgSentenceLengthWords ?? result.metrics.avgWordsPerSentence ?? 0}`);
   lines.push(`Frases Longas (> 20 palavras): ${result.metrics.longSentencesCount}`);
   lines.push(`Índice Flesch-BR: ${result.metrics.fleschReadingEaseBR}/100`);
   lines.push("");
@@ -38,7 +38,7 @@ export function exportToTxt(result: AnalysisResult, mode: "simplified_only" | "f
     lines.push(`    Explicação: ${f.explanation}`);
     lines.push(`    Recomendação: ${f.recommendation}`);
     if (f.suggestedText) lines.push(`    Sugestão: "${f.suggestedText}"`);
-    lines.push(`    Fonte: ${f.source.title}`);
+    if (f.source?.title) lines.push(`    Fonte: ${f.source.title}`);
     lines.push("");
   });
   lines.push("==================================================================");

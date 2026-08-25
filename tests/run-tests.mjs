@@ -11,6 +11,7 @@ import siglasPadraoData from "../src/data/terminology/siglas-padrao.json" with {
 
 import { computeWordDiff, calculateDiffStats } from "../src/lib/analysis/diff-utils.ts";
 import { rewriteToPlainLanguage } from "../src/lib/analysis/plain-language-rewriter.ts";
+import { runDeterministicAnalysis } from "../src/lib/analysis/deterministic-engine.ts";
 
 test("1. Verificação dos Datasets de Conhecimento da Unicamp", (t) => {
   assert.ok(verbosidadeData.length >= 20, "Dicionário de verbosidade deve conter termos suficientes");
@@ -67,4 +68,25 @@ test("6. Motor de Reescrita para Linguagem Simples (Nunca retorna idêntico em t
   assert.ok(!rewritten.includes("supracitado"), "Deve substituir 'supracitado'");
   assert.ok(!rewritten.includes("14:00hs"), "Deve formatar '14:00hs' para '14h'");
   assert.ok(!rewritten.includes("para dirimir dúvidas"), "Deve simplificar 'para dirimir dúvidas'");
+});
+
+test("7. Preservação Rigorosa de Marcas de Parágrafo e Quebras de Linha", () => {
+  const multiParagraph = "Primeiro parágrafo burocrático com supracitado.\n\nSegundo parágrafo com reunião às 14:00hs.\n\nTerceiro parágrafo.";
+  const rewritten = rewriteToPlainLanguage(multiParagraph);
+
+  const originalParagraphs = multiParagraph.split("\n\n");
+  const rewrittenParagraphs = rewritten.split("\n\n");
+
+  assert.equal(rewrittenParagraphs.length, originalParagraphs.length, "Deve preservar exatamente o número de parágrafos separados por dupla quebra de linha");
+  assert.ok(rewritten.includes("\n\n"), "As quebras de parágrafo NÃO devem ser substituídas por espaços simples");
+});
+
+test("8. Geração Automática de Sugestões para Frases Longas", () => {
+  const longSentenceText = "Informamos a todos os interessados que o processo de submissão de propostas para o presente edital de extensão comunitária da universidade foi prorrogado, tendo em vista que ocorreram instabilidades técnicas significativas no sistema institucional de cadastramento durante o final de semana passado.";
+  const findings = runDeterministicAnalysis({ text: longSentenceText, documentType: "general" });
+
+  const lengthFinding = findings.find(f => f.ruleId === "unicamp-sentence-length");
+  assert.ok(lengthFinding, "Deve identificar frase longa");
+  assert.ok(lengthFinding.suggestedText, "Deve fornecer suggestedText automático para frase longa");
+  assert.notEqual(lengthFinding.suggestedText, lengthFinding.originalText, "A sugestão deve ser diferente da frase original longa");
 });

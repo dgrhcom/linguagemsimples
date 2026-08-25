@@ -120,7 +120,9 @@ export function FullReport({ result }: FullReportProps) {
               {f.suggestedText && (
                 <p className="text-blue-800"><strong className="text-blue-900">Sugestão:</strong> &ldquo;{f.suggestedText}&rdquo;</p>
               )}
-              <div className="text-[10px] text-slate-400 pt-1">Fonte: {f.source.title}</div>
+              {f.source?.title && (
+                <div className="text-[10px] text-slate-400 pt-1">Fonte: {f.source.title}</div>
+              )}
             </div>
           ))}
         </div>
@@ -141,7 +143,7 @@ export function FullReport({ result }: FullReportProps) {
         <div className="border border-slate-200 rounded-xl p-4 text-xs text-slate-600 flex items-center gap-3">
           <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
           <span>
-            Validação Semântica Concluída ({result.semanticValidation.preservationScore}% de preservação): todos os fatos, números, datas e leis foram validados.
+            {result.semanticValidation.summary || `Validação Semântica Concluída (${result.semanticValidation.preservationScore ?? 100}% de preservação): todos os fatos, números, datas e leis foram validados.`}
           </span>
         </div>
       )}

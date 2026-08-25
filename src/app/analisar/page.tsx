@@ -8,24 +8,54 @@ import { FindingsList } from "@/components/findings/findings-list";
 import { ComparisonView } from "@/components/comparison/comparison-view";
 import { FullReport } from "@/components/report/full-report";
 import { ExportModal } from "@/components/export/export-modal";
+import { SettingsModal } from "@/components/layout/settings-modal";
 import { AnalysisInput, AnalysisResult, Finding } from "@/types/analysis";
-import { Sparkles, LayoutDashboard, CheckSquare, GitCompare, FileText, Download, ArrowLeft, CheckCircle2, Wand2 } from "lucide-react";
+import {
+  LayoutDashboard,
+  CheckSquare,
+  GitCompare,
+  FileText,
+  Download,
+  RotateCcw,
+  Sparkles,
+  CheckCircle2,
+  Wand2,
+  Cpu,
+  Settings
+} from "lucide-react";
 
 export default function AnalisarPage() {
-  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [fullRewriting, setFullRewriting] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "findings" | "comparison" | "report">("overview");
+  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "findings" | "comparison" | "report">("overview");
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [aiProviderName, setAiProviderName] = useState<string>("Motor Unicamp (Offline)");
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+  const updateAiProviderDisplay = () => {
+    try {
+      const provider = localStorage.getItem("preferred_ai_provider") || "offline";
+      const geminiKey = localStorage.getItem("custom_gemini_api_key");
+      const openaiKey = localStorage.getItem("custom_openai_api_key");
+
+      if (provider === "gemini" && geminiKey) {
+        setAiProviderName("Google Gemini (Online)");
+      } else if (provider === "openai" && openaiKey) {
+        setAiProviderName("OpenAI GPT (Online)");
+      } else {
+        setAiProviderName("Motor Unicamp (Offline)");
+      }
+    } catch (e) {
+      setAiProviderName("Motor Unicamp (Offline)");
+    }
   };
 
   useEffect(() => {
+    updateAiProviderDisplay();
+
+    // Carrega exemplo se veio da home ou de exemplos
     if (typeof window !== "undefined") {
       const pending = sessionStorage.getItem("pending_analysis");
       if (pending) {
@@ -40,12 +70,29 @@ export default function AnalisarPage() {
     }
   }, []);
 
+  const getAiHeaders = (): Record<string, string> => {
+    try {
+      const provider = localStorage.getItem("preferred_ai_provider") || "offline";
+      if (provider === "gemini") {
+        const key = localStorage.getItem("custom_gemini_api_key");
+        if (key) return { "x-ai-provider": "gemini", "x-ai-api-key": key };
+      } else if (provider === "openai") {
+        const key = localStorage.getItem("custom_openai_api_key");
+        if (key) return { "x-ai-provider": "openai", "x-ai-api-key": key };
+      }
+    } catch (e) {}
+    return {};
+  };
+
   const handleAnalyze = async (input: AnalysisInput) => {
     setLoading(true);
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAiHeaders()
+        },
         body: JSON.stringify(input)
       });
 
@@ -181,61 +228,86 @@ export default function AnalisarPage() {
       findings: result.findings.map(f => ({ ...f, status: "applied" as const }))
     });
 
-    setActiveTab("comparison");
-    showToast("Versão reescrita integralmente por IA aplicada ao texto de trabalho!");
+    showToast("Versão integral em Linguagem Simples aplicada ao texto de trabalho!");
   };
 
-  const handleReset = () => {
+  const handleResetAnalysis = () => {
     setResult(null);
     setSelectedFinding(null);
+    setActiveTab("overview");
   };
 
-  const appliedCount = result?.findings.filter(f => f.status === "applied").length || 0;
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 4000);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Notificação Toast */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Toast de Notificação */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#164e87] text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-blue-400 animate-in fade-in slide-in-from-bottom-3">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#164e87] text-white px-5 py-3 rounded-2xl shadow-xl border border-blue-400 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
       )}
 
-      {!result ? (
-        <div className="space-y-6 max-w-4xl mx-auto">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Avalie e Simplifique seu Texto
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Descubra se sua comunicação está clara, inclusiva e fácil de entender segundo os critérios do projeto Linguagem Simples da Unicamp.
-            </p>
+      {/* Se não houver resultado, exibe o Editor */}
+      {!result && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <div>
+              <h1 className="text-2xl font-black text-[#1c2d42] tracking-tight">
+                Avaliação de Texto em Linguagem Simples
+              </h1>
+              <p className="text-xs text-slate-600 mt-1">
+                Cole sua mensagem, ofício ou relatório para receber diagnóstico multidimensional e propostas de simplificação.
+              </p>
+            </div>
+
+            {/* Status do Provedor de IA */}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-2 transition-all shadow-2xs"
+              title="Configurar Chaves de API de IA"
+            >
+              <Cpu className="w-3.5 h-3.5 text-[#005a87]" />
+              <span>{aiProviderName}</span>
+              <Settings className="w-3 h-3 text-slate-400 ml-1" />
+            </button>
           </div>
 
           <TextEditor onAnalyze={handleAnalyze} isLoading={loading} />
         </div>
-      ) : (
+      )}
+
+      {/* Se houver resultado, exibe o Painel de Análise e Revisão */}
+      {result && (
         <div className="space-y-6">
-          {/* Barra de Ações Superior do Painel de Análise */}
+          {/* Barra Superior de Ações e Abas */}
           <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
             <div className="flex items-center gap-3">
               <button
-                onClick={handleReset}
-                className="text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
+                onClick={handleResetAnalysis}
+                className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors"
+                title="Voltar ao editor e analisar novo texto"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 <span>Nova Análise</span>
               </button>
 
-              <div className="text-xs text-slate-500 hidden sm:block">
-                Documento: <strong className="text-slate-800 capitalize">{result.input.documentType}</strong> • {result.metrics.wordCount} palavras
-                {appliedCount > 0 && (
-                  <span className="ml-2 text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                    {appliedCount} alteração(ões) aceita(s)
-                  </span>
-                )}
-              </div>
+              <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+
+              {/* Status do Provedor */}
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="text-xs font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 border border-slate-200"
+              >
+                <Cpu className="w-3.5 h-3.5 text-[#005a87]" />
+                <span>{aiProviderName}</span>
+              </button>
             </div>
 
             {/* Abas de Navegação */}
@@ -321,16 +393,31 @@ export default function AnalisarPage() {
                       Ver todos os {result.findings.length} apontamentos →
                     </button>
                   </div>
-                  <FindingsList
-                    findings={result.findings.slice(0, 3)}
-                    targetAudience={result.input.targetAudience}
-                    documentType={result.input.documentType}
-                    onApplySuggestion={handleApplySuggestion}
-                    onRevertSuggestion={handleRevertSuggestion}
-                    onIgnoreFinding={handleIgnoreFinding}
-                    onUpdateFindingSuggestion={handleUpdateFindingSuggestion}
-                    onSelectFinding={setSelectedFinding}
-                  />
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-6">
+                      <AnnotatedText
+                        text={result.workingText || result.input.text}
+                        findings={result.findings}
+                        selectedFinding={selectedFinding}
+                        onSelectFinding={setSelectedFinding}
+                      />
+                    </div>
+                    <div className="lg:col-span-6">
+                      <FindingsList
+                        findings={result.findings.slice(0, 5)}
+                        targetAudience={result.input.targetAudience}
+                        documentType={result.input.documentType}
+                        selectedFinding={selectedFinding}
+                        onSelectFinding={setSelectedFinding}
+                        onApplySuggestion={handleApplySuggestion}
+                        onRevertSuggestion={handleRevertSuggestion}
+                        onIgnoreFinding={handleIgnoreFinding}
+                        onUpdateFindingSuggestion={handleUpdateFindingSuggestion}
+                        onApplyAllSuggestions={handleApplyAllSuggestions}
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -338,33 +425,29 @@ export default function AnalisarPage() {
 
           {activeTab === "findings" && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-6 space-y-3">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Texto com Marcações Interativas
+              <div className="lg:col-span-5">
+                <div className="sticky top-28">
+                  <AnnotatedText
+                    text={result.workingText || result.input.text}
+                    findings={result.findings}
+                    selectedFinding={selectedFinding}
+                    onSelectFinding={setSelectedFinding}
+                  />
                 </div>
-                <AnnotatedText
-                  text={result.workingText || result.input.text}
-                  findings={result.findings.filter(f => f.status !== "applied")}
-                  selectedFindingId={selectedFinding?.id}
-                  onSelectFinding={setSelectedFinding}
-                />
               </div>
 
-              <div className="lg:col-span-6 space-y-3">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Apontamentos e Sugestões da Metodologia
-                </div>
+              <div className="lg:col-span-7">
                 <FindingsList
                   findings={result.findings}
                   targetAudience={result.input.targetAudience}
                   documentType={result.input.documentType}
+                  selectedFinding={selectedFinding}
+                  onSelectFinding={setSelectedFinding}
                   onApplySuggestion={handleApplySuggestion}
                   onRevertSuggestion={handleRevertSuggestion}
                   onIgnoreFinding={handleIgnoreFinding}
                   onUpdateFindingSuggestion={handleUpdateFindingSuggestion}
                   onApplyAllSuggestions={handleApplyAllSuggestions}
-                  selectedFindingId={selectedFinding?.id}
-                  onSelectFinding={setSelectedFinding}
                 />
               </div>
             </div>
@@ -375,7 +458,14 @@ export default function AnalisarPage() {
               originalText={result.input.text}
               workingText={result.workingText || result.input.text}
               rewrittenText={result.rewrittenText || result.input.text}
-              semanticValidation={result.semanticValidation}
+              onApplyRewritten={() => {
+                setResult({
+                  ...result,
+                  workingText: result.rewrittenText,
+                  findings: result.findings.map(f => ({ ...f, status: "applied" as const }))
+                });
+                showToast("Versão Simplificada aplicada ao texto de trabalho!");
+              }}
             />
           )}
 
@@ -385,12 +475,19 @@ export default function AnalisarPage() {
 
           {/* Modal de Exportação */}
           <ExportModal
-            result={{
-              ...result,
-              rewrittenText: result.workingText || result.rewrittenText || result.input.text
-            }}
             isOpen={isExportOpen}
             onClose={() => setIsExportOpen(false)}
+            result={result}
+          />
+
+          {/* Modal de Configurações de IA */}
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => {
+              setIsSettingsOpen(false);
+              updateAiProviderDisplay();
+            }}
+            onSaved={updateAiProviderDisplay}
           />
         </div>
       )}

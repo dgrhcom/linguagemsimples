@@ -4,14 +4,12 @@ import linguagemNaoSexistaList from "../../data/terminology/linguagem-nao-sexist
 import termosNaoOfensivosList from "../../data/terminology/termos-nao-ofensivos.json" with { type: "json" };
 
 /**
- * Motor estruturado de reescrita em Linguagem Simples e Inclusiva.
- * Aplica sistematicamente todas as regras e dicionários da Unicamp,
- * reestrutura frases longas, converte voz passiva e elimina burocratês.
+ * Reescreve um parágrafo individual aplicando as regras da Unicamp.
  */
-export function rewriteToPlainLanguage(text: string): string {
-  if (!text || !text.trim()) return text;
+function rewriteSingleParagraph(paragraph: string): string {
+  if (!paragraph || !paragraph.trim()) return paragraph;
 
-  let result = text;
+  let result = paragraph;
 
   // 1. Elimina fórmulas de abertura e fechos burocráticos vazios
   const openingsAndClosings: [RegExp, string][] = [
@@ -32,7 +30,7 @@ export function rewriteToPlainLanguage(text: string): string {
   result = result.replace(/\bIlm[oa]\.\s*Sr[a]?\.\s*/gi, "Senhor(a) ");
   result = result.replace(/\b(Dign[ií]ssim[oa]|Ilustr[ií]ssim[oa])\s+Senhor[a]?\b/gi, "Senhor(a)");
 
-  // 3. Aplicação do Dicionário de Verbosidade da Unicamp
+  // 3. Dicionário de Verbosidade da Unicamp
   for (const item of verbosidadeList) {
     if (!item.termo || !item.alternativas?.length) continue;
     const escaped = item.termo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -40,7 +38,7 @@ export function rewriteToPlainLanguage(text: string): string {
     result = result.replace(regex, item.alternativas[0]);
   }
 
-  // 4. Aplicação do Dicionário de Chavões da Unicamp
+  // 4. Dicionário de Chavões da Unicamp
   for (const item of chavoesList) {
     if (!item.expressao || !item.substituicoes?.length) continue;
     const escaped = item.expressao.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -48,7 +46,7 @@ export function rewriteToPlainLanguage(text: string): string {
     result = result.replace(regex, item.substituicoes[0]);
   }
 
-  // 5. Aplicação do Dicionário de Linguagem Inclusiva / Não-Sexista
+  // 5. Dicionário de Linguagem Inclusiva / Não-Sexista
   for (const item of linguagemNaoSexistaList) {
     if (!item.termoExcludente || !item.alternativas?.length) continue;
     const escaped = item.termoExcludente.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -56,7 +54,7 @@ export function rewriteToPlainLanguage(text: string): string {
     result = result.replace(regex, item.alternativas[0]);
   }
 
-  // 6. Aplicação do Dicionário de Termos Não Ofensivos / Não Capacitistas
+  // 6. Dicionário de Termos Não Ofensivos / Não Capacitistas
   for (const item of termosNaoOfensivosList) {
     if (!item.termoInadequado || !item.alternativas?.length) continue;
     const escaped = item.termoInadequado.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -64,7 +62,7 @@ export function rewriteToPlainLanguage(text: string): string {
     result = result.replace(regex, item.alternativas[0]);
   }
 
-  // 7. Conversão de Expressões Burocráticas e Nominalizações Comuns
+  // 7. Conversão de Expressões Burocráticas e Nominalizações
   const phraseTransformations: [RegExp, string][] = [
     [/\bcom\s+vistas\s+a\b/gi, "para"],
     [/\bcom\s+o\s+intuito\s+de\b/gi, "para"],
@@ -125,8 +123,7 @@ export function rewriteToPlainLanguage(text: string): string {
     result = result.replace(pattern, replacement);
   }
 
-  // 8. Padronização de Horas conforme a Metodologia Unicamp
-  // "14:00hs" -> "14h", "14:30hs" -> "14h30", "09:00 horas" -> "9h"
+  // 8. Padronização de Horas
   result = result.replace(/\b0?([1-9]|1\d|2[0-3])(?::|\.)00\s*(?:hs?|hrs?|horas?)\b/gi, "$1h");
   result = result.replace(/\b0?([1-9]|1\d|2[0-3])(?::|\.)([0-5]\d)\s*(?:hs?|hrs?|horas?)\b/gi, "$1h$2");
   result = result.replace(/\b0?([1-9]|1\d|2[0-3])\s*(?:hs|hrs|horas)\b/gi, "$1h");
@@ -136,10 +133,27 @@ export function rewriteToPlainLanguage(text: string): string {
   result = result.replace(/,\s*(tendo\s+em\s+vista\s+que|haja\s+vista\s+que|uma\s+vez\s+que)\s+/gi, ". Isso porque ");
   result = result.replace(/,\s*(bem\s+como|al[eé]m\s+do\s+mais)\s+/gi, ". Além disso, ");
 
-  // Ajustes de pontuação e espaçamento
-  result = result.replace(/\s{2,}/g, " ");
-  result = result.replace(/\s+([,.;:!?])/g, "$1");
+  // Ajustes de pontuação e espaçamento (PRESERVANDO QUEBRAS DE LINHA!)
+  result = result.replace(/[^\S\r\n]{2,}/g, " ");
+  result = result.replace(/[^\S\r\n]+([,.;:!?])/g, "$1");
   result = result.replace(/([.!?])\s*([a-záéíóúç])/g, (m, p, l) => `${p} ${l.toUpperCase()}`);
 
   return result.trim();
+}
+
+/**
+ * Motor estruturado de reescrita em Linguagem Simples e Inclusiva.
+ * Processa o texto preservando RIGOROSAMENTE todas as quebras de parágrafo (\n\n).
+ */
+export function rewriteToPlainLanguage(text: string): string {
+  if (!text || !text.trim()) return text;
+
+  // Divide o texto por quebras de linha preservando a estrutura de parágrafos
+  const lines = text.split(/\r?\n/);
+  const rewrittenLines = lines.map(line => {
+    if (!line.trim()) return ""; // Mantém linhas em branco intactas
+    return rewriteSingleParagraph(line);
+  });
+
+  return rewrittenLines.join("\n");
 }

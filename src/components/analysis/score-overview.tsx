@@ -52,11 +52,11 @@ export function ScoreOverview({ score, metrics }: ScoreOverviewProps) {
         <div className="mt-6 pt-6 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-sky-100">
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-sky-300" />
-            <span><strong>{metrics.wordCount}</strong> palavras</span>
+            <span><strong>{metrics.wordsCount ?? metrics.wordCount ?? 0}</strong> palavras</span>
           </div>
           <div className="flex items-center gap-2">
             <AlignLeft className="w-4 h-4 text-sky-300" />
-            <span><strong>{metrics.sentenceCount}</strong> frases ({metrics.avgWordsPerSentence} pal/frase)</span>
+            <span><strong>{metrics.sentencesCount ?? metrics.sentenceCount ?? 0}</strong> frases ({metrics.avgSentenceLengthWords ?? metrics.avgWordsPerSentence ?? 0} pal/frase)</span>
           </div>
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-amber-300" />
@@ -64,7 +64,7 @@ export function ScoreOverview({ score, metrics }: ScoreOverviewProps) {
           </div>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-emerald-300" />
-            <span><strong>{metrics.estimatedReadTimeMinutes}</strong> min de leitura estimada</span>
+            <span><strong>{Math.max(1, Math.round((metrics.readingTimeSeconds ?? 60) / 60))}</strong> min de leitura estimada</span>
           </div>
         </div>
       </div>

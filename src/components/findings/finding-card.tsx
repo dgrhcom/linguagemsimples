@@ -71,9 +71,27 @@ export function FindingCard({
     if (aiRewriting) return;
     setAiRewriting(true);
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      try {
+        const provider = localStorage.getItem("preferred_ai_provider") || "offline";
+        if (provider === "gemini") {
+          const key = localStorage.getItem("custom_gemini_api_key");
+          if (key) {
+            headers["x-ai-provider"] = "gemini";
+            headers["x-ai-api-key"] = key;
+          }
+        } else if (provider === "openai") {
+          const key = localStorage.getItem("custom_openai_api_key");
+          if (key) {
+            headers["x-ai-provider"] = "openai";
+            headers["x-ai-api-key"] = key;
+          }
+        }
+      } catch (e) {}
+
       const res = await fetch("/api/rewrite", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           text: finding.originalText,
           mode: "segment",

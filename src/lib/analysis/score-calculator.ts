@@ -25,12 +25,17 @@ export function calculateAnalysisScore(metrics: TextMetrics, findings: Finding[]
 
   // 1. DIMENSÃO: Estrutura das Frases
   let sentenceScore = 100;
+  const sentenceTotal = metrics.sentencesCount ?? metrics.sentenceCount ?? 1;
+  const avgWords = metrics.avgSentenceLengthWords ?? metrics.avgWordsPerSentence ?? 15;
+  const paragraphTotal = metrics.paragraphsCount ?? metrics.paragraphCount ?? 1;
+  const wordsTotal = metrics.wordsCount ?? metrics.wordCount ?? 0;
+
   if (metrics.longSentencesCount > 0) {
-    const longRatio = metrics.longSentencesCount / Math.max(1, metrics.sentenceCount);
+    const longRatio = metrics.longSentencesCount / Math.max(1, sentenceTotal);
     sentenceScore -= Math.round(longRatio * 50);
   }
-  if (metrics.avgWordsPerSentence > 20) {
-    sentenceScore -= Math.min(25, Math.round((metrics.avgWordsPerSentence - 20) * 3));
+  if (avgWords > 20) {
+    sentenceScore -= Math.min(25, Math.round((avgWords - 20) * 3));
   }
   sentenceScore = Math.max(20, Math.min(100, sentenceScore));
 
@@ -60,7 +65,7 @@ export function calculateAnalysisScore(metrics: TextMetrics, findings: Finding[]
 
   // 5. DIMENSÃO: Organização e Hierarquia
   let orgScore = 100;
-  if (metrics.paragraphCount === 1 && metrics.wordCount > 100) {
+  if (paragraphTotal === 1 && wordsTotal > 100) {
     orgScore -= 20; // Parágrafo monolítico sem divisão
   }
   const orgFindings = [

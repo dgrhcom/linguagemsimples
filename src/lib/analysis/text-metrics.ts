@@ -1,4 +1,4 @@
-import { TextMetrics } from "@/types/analysis";
+import type { TextMetrics } from "../../types/analysis";
 
 /**
  * Divide o texto em sentenças preservando abreviações conhecidas.
@@ -8,54 +8,54 @@ export function splitSentences(text: string): { sentence: string; index: number;
 
   // Protege abreviações comuns para não quebrar a frase no ponto abreviativo
   const protectedText = text
-    .replace(/\b(Sr|Sra|Dr|Dra|Prof|Profa|V\.?\s*Exa|V\.?\s*Sa|art|inc|av|cód|etc)\./gi, "$1§DOT§")
-    .replace(/(\d+)\.(\d+)/g, "$1§NUMDOT§$2");
+    .replace(/\b(Art|art|Prof|prof|Dr|dr|Dra|dra|Sr|sr|Sra|sra|Av|av|R|r|Pág|pág|p|ex|etc|DD|Ilmo|Exmo)\.\s+/g, "$1___DOT___ ")
+    .replace(/\b(\d+)\.\s+(\d+)/g, "$1___DOT___$2");
 
-  const regex = /([^.!?\n]+[.!?\n]+|[^.!?\n]+$)/g;
-  const matches = [...protectedText.matchAll(regex)];
+  // Regex para captura de frases terminadas em . ? ! ou quebra de linha com sentido completo
+  const sentenceEndRegex = /([^.?!;\n]+(?:[.?!;]|\n|$))/g;
+  const matches: { sentence: string; index: number; wordCount: number }[] = [];
 
-  let currentIndex = 0;
-  const result: { sentence: string; index: number; wordCount: number }[] = [];
-
-  for (const m of matches) {
-    let rawSentence = m[0];
-    const originalSentence = rawSentence
-      .replace(/§DOT§/g, ".")
-      .replace(/§NUMDOT§/g, ".");
-
-    const trimmed = originalSentence.trim();
-    if (trimmed.length > 0) {
-      const words = trimmed.split(/\s+/).filter(w => w.length > 0 && /[a-zA-Z0-9À-ÿ]/.test(w));
-      result.push({
-        sentence: trimmed,
-        index: currentIndex,
-        wordCount: words.length
-      });
+  let match: RegExpExecArray | null;
+  while ((match = sentenceEndRegex.exec(protectedText)) !== null) {
+    const raw = match[0];
+    const restored = raw.replace(/___DOT___/g, ".").trim();
+    if (restored.length > 0) {
+      const words = restored.split(/\s+/).filter(w => w.length > 0 && /[a-zA-Z0-9À-ÿ]/.test(w));
+      if (words.length > 0) {
+        matches.push({
+          sentence: restored,
+          index: match.index,
+          wordCount: words.length
+        });
+      }
     }
-    currentIndex += rawSentence.length;
   }
 
-  return result;
+  return matches;
 }
 
 /**
- * Estimativa de contagem de sílabas para o Português (Flesch-BR).
+ * Conta sílabas aproximadas em português para uma palavra.
  */
 function countSyllablesInWord(word: string): number {
-  const cleanWord = word.toLowerCase().replace(/[^a-záàâãéêíóôõúüç]/g, "");
-  if (!cleanWord) return 1;
+  const clean = word.toLowerCase().replace(/[^a-záéíóúâêîôûãõàüç]/g, "");
+  if (!clean) return 0;
+  if (clean.length <= 3) return 1;
 
-  // Diftongos e hiatos aproximados em português
-  const matches = cleanWord.match(/[aeiouyáàâãéêíóôõúü]+/gi);
-  return matches ? Math.max(1, matches.length) : 1;
+  // Vogais e ditongos aproximados
+  const vowelMatches = clean.match(/[aeiouáéíóúâêîôûãõàü]+/g);
+  return vowelMatches ? Math.max(1, vowelMatches.length) : 1;
 }
 
 /**
- * Calcula o Índice de Facilidade de Leitura Flesch adaptado ao Português (Flesch-BR).
- * Fórmula: 248.835 - (1.015 * (TotalPalavras / TotalFrases)) - (84.6 * (TotalSílabas / TotalPalavras))
+ * Índice de Facilidade de Leitura Flesch adaptado para o Português (Flesch-BR).
+ * Fórmula: 248.835 - (1.015 * ASL) - (84.6 * ASW)
+ * ASL = Média de palavras por sentença
+ * ASW = Média de sílabas por palavra
  */
-export function calculateFleschBR(wordCount: number, sentenceCount: number, totalSyllables: number): number {
+function calculateFleschBR(wordCount: number, sentenceCount: number, totalSyllables: number): number {
   if (wordCount === 0 || sentenceCount === 0) return 100;
+
   const ASL = wordCount / sentenceCount; // Average Sentence Length
   const ASW = totalSyllables / wordCount; // Average Syllables per Word
   const score = 248.835 - (1.015 * ASL) - (84.6 * ASW);
@@ -68,14 +68,23 @@ export function calculateFleschBR(wordCount: number, sentenceCount: number, tota
 export function calculateTextMetrics(text: string): TextMetrics {
   if (!text || !text.trim()) {
     return {
+      charactersCount: 0,
+      charactersWithoutSpacesCount: 0,
+      wordsCount: 0,
+      sentencesCount: 0,
+      paragraphsCount: 0,
+      avgSentenceLengthWords: 0,
+      avgWordLengthChars: 0,
+      longSentencesCount: 0,
+      gunningFogIndex: 0,
+      fleschReadingEaseBR: 100,
+      readingTimeSeconds: 0,
       charCount: 0,
       wordCount: 0,
       sentenceCount: 0,
       paragraphCount: 0,
       avgWordsPerSentence: 0,
-      longSentencesCount: 0,
-      estimatedReadTimeMinutes: 0,
-      fleschReadingEaseBR: 100
+      estimatedReadTimeMinutes: 0
     };
   }
 
@@ -87,28 +96,42 @@ export function calculateTextMetrics(text: string): TextMetrics {
 
   const words = text.split(/\s+/).filter(w => w.length > 0 && /[a-zA-Z0-9À-ÿ]/.test(w));
   const wordCount = words.length;
+  const charsWithoutSpaces = text.replace(/\s+/g, "").length;
 
   let totalSyllables = 0;
+  let totalCharsInWords = 0;
   for (const w of words) {
     totalSyllables += countSyllablesInWord(w);
+    totalCharsInWords += w.length;
   }
 
-  // Regra da Unicamp: Frases com mais de 20 palavras são consideradas excessivamente longas
   const longSentences = sentences.filter(s => s.wordCount > 20);
   const longSentencesCount = longSentences.length;
 
   const avgWordsPerSentence = sentenceCount > 0 ? Math.round((wordCount / sentenceCount) * 10) / 10 : 0;
+  const avgWordLengthChars = wordCount > 0 ? Math.round((totalCharsInWords / wordCount) * 10) / 10 : 0;
+  const readingTimeSeconds = Math.max(1, Math.round((wordCount / 150) * 60));
   const estimatedReadTimeMinutes = Math.max(0.5, Math.round((wordCount / 150) * 10) / 10);
   const fleschReadingEaseBR = calculateFleschBR(wordCount, sentenceCount, totalSyllables);
+  const gunningFogIndex = Math.round((avgWordsPerSentence + (longSentencesCount / Math.max(1, sentenceCount)) * 100) * 0.4);
 
   return {
+    charactersCount: text.length,
+    charactersWithoutSpacesCount: charsWithoutSpaces,
+    wordsCount: wordCount,
+    sentencesCount: sentenceCount,
+    paragraphsCount: paragraphCount,
+    avgSentenceLengthWords: avgWordsPerSentence,
+    avgWordLengthChars,
+    longSentencesCount,
+    gunningFogIndex,
+    fleschReadingEaseBR,
+    readingTimeSeconds,
     charCount: text.length,
     wordCount,
     sentenceCount,
     paragraphCount,
     avgWordsPerSentence,
-    longSentencesCount,
-    estimatedReadTimeMinutes,
-    fleschReadingEaseBR
+    estimatedReadTimeMinutes
   };
 }

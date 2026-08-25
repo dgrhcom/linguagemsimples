@@ -28,9 +28,9 @@ export function exportToMarkdown(result: AnalysisResult, mode: "simplified_only"
   lines.push("### Métricas de Legibilidade");
   lines.push("| Métrica | Valor |");
   lines.push("| :--- | :--- |");
-  lines.push(`| Total de Palavras | ${result.metrics.wordCount} |`);
-  lines.push(`| Total de Frases | ${result.metrics.sentenceCount} |`);
-  lines.push(`| Média de Palavras/Frase | ${result.metrics.avgWordsPerSentence} |`);
+  lines.push(`| Total de Palavras | ${result.metrics.wordsCount ?? result.metrics.wordCount ?? 0} |`);
+  lines.push(`| Total de Frases | ${result.metrics.sentencesCount ?? result.metrics.sentenceCount ?? 0} |`);
+  lines.push(`| Média de Palavras/Frase | ${result.metrics.avgSentenceLengthWords ?? result.metrics.avgWordsPerSentence ?? 0} |`);
   lines.push(`| Frases Longas (> 20 palavras) | ${result.metrics.longSentencesCount} |`);
   lines.push(`| Facilidade de Leitura Flesch-BR | ${result.metrics.fleschReadingEaseBR}/100 |`);
   lines.push("");
@@ -46,7 +46,9 @@ export function exportToMarkdown(result: AnalysisResult, mode: "simplified_only"
     if (f.suggestedText) {
       lines.push(`* **Sugestão:** \`${f.suggestedText}\``);
     }
-    lines.push(`* **Fonte:** [${f.source.title}](${f.source.url || "#"})`);
+    if (f.source?.title) {
+      lines.push(`* **Fonte:** [${f.source.title}](${f.source.url || "#"})`);
+    }
     lines.push("");
   });
   lines.push("---");

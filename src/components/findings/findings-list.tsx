@@ -15,6 +15,7 @@ interface FindingsListProps {
   onUpdateFindingSuggestion?: (finding: Finding, newSuggestion: string) => void;
   onApplyAllSuggestions?: () => void;
   selectedFindingId?: string;
+  selectedFinding?: Finding | null;
   onSelectFinding: (finding: Finding) => void;
 }
 
@@ -28,8 +29,10 @@ export function FindingsList({
   onUpdateFindingSuggestion,
   onApplyAllSuggestions,
   selectedFindingId,
+  selectedFinding,
   onSelectFinding
 }: FindingsListProps) {
+  const activeSelectedId = selectedFinding?.id || selectedFindingId;
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "applied" | "ignored">("all");
 
@@ -141,7 +144,7 @@ export function FindingsList({
               onRevertSuggestion={onRevertSuggestion}
               onIgnoreFinding={onIgnoreFinding}
               onUpdateFindingSuggestion={onUpdateFindingSuggestion}
-              isSelected={selectedFindingId === finding.id}
+              isSelected={activeSelectedId === finding.id}
               onSelect={() => onSelectFinding(finding)}
             />
           ))

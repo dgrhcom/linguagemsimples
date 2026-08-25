@@ -29,7 +29,7 @@ export function exportToHtml(result: AnalysisResult, mode: "simplified_only" | "
       <p style="margin: 6px 0; color: #334155;"><strong>Problema:</strong> ${f.explanation}</p>
       <p style="margin: 6px 0; color: #166534;"><strong>Recomendação:</strong> ${f.recommendation}</p>
       ${f.suggestedText ? `<p style="margin: 6px 0; color: #1e40af;"><strong>Sugestão:</strong> "${f.suggestedText}"</p>` : ""}
-      <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Fonte: ${f.source.title}</div>
+      ${f.source?.title ? `<div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">Fonte: ${f.source.title}</div>` : ""}
     </div>
   `).join("");
 
@@ -95,9 +95,9 @@ export function exportToHtml(result: AnalysisResult, mode: "simplified_only" | "
   <h2>Métricas do Texto</h2>
   <table>
     <tbody>
-      <tr><td>Total de Palavras</td><td><strong>${result.metrics.wordCount}</strong></td></tr>
-      <tr><td>Total de Frases</td><td><strong>${result.metrics.sentenceCount}</strong></td></tr>
-      <tr><td>Média de Palavras por Frase</td><td><strong>${result.metrics.avgWordsPerSentence}</strong></td></tr>
+      <tr><td>Total de Palavras</td><td><strong>${result.metrics.wordsCount ?? result.metrics.wordCount ?? 0}</strong></td></tr>
+      <tr><td>Total de Frases</td><td><strong>${result.metrics.sentencesCount ?? result.metrics.sentenceCount ?? 0}</strong></td></tr>
+      <tr><td>Média de Palavras por Frase</td><td><strong>${result.metrics.avgSentenceLengthWords ?? result.metrics.avgWordsPerSentence ?? 0}</strong></td></tr>
       <tr><td>Frases com mais de 20 palavras</td><td><strong>${result.metrics.longSentencesCount}</strong></td></tr>
       <tr><td>Índice de Facilidade de Leitura (Flesch-BR)</td><td><strong>${result.metrics.fleschReadingEaseBR}/100</strong></td></tr>
     </tbody>

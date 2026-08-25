@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx tests/run-tests.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
@@ -38,6 +39,7 @@
     "lightningcss-win32-x64-msvc": "^1.33.0",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.19",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }

@@ -7,10 +7,12 @@ interface AnnotatedTextProps {
   text: string;
   findings: Finding[];
   selectedFindingId?: string;
-  onSelectFinding: (finding: Finding) => void;
+  selectedFinding?: Finding | null;
+  onSelectFinding: (finding: Finding | null) => void;
 }
 
-export function AnnotatedText({ text, findings, selectedFindingId, onSelectFinding }: AnnotatedTextProps) {
+export function AnnotatedText({ text, findings, selectedFindingId, selectedFinding, onSelectFinding }: AnnotatedTextProps) {
+  const activeSelectedId = selectedFinding?.id || selectedFindingId;
   if (!text) return null;
 
   // Realça os trechos problemáticos no texto com spans clicáveis
@@ -57,7 +59,7 @@ export function AnnotatedText({ text, findings, selectedFindingId, onSelectFindi
       );
     }
 
-    const isSelected = selectedFindingId === occ.finding.id;
+    const isSelected = activeSelectedId === occ.finding.id;
     const severityColor = {
       critical: "bg-rose-100 text-rose-900 border-b-2 border-rose-500 hover:bg-rose-200",
       warning: "bg-amber-100 text-amber-900 border-b-2 border-amber-500 hover:bg-amber-200",

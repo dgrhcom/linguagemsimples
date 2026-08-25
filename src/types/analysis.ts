@@ -1,6 +1,6 @@
-import { FindingCategory, RuleSource, Severity } from "./rules";
-import { AnalysisScore } from "./score";
-import { DocumentType } from "./document";
+import type { FindingCategory, RuleSource, Severity } from "./rules";
+import type { AnalysisScore } from "./score";
+import type { DocumentType } from "./document";
 
 export type { FindingCategory, RuleSource, Severity };
 
@@ -21,45 +21,61 @@ export interface Finding {
   explanation: string;
   recommendation: string;
   suggestedText?: string;
+  source?: RuleSource;
   status?: "pending" | "applied" | "ignored";
-  contextSentence?: string;
-  source: RuleSource;
 }
 
 export interface TextMetrics {
-  charCount: number;
-  wordCount: number;
-  sentenceCount: number;
-  paragraphCount: number;
-  avgWordsPerSentence: number;
-  longSentencesCount: number; // Frases > 20 palavras (regra Unicamp)
-  estimatedReadTimeMinutes: number;
-  fleschReadingEaseBR?: number;
+  charactersCount: number;
+  charactersWithoutSpacesCount: number;
+  wordsCount: number;
+  sentencesCount: number;
+  paragraphsCount: number;
+  avgSentenceLengthWords: number;
+  avgWordLengthChars: number;
+  longSentencesCount: number;
+  gunningFogIndex: number;
+  fleschReadingEaseBR: number;
+  readingTimeSeconds: number;
+  // Aliases for component compatibility
+  wordCount?: number;
+  sentenceCount?: number;
+  paragraphCount?: number;
+  charCount?: number;
+  avgWordsPerSentence?: number;
+  estimatedReadTimeMinutes?: number;
+}
+
+export interface SemanticValidation {
+  isSemanticPreserved: boolean;
+  preservedEntities: string[];
+  missingEntities: string[];
+  preservedDates: string[];
+  missingDates: string[];
+  preservedDeadlines: string[];
+  missingDeadlines: string[];
+  summary: string;
+  isValid?: boolean;
+  preservationScore?: number;
+  warnings?: string[];
+}
+
+export interface EssentialFact {
+  fact: string;
+  category: "entity" | "date" | "deadline" | "instruction" | "data";
+  foundInOriginal: boolean;
+  foundInSimplified: boolean;
 }
 
 export interface AnalysisInput {
   text: string;
-  documentType: DocumentType;
-  targetAudience?: string; // Ex: "Estudantes", "População geral", "Servidores"
-  textGoal?: string;       // Ex: "Convocação para matrícula", "Solicitação de compra"
+  documentType?: DocumentType;
+  targetAudience?: string;
+  textGoal?: string;
   options?: {
     preserveTechnicalTerms?: boolean;
     strictInclusiveMode?: boolean;
   };
-}
-
-export interface EssentialFact {
-  type: "date" | "number" | "obligation" | "deadline" | "legal_ref" | "entity" | "condition";
-  value: string;
-  context: string;
-}
-
-export interface SemanticValidation {
-  isValid: boolean;
-  preservationScore: number; // 0 a 100
-  preservedFacts: EssentialFact[];
-  missingFacts: EssentialFact[];
-  warnings: string[];
 }
 
 export interface AnalysisResult {
@@ -70,7 +86,7 @@ export interface AnalysisResult {
   score: AnalysisScore;
   findings: Finding[];
   rewrittenText?: string;
-  workingText?: string; // Texto com as alterações aceitas pelo usuário
+  workingText?: string;
   semanticValidation?: SemanticValidation;
   appliedRuleVersion: string;
 }

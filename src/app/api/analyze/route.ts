@@ -36,6 +36,10 @@ export async function POST(req: NextRequest) {
 
     const input: AnalysisInput = parsed.data;
 
+    // Headers opcionais de API Key enviados pelo cliente
+    const customApiKey = req.headers.get("x-ai-api-key") || undefined;
+    const customProvider = (req.headers.get("x-ai-provider") as any) || undefined;
+
     // 1. Métricas de texto
     const metrics = calculateTextMetrics(input.text);
 
@@ -43,7 +47,7 @@ export async function POST(req: NextRequest) {
     const deterministicFindings = runDeterministicAnalysis(input);
 
     // 3. Análise e Reescrita por IA
-    const aiProvider = getLanguageModelProvider();
+    const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
     const aiOutput = await aiProvider.analyzeText(input, deterministicFindings);
 
     // 4. Consolidação de Findings (evitando duplicatas exatas)
