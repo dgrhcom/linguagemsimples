@@ -25,21 +25,16 @@ export function Header() {
         <AccessibilityBar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-18 gap-3">
-            {/* Logotipo Unicamp LinguagemSimples */}
-            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group py-1.5 shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#18181b] border border-[#FBB040] flex items-center justify-center text-[#FBB040] font-black shadow-2xs group-hover:bg-black transition-colors shrink-0">
-                <span className="text-xs sm:text-sm font-black tracking-tighter">LS</span>
-              </div>
-              <div className="shrink-0">
-                <div className="text-base sm:text-lg font-black text-[#18181b] tracking-tight leading-none flex items-center">
-                  <span>Linguagem</span>
-                  <span className="text-[#FBB040] ml-1 px-1 py-0.5 bg-[#18181b] rounded text-[11px] sm:text-xs inline-block">Simples</span>
-                </div>
-                <span className="text-[9px] sm:text-[10px] text-zinc-500 font-bold uppercase tracking-wider block mt-0.5 leading-none">
-                  Universidade Estadual de Campinas
-                </span>
-              </div>
+            {/* Logotipo Oficial Unicamp Linguagem Simples */}
+            <Link href="/" className="flex items-center gap-3 group py-1 shrink-0" title="Página Inicial - Linguagem Simples Unicamp">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/linguagem-simples.svg"
+                alt="Linguagem Simples - Unicamp"
+                className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105"
+              />
             </Link>
+
 
             {/* Navegação Principal */}
             <nav id="main-nav" className="hidden lg:flex items-center gap-1 shrink-0" aria-label="Menu principal">

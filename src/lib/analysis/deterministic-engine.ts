@@ -20,33 +20,56 @@ function createPortugueseWordRegex(term: string): RegExp {
 }
 
 
-function generateShortSentenceSuggestion(sentence: string): string {
+export function generateShortSentenceSuggestion(sentence: string): string {
   let rewritten = rewriteToPlainLanguage(sentence);
-  if (rewritten !== sentence && splitSentences(rewritten).length > 1) {
-    return rewritten;
-  }
 
   const conjunctions: [RegExp, string][] = [
-    [/,\s*(pois|porque|uma vez que|haja vista que|tendo em vista que|visto que)\s+/gi, ". Isso ocorreu porque "],
-    [/,\s*(mas|porém|contudo|todavia|entretanto)\s+/gi, ". No entanto, "],
-    [/,\s*(sendo que|de modo que|de forma que)\s+/gi, ". Assim, "],
-    [/,\s*(portanto|por conseguinte|logo)\s+/gi, ". Portanto, "],
-    [/,\s*(bem como|além do mais|e também)\s+/gi, ". Além disso, "],
-    [/,\s*(a fim de que|para que)\s+/gi, ". Para isso, "],
+    [/,\s*(pois|porque|uma\s+vez\s+que|haja\s+vista\s+que|tendo\s+em\s+vista\s+que|visto\s+que)\s+/gi, ". Isso ocorreu porque "],
+    [/,\s*(mas|por[eé]m|contudo|todavia|entretanto|no\s+entanto)\s+/gi, ". No entanto, "],
+    [/,\s*(sendo\s+que|de\s+modo\s+que|de\s+forma\s+que|de\s+maneira\s+que)\s+/gi, ". Assim, "],
+    [/,\s*(portanto|por\s+conseguinte|logo|por\s+isso)\s+/gi, ". Por isso, "],
+    [/,\s*(bem\s+como|al[eé]m\s+do\s+mais|e\s+tamb[eé]m|al[eé]m\s+disso)\s+/gi, ". Além disso, "],
+    [/,\s*(a\s+fim\s+de\s+que|para\s+que|com\s+vistas\s+a|visando\s+a)\s+/gi, ". Para isso, "],
     [/,\s*cabendo\s+a[o|a]?\s+/gi, ". Essa tarefa cabe a "],
+    [/,\s*devendo\s+(?:o|a|os|as)?\s+/gi, ". É necessário que "],
+    [/,\s*(?:com|sob)\s+o\s+objetivo\s+de\s+/gi, ". O objetivo é "],
+    [/,\s*onde\s+/gi, ". Nesse local, "],
+    [/,\s*quando\s+/gi, ". Nesse momento, "],
+    [/,\s*ficando\s+/gi, ". Fica "],
+    [/,\s*obedecendo\s+a[o|a]?\s+/gi, ". A medida segue "],
     [/;\s*/g, ". "]
   ];
 
   for (const [conj, replacement] of conjunctions) {
     if (conj.test(rewritten)) {
       rewritten = rewritten.replace(conj, replacement);
-      break;
+    }
+  }
+
+  // Se ainda for apenas 1 sentença e tiver mais de 20 palavras, divide na vírgula mais central
+  const words = rewritten.split(/\s+/).filter(Boolean);
+  if (words.length > 20 && rewritten.includes(",")) {
+    const commas: number[] = [];
+    for (let i = 0; i < rewritten.length; i++) {
+      if (rewritten[i] === ",") commas.push(i);
+    }
+    if (commas.length > 0) {
+      // Pega a vírgula mais próxima do meio
+      const mid = rewritten.length / 2;
+      const bestComma = commas.reduce((prev, curr) => Math.abs(curr - mid) < Math.abs(prev - mid) ? curr : prev);
+      const part1 = rewritten.substring(0, bestComma).trim();
+      const part2 = rewritten.substring(bestComma + 1).trim();
+      if (part1.length > 10 && part2.length > 10) {
+        const capPart2 = part2.charAt(0).toUpperCase() + part2.slice(1);
+        rewritten = `${part1}. ${capPart2}`;
+      }
     }
   }
 
   rewritten = rewritten.replace(/([.!?])\s*([a-záéíóúç])/g, (m, p, l) => `${p} ${l.toUpperCase()}`);
   return rewriteToPlainLanguage(rewritten);
 }
+
 
 
 /**

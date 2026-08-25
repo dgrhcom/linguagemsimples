@@ -115,15 +115,41 @@ export default function AnalisarPage() {
 		if (!result || !finding.suggestedText || finding.suggestedText.trim() === finding.originalText.trim()) return;
 
 		const currentText = result.workingText || result.input.text;
-		if (!currentText.includes(finding.originalText)) {
-			showToast("O trecho original já foi modificado em uma revisão anterior.");
-			return;
-		}
+		let updatedText = currentText;
 
-		const updatedText = currentText.replace(finding.originalText, finding.suggestedText);
+		if (currentText.includes(finding.originalText)) {
+			updatedText = currentText.replace(finding.originalText, finding.suggestedText);
+		} else {
+			// Tenta correspondência flexível para sentenças que já tiveram pequenas alterações internas
+			const origWords = finding.originalText.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+			const paragraphs = currentText.split(/\n/);
+			let replaced = false;
+
+			const newParagraphs = paragraphs.map(p => {
+				if (replaced) return p;
+				const pWords = p.toLowerCase().split(/\s+/);
+				const matches = origWords.filter(w => pWords.includes(w)).length;
+				if (origWords.length > 0 && matches / origWords.length >= 0.6) {
+					replaced = true;
+					return finding.suggestedText!;
+				}
+				return p;
+			});
+
+			if (replaced) {
+				updatedText = newParagraphs.join("\n");
+			} else {
+				showToast("O trecho original já foi modificado em uma revisão anterior.");
+				return;
+			}
+		}
 
 		const updatedFindings = result.findings.map(f => {
 			if (f.id === finding.id) {
+				return { ...f, status: "applied" as const };
+			}
+			// Se o finding for uma frase e contiver outro finding menor, marca como applied também
+			if (finding.category === "sentence" && finding.originalText.includes(f.originalText)) {
 				return { ...f, status: "applied" as const };
 			}
 			return f;
@@ -135,7 +161,7 @@ export default function AnalisarPage() {
 			findings: updatedFindings
 		});
 
-		showToast(`Sugestão aplicada para '${finding.originalText}'!`);
+		showToast(`Sugestão aplicada com sucesso!`);
 	};
 
 	const handleRevertSuggestion = (finding: Finding) => {
@@ -162,7 +188,7 @@ export default function AnalisarPage() {
 			findings: updatedFindings
 		});
 
-		showToast(`Alteração revertida para '${finding.originalText}'!`);
+		showToast(`Alteração revertida para o original!`);
 	};
 
 	const handleIgnoreFinding = (finding: Finding) => {
@@ -201,7 +227,7 @@ export default function AnalisarPage() {
 			findings: updatedFindings
 		});
 
-		showToast("Nova sugestão de IA gerada para o trecho!");
+		showToast("Sugestão de reescrita atualizada!");
 	};
 
 	const handleApplyAllSuggestions = () => {
@@ -209,13 +235,54 @@ export default function AnalisarPage() {
 
 		let currentText = result.workingText || result.input.text;
 		let appliedCount = 0;
-		const updatedFindings = result.findings.map(f => {
-			if ((!f.status || f.status === "pending") && f.suggestedText && f.suggestedText.trim() !== f.originalText.trim()) {
-				if (currentText.includes(f.originalText)) {
-					currentText = currentText.replace(f.originalText, f.suggestedText);
-					appliedCount++;
-					return { ...f, status: "applied" as const };
+
+		// 1. Processa primeiro as frases longas (maiores estruturas)
+		const sentenceFindings = result.findings.filter(
+			f => (!f.status || f.status === "pending") && f.category === "sentence" && f.suggestedText && f.suggestedText.trim() !== f.originalText.trim()
+		);
+
+		const otherFindings = result.findings.filter(
+			f => (!f.status || f.status === "pending") && f.category !== "sentence" && f.suggestedText && f.suggestedText.trim() !== f.originalText.trim()
+		);
+
+		const appliedIds = new Set<string>();
+
+		// Aplica sentenças primeiro
+		for (const f of sentenceFindings) {
+			if (currentText.includes(f.originalText)) {
+				currentText = currentText.replace(f.originalText, f.suggestedText!);
+				appliedCount++;
+				appliedIds.add(f.id);
+
+				// Marca sub-achados contidos nesta frase como aplicados
+				for (const of_ of otherFindings) {
+					if (f.originalText.includes(of_.originalText)) {
+						appliedIds.add(of_.id);
+						appliedCount++;
+					}
 				}
+			}
+		}
+
+		// Aplica os demais achados que ainda estão no texto
+		for (const f of otherFindings) {
+			if (!appliedIds.has(f.id) && currentText.includes(f.originalText)) {
+				currentText = currentText.replace(f.originalText, f.suggestedText!);
+				appliedCount++;
+				appliedIds.add(f.id);
+			}
+		}
+
+		// Fallback: se por diferenças de quebra de linha nenhum foi substituído, aplica a reescrita integral da IA
+		if (appliedCount === 0 && result.rewrittenText && result.rewrittenText !== result.input.text) {
+			currentText = result.rewrittenText;
+			appliedCount = result.findings.length;
+			result.findings.forEach(f => appliedIds.add(f.id));
+		}
+
+		const updatedFindings = result.findings.map(f => {
+			if (appliedIds.has(f.id)) {
+				return { ...f, status: "applied" as const };
 			}
 			return f;
 		});
@@ -226,8 +293,9 @@ export default function AnalisarPage() {
 			findings: updatedFindings
 		});
 
-		showToast(`${appliedCount} sugestões aceitas e aplicadas com sucesso!`);
+		showToast(`${appliedCount} sugestões aceitas e aplicadas no texto com sucesso!`);
 	};
+
 
 	const handleApplyFullAiRewrite = () => {
 		if (!result || !result.rewrittenText) return;

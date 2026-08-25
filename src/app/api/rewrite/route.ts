@@ -5,6 +5,7 @@ import { validateSemanticPreservation } from "@/lib/analysis/semantic-validator"
 import { AnalysisInput } from "@/types/analysis";
 import { buildSegmentRewritePrompt } from "@/lib/ai/prompts";
 import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "@/lib/analysis/plain-language-rewriter";
+import { generateShortSentenceSuggestion } from "@/lib/analysis/deterministic-engine";
 
 const inputSchema = z.object({
   text: z.string().min(1).max(50000),
@@ -34,7 +35,8 @@ export async function POST(req: NextRequest) {
     const customProvider = (req.headers.get("x-ai-provider") as any) || undefined;
 
     const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
-    const unicampBase = rewriteToPlainLanguage(text);
+    const isLongSentence = text.split(/\s+/).filter(Boolean).length > 20;
+    const unicampBase = isLongSentence ? generateShortSentenceSuggestion(text) : rewriteToPlainLanguage(text);
     const input: AnalysisInput = { text, documentType, targetAudience, textGoal };
 
     if (mode === "segment") {
@@ -46,9 +48,15 @@ export async function POST(req: NextRequest) {
         targetAudience
       });
 
-      let rewritten = output.rewrittenText.trim();
+      let rewritten = output.rewrittenText
+        .replace(/^```(?:text|markdown)?\s*\n?/i, "")
+        .replace(/\n?```\s*$/i, "")
+        .replace(/^(?:Aqui está a (?:frase|versão|reescrita)[^:\n]*:?\s*|Sugestão[^:\n]*:?\s*|Reescrita[^:\n]*:?\s*)/i, "")
+        .replace(/^["'“”«»]+|["'“”«»]+$/g, "")
+        .trim();
+
       if (!rewritten || rewritten === text.trim()) {
-        rewritten = guaranteeDifferentSuggestion(text, unicampBase);
+        rewritten = isLongSentence ? generateShortSentenceSuggestion(text) : guaranteeDifferentSuggestion(text, unicampBase);
       }
 
       return NextResponse.json({
@@ -56,6 +64,7 @@ export async function POST(req: NextRequest) {
         mode: "segment"
       });
     }
+
 
     // Reescrita Completa com IA utilizando a base da Unicamp
     const output = await aiProvider.rewriteText(input, {

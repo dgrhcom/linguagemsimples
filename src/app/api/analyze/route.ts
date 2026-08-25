@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { runDeterministicAnalysis } from "@/lib/analysis/deterministic-engine";
+import { runDeterministicAnalysis, generateShortSentenceSuggestion } from "@/lib/analysis/deterministic-engine";
 import { calculateTextMetrics } from "@/lib/analysis/text-metrics";
 import { calculateAnalysisScore } from "@/lib/analysis/score-calculator";
 import { validateSemanticPreservation } from "@/lib/analysis/semantic-validator";
-import { rewriteToPlainLanguage } from "@/lib/analysis/plain-language-rewriter";
+import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "@/lib/analysis/plain-language-rewriter";
 import { getLanguageModelProvider } from "@/lib/ai";
 import { AnalysisInput, AnalysisResult, Finding } from "@/types/analysis";
+
 
 const inputSchema = z.object({
   text: z.string().min(1, "O texto para análise não pode estar vazio.").max(50000, "Texto muito longo (máximo 50.000 caracteres)."),
@@ -65,9 +66,14 @@ export async function POST(req: NextRequest) {
     // Garante que todo apontamento possua suggestedText preenchido e simplificado
     for (const f of combinedFindings) {
       if (!f.suggestedText || f.suggestedText === f.originalText) {
-        f.suggestedText = rewriteToPlainLanguage(f.originalText);
+        if (f.category === "sentence") {
+          f.suggestedText = generateShortSentenceSuggestion(f.originalText);
+        } else {
+          f.suggestedText = guaranteeDifferentSuggestion(f.originalText, rewriteToPlainLanguage(f.originalText));
+        }
       }
     }
+
 
     // 5. Cálculo do Score Multidimensional
     const score = calculateAnalysisScore(metrics, combinedFindings);

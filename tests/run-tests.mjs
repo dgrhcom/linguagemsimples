@@ -190,6 +190,26 @@ test("15. Editor de Sugestões: Aplicação de Versão Customizada pelo Usuário
   );
 });
 
+test("16. Garantia de Reescrita de Frases Longas e Sugestões para Comparação", () => {
+  const longSentence = "A comissão deliberativa especial de avaliação realizou a conferência de todos os documentos apresentados pelos candidatos no prazo estipulado, sendo que todas as pendências foram devidamente encaminhadas para regularização perante o órgão competente.";
+  
+  const findings = runDeterministicAnalysis({ text: longSentence });
+  const sentenceFinding = findings.find(f => f.category === "sentence");
+
+  assert.ok(sentenceFinding, "Deve identificar apontamento de frase longa");
+  assert.ok(sentenceFinding.suggestedText, "A frase longa DEVE ter sugestão gerada");
+  assert.notEqual(
+    sentenceFinding.suggestedText.trim(),
+    sentenceFinding.originalText.trim(),
+    "A sugestão para frase longa NUNCA pode ser idêntica ao original!"
+  );
+  assert.ok(
+    sentenceFinding.suggestedText.includes(". Assim,") || sentenceFinding.suggestedText.includes(". "),
+    "A sugestão deve conter divisão em frases mais curtas"
+  );
+});
+
+
 
 
 

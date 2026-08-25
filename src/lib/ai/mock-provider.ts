@@ -1,6 +1,7 @@
 import { AnalysisInput, Finding } from "@/types/analysis";
 import { AIAnalysisOutput, AIExplainOutput, AIRewriteOutput, LanguageModelProvider, RewriteOptions } from "./provider";
 import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "@/lib/analysis/plain-language-rewriter";
+import { generateShortSentenceSuggestion } from "@/lib/analysis/deterministic-engine";
 
 export class MockLanguageModelProvider implements LanguageModelProvider {
   async analyzeText(
@@ -15,9 +16,14 @@ export class MockLanguageModelProvider implements LanguageModelProvider {
     // 1. Garante que todos os achados determinísticos tenham uma sugestão simplificada válida
     for (const df of deterministicFindings) {
       if (!df.suggestedText || df.suggestedText === df.originalText) {
-        df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
+        if (df.category === "sentence") {
+          df.suggestedText = generateShortSentenceSuggestion(df.originalText);
+        } else {
+          df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
+        }
       }
     }
+
 
     // 2. Verificação de voz passiva ou inversões sintáticas comuns
     const passiveRegex = /\b(foi|foram|será|serão|sendo)\s+([a-z]+do|[a-z]+da|[a-z]+dos|[a-z]+das)\s+pelo|\b(foi|foram|será|serão)\s+([a-z]+do|[a-z]+da|[a-z]+dos|[a-z]+das)\s+pela\b/gi;

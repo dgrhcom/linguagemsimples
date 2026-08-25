@@ -7,12 +7,17 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 text-white font-black text-lg mb-3">
-              <div className="w-8 h-8 rounded-lg bg-black border border-[#FBB040] flex items-center justify-center text-[#FBB040] text-xs font-black">
-                LS
+            <div className="flex items-center gap-3 text-white font-black text-lg mb-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className="bg-white px-2.5 py-1.5 rounded-xl border border-zinc-700">
+                <img
+                  src="/images/linguagem-simples.svg"
+                  alt="Linguagem Simples Unicamp"
+                  className="h-7 w-auto object-contain"
+                />
               </div>
-              <span>Linguagem Simples & Inclusiva</span>
             </div>
+
             <p className="text-zinc-400 text-xs leading-relaxed max-w-md">
               Uma ferramenta pública de apoio à redação oficial para transformar a comunicação em uma experiência clara, direta e acessível, fundamentada nas diretrizes do <strong>Projeto Linguagem Simples e Inclusiva da Unicamp</strong>.
             </p>

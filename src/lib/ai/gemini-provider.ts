@@ -8,8 +8,10 @@ import {
 } from "./prompts";
 import { MockLanguageModelProvider } from "./mock-provider";
 import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "@/lib/analysis/plain-language-rewriter";
+import { generateShortSentenceSuggestion } from "@/lib/analysis/deterministic-engine";
 
 export class GeminiLanguageModelProvider implements LanguageModelProvider {
+
   private apiKey: string;
   private primaryModel: string;
   private fallback: MockLanguageModelProvider;
@@ -176,10 +178,13 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
         if (aiSuggestion && aiSuggestion !== df.originalText) {
           df.suggestedText = aiSuggestion;
         } else if (!df.suggestedText || df.suggestedText === df.originalText) {
-          df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
+          if (df.category === "sentence") {
+            df.suggestedText = generateShortSentenceSuggestion(df.originalText);
+          } else {
+            df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
+          }
         }
       }
-
 
       // 2. Achados adicionais identificados contextualmente pela IA
       const rawAdditional: any[] = Array.isArray(parsed.additionalFindings) ? parsed.additionalFindings : [];
@@ -222,7 +227,7 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
 
   async rewriteText(input: AnalysisInput, options?: RewriteOptions): Promise<AIRewriteOutput> {
     const isSegmentMode = options?.mode === "segment";
-    const baseRewrite = options?.unicampBase || rewriteToPlainLanguage(input.text);
+    const baseRewrite = options?.unicampBase || (isSegmentMode ? generateShortSentenceSuggestion(input.text) : rewriteToPlainLanguage(input.text));
 
     try {
       let prompt: string;
@@ -238,15 +243,22 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
       }
 
       const rawText = await this.callGemini(SYSTEM_PROMPT_ANALYSIS, prompt, false);
-      let cleaned = rawText.replace(/^["']|["']$/g, "").trim();
+      let cleaned = rawText
+        .replace(/^```(?:text|markdown)?\s*\n?/i, "")
+        .replace(/\n?```\s*$/i, "")
+        .replace(/^(?:Aqui está a (?:frase|versão|reescrita)[^:\n]*:?\s*|Sugestão[^:\n]*:?\s*|Reescrita[^:\n]*:?\s*)/i, "")
+        .replace(/^["'“”«»]+|["'“”«»]+$/g, "")
+        .trim();
 
-      const finalRewritten = guaranteeDifferentSuggestion(input.text, cleaned || baseRewrite);
+      const candidate = cleaned || baseRewrite;
+      const finalRewritten = guaranteeDifferentSuggestion(input.text, candidate);
       return { rewrittenText: finalRewritten };
     } catch (e) {
       console.error("[Gemini Provider] Erro no rewriteText, utilizando motor Unicamp enriquecido:", e);
       return this.fallback.rewriteText(input, options);
     }
   }
+
 
   async explainFinding(finding: Finding): Promise<AIExplainOutput> {
     return this.fallback.explainFinding(finding);
