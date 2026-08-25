@@ -16,7 +16,6 @@ export function AnnotatedText({ text, findings, selectedFindingId, selectedFindi
   if (!text) return null;
 
   // Realça os trechos problemáticos no texto com spans clicáveis
-  // Criamos uma lista ordenada de ocorrências
   const occurrences: { start: number; end: number; text: string; finding: Finding }[] = [];
 
   for (const f of findings) {
@@ -61,20 +60,20 @@ export function AnnotatedText({ text, findings, selectedFindingId, selectedFindi
 
     const isSelected = activeSelectedId === occ.finding.id;
     const severityColor = {
-      critical: "bg-rose-100 text-rose-900 border-b-2 border-rose-500 hover:bg-rose-200",
-      warning: "bg-amber-100 text-amber-900 border-b-2 border-amber-500 hover:bg-amber-200",
-      suggestion: "bg-blue-100 text-blue-900 border-b-2 border-blue-500 hover:bg-blue-200",
-      info: "bg-slate-100 text-slate-900 border-b-2 border-slate-400 hover:bg-slate-200"
+      critical: "bg-[#fdecd0] text-black border-b-2 border-[#d98a1a] hover:bg-[#fbd38d]",
+      warning: "bg-[#fef7eb] text-zinc-900 border-b-2 border-[#FBB040] hover:bg-[#fdecd0]",
+      suggestion: "bg-zinc-100 text-zinc-900 border-b-2 border-zinc-400 hover:bg-zinc-200",
+      info: "bg-zinc-100 text-zinc-900 border-b-2 border-zinc-300 hover:bg-zinc-200"
     }[occ.finding.severity];
 
     segments.push(
       <mark
         key={`mark-${occ.start}-${i}`}
         onClick={() => onSelectFinding(occ.finding)}
-        className={`cursor-pointer px-1 py-0.5 rounded transition-all font-medium ${severityColor} ${
-          isSelected ? "ring-2 ring-blue-600 ring-offset-1 font-bold" : ""
+        className={`cursor-pointer px-1.5 py-0.5 rounded-md transition-all font-semibold ${severityColor} ${
+          isSelected ? "!bg-[#FBB040] !text-black ring-2 ring-black font-black shadow-xs" : ""
         }`}
-        title={`Clique para ver a orientação da Unicamp sobre '${occ.text}'`}
+        title={`Clique para ver a orientação sobre '${occ.text}'`}
       >
         {occ.text}
       </mark>
@@ -92,7 +91,7 @@ export function AnnotatedText({ text, findings, selectedFindingId, selectedFindi
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs leading-relaxed text-slate-800 whitespace-pre-wrap font-sans text-base">
+    <div className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-7 shadow-xs leading-relaxed text-zinc-900 whitespace-pre-wrap font-sans text-base">
       {segments}
     </div>
   );

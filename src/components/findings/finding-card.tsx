@@ -36,10 +36,10 @@ export function FindingCard({
   const isIgnored = finding.status === "ignored";
 
   const severityStyles = {
-    critical: { border: "border-rose-300", badge: "bg-rose-100 text-rose-800", icon: AlertCircle, label: "Crítico" },
-    warning: { border: "border-amber-300", badge: "bg-amber-100 text-amber-800", icon: AlertTriangle, label: "Atenção" },
-    suggestion: { border: "border-sky-300", badge: "bg-sky-100 text-sky-800", icon: Info, label: "Sugestão" },
-    info: { border: "border-slate-300", badge: "bg-slate-100 text-slate-800", icon: Info, label: "Informativo" }
+    critical: { border: "border-zinc-300", badge: "bg-[#18181b] text-[#FBB040]", icon: AlertCircle, label: "Crítico" },
+    warning: { border: "border-zinc-300", badge: "bg-[#fef7eb] text-black border border-[#FBB040]", icon: AlertTriangle, label: "Atenção" },
+    suggestion: { border: "border-zinc-200", badge: "bg-zinc-100 text-zinc-800", icon: Info, label: "Sugestão" },
+    info: { border: "border-zinc-200", badge: "bg-zinc-100 text-zinc-700", icon: Info, label: "Informativo" }
   }[finding.severity];
 
   const Icon = severityStyles.icon;
@@ -66,7 +66,6 @@ export function FindingCard({
     }
   };
 
-  // Solicitar reescrita inteligente por IA para este trecho específico
   const handleAiRewriteSegment = async () => {
     if (aiRewriting) return;
     setAiRewriting(true);
@@ -116,72 +115,72 @@ export function FindingCard({
   return (
     <div
       onClick={onSelect}
-      className={`rounded-2xl border transition-all shadow-xs p-5 ${
+      className={`rounded-3xl border transition-all shadow-xs p-5 sm:p-6 ${
         isApplied
-          ? "bg-emerald-50/40 border-emerald-300"
+          ? "bg-[#fef7eb]/60 border-[#FBB040]"
           : isIgnored
-          ? "bg-slate-50 border-slate-200 opacity-60"
+          ? "bg-zinc-50 border-zinc-200 opacity-60"
           : isSelected
-          ? "bg-white border-[#005a87] ring-2 ring-[#005a87]/20"
-          : `bg-white ${severityStyles.border}`
+          ? "bg-white border-black ring-2 ring-[#FBB040]"
+          : `bg-white ${severityStyles.border} hover:border-[#FBB040]`
       }`}
     >
       <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${severityStyles.badge} uppercase tracking-wider flex items-center gap-1`}>
+          <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full ${severityStyles.badge} uppercase tracking-wider flex items-center gap-1`}>
             <Icon className="w-3.5 h-3.5" />
             <span>{severityStyles.label}</span>
           </span>
 
-          <span className="text-xs font-semibold text-slate-500 capitalize">
+          <span className="text-xs font-bold text-zinc-500 capitalize">
             {finding.category}
           </span>
 
           {isApplied && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white flex items-center gap-1">
-              <Check className="w-3 h-3" />
+            <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-black text-[#FBB040] flex items-center gap-1">
+              <Check className="w-3 h-3 text-[#FBB040]" />
               <span>Aplicada</span>
             </span>
           )}
 
           {isIgnored && (
-            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">
+            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-600">
               Ignorada
             </span>
           )}
         </div>
 
         {finding.source && (
-          <span className="text-[11px] text-slate-400 font-medium truncate max-w-[180px]" title={finding.source.title}>
+          <span className="text-[11px] text-zinc-400 font-medium truncate max-w-[180px]" title={finding.source.title}>
             {finding.source.title}
           </span>
         )}
       </div>
 
       {/* Explicação do problema */}
-      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed mb-3">
+      <p className="text-xs sm:text-sm text-zinc-800 leading-relaxed mb-3 font-medium">
         {finding.explanation}
       </p>
 
       {/* VISUALIZAÇÃO DE ANTES E COMO FICARÁ (PREVIEW) */}
-      <div className="space-y-2 bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/80 my-3">
+      <div className="space-y-2 bg-[#faf9f5] rounded-2xl p-4 border border-zinc-200 my-3">
         <div className="flex items-start gap-2 text-xs">
-          <span className="text-rose-700 font-bold shrink-0 w-24">Como está:</span>
-          <div className="font-mono text-slate-800 bg-rose-50 border border-rose-200 px-2 py-1 rounded-md flex-1">
-            <span className="line-through text-rose-900 bg-rose-200/70 px-1 rounded mr-1">{finding.originalText}</span>
+          <span className="text-zinc-600 font-bold shrink-0 w-24">Como está:</span>
+          <div className="font-mono text-zinc-700 bg-white border border-zinc-300 px-2.5 py-1.5 rounded-xl flex-1">
+            <span className="line-through text-zinc-500 mr-1">{finding.originalText}</span>
           </div>
         </div>
 
         {finding.suggestedText ? (
           <div className="flex items-start gap-2 text-xs">
-            <span className="text-emerald-700 font-bold shrink-0 w-24">Como ficará:</span>
-            <div className="font-mono text-slate-900 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-md flex-1 font-semibold">
-              <span className="text-emerald-900 bg-emerald-200/70 px-1 rounded">{finding.suggestedText}</span>
+            <span className="text-black font-black shrink-0 w-24">Como ficará:</span>
+            <div className="font-mono text-black bg-[#fef7eb] border border-[#FBB040] px-2.5 py-1.5 rounded-xl flex-1 font-bold">
+              <span>{finding.suggestedText}</span>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between gap-2 text-xs bg-blue-50/60 p-2 rounded-lg border border-blue-100 text-blue-900">
-            <span>Deseja que a IA gere uma proposta de reescrita completa para esta frase?</span>
+          <div className="flex items-center justify-between gap-2 text-xs bg-[#fef7eb] p-2.5 rounded-xl border border-[#FBB040]/60 text-zinc-900">
+            <span className="font-medium">Deseja que a IA elabore uma sugestão para esta frase?</span>
             <button
               type="button"
               onClick={(e) => {
@@ -189,9 +188,9 @@ export function FindingCard({
                 handleAiRewriteSegment();
               }}
               disabled={aiRewriting}
-              className="text-[11px] font-bold bg-[#005a87] text-white px-2.5 py-1 rounded-md hover:bg-[#00476b] transition-colors flex items-center gap-1 shrink-0"
+              className="text-[11px] font-black bg-[#18181b] text-[#FBB040] px-3 py-1 rounded-lg hover:bg-black transition-colors flex items-center gap-1 shrink-0 shadow-xs"
             >
-              <Sparkles className="w-3 h-3 text-amber-300" />
+              <Sparkles className="w-3 h-3 text-[#FBB040]" />
               <span>{aiRewriting ? "Reescrevendo..." : "Reescrever com IA"}</span>
             </button>
           </div>
@@ -199,13 +198,13 @@ export function FindingCard({
       </div>
 
       {/* Recomendação da Metodologia */}
-      <div className="text-xs text-slate-800 font-medium mb-4 bg-sky-50/60 p-2.5 rounded-xl border border-sky-200">
-        <strong className="text-sky-900 block mb-0.5">Recomendação da Unicamp:</strong>
+      <div className="text-xs text-zinc-900 font-medium mb-4 bg-white p-3 rounded-2xl border border-zinc-200">
+        <strong className="text-black block mb-0.5 font-bold">Recomendação da Unicamp:</strong>
         {finding.recommendation}
       </div>
 
       {/* Barra de Ações */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-100">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -213,9 +212,9 @@ export function FindingCard({
               e.stopPropagation();
               handleLearnMore();
             }}
-            className="text-xs text-[#005a87] hover:underline font-semibold flex items-center gap-1 transition-colors"
+            className="text-xs text-zinc-700 hover:text-black hover:underline font-bold flex items-center gap-1 transition-colors"
           >
-            <HelpCircle className="w-3.5 h-3.5" />
+            <HelpCircle className="w-3.5 h-3.5 text-zinc-500" />
             <span>{showExplanation ? "Ocultar fundamentação" : "Por que isso importa?"}</span>
           </button>
 
@@ -227,10 +226,10 @@ export function FindingCard({
                 handleAiRewriteSegment();
               }}
               disabled={aiRewriting}
-              className="text-xs text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-1 transition-colors"
+              className="text-xs text-zinc-700 hover:text-black font-bold flex items-center gap-1 transition-colors"
               title="Solicitar nova alternativa de reescrita inteligente para esta frase"
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <Sparkles className="w-3.5 h-3.5 text-[#d98a1a]" />
               <span>{aiRewriting ? "Gerando..." : "Reescrever com IA"}</span>
             </button>
           )}
@@ -244,7 +243,7 @@ export function FindingCard({
                 e.stopPropagation();
                 onIgnoreFinding(finding);
               }}
-              className="text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+              className="text-xs text-zinc-500 hover:text-black hover:bg-zinc-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 font-medium"
             >
               <EyeOff className="w-3.5 h-3.5" />
               <span>{isIgnored ? "Reativar" : "Ignorar"}</span>
@@ -258,7 +257,7 @@ export function FindingCard({
                 e.stopPropagation();
                 onRevertSuggestion(finding);
               }}
-              className="text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+              className="text-xs font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 px-3.5 py-1.5 rounded-xl flex items-center gap-1 transition-colors"
             >
               <Undo2 className="w-3.5 h-3.5" />
               <span>Reverter Alteração</span>
@@ -272,9 +271,9 @@ export function FindingCard({
                 e.stopPropagation();
                 onApplySuggestion(finding);
               }}
-              className="text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shadow-xs transition-all hover:shadow"
+              className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-[#111111] px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-all border border-[#d98a1a]"
             >
-              <Check className="w-3.5 h-3.5" />
+              <Check className="w-3.5 h-3.5 text-black" />
               <span>Aceitar Sugestão</span>
             </button>
           )}
@@ -283,20 +282,20 @@ export function FindingCard({
 
       {/* Fundamentação Pedagógica Expandida */}
       {showExplanation && (
-        <div className="mt-4 pt-4 border-t border-slate-200 text-xs bg-slate-50 p-4 rounded-xl space-y-2.5 text-slate-700">
+        <div className="mt-4 pt-4 border-t border-zinc-200 text-xs bg-[#faf9f5] p-4 rounded-2xl space-y-2.5 text-zinc-700">
           {detailedLoading ? (
-            <div className="flex items-center gap-2 text-slate-500 py-2">
-              <div className="w-3.5 h-3.5 border-2 border-[#005a87] border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center gap-2 text-zinc-500 py-2">
+              <div className="w-3.5 h-3.5 border-2 border-[#18181b] border-t-transparent rounded-full animate-spin" />
               <span>Carregando fundamentação pedagógica...</span>
             </div>
           ) : (
             <>
               <div>
-                <strong className="text-slate-900 block mb-0.5">Por que isso importa na comunicação pública?</strong>
+                <strong className="text-black block mb-0.5 font-bold">Por que isso importa na comunicação pública?</strong>
                 <p className="leading-relaxed">{detailedData?.whyItMatters || "Comunicações diretas e acessíveis garantem que a pessoa encontre, compreenda e consiga agir sem barreiras."}</p>
               </div>
               <div>
-                <strong className="text-slate-900 block mb-0.5">Dica Prática de Redação:</strong>
+                <strong className="text-black block mb-0.5 font-bold">Dica Prática de Redação:</strong>
                 <p className="leading-relaxed">{detailedData?.pedagogicalTip || "Priorize a ordem direta (sujeito + verbo + complemento) e evite períodos com mais de 20 palavras."}</p>
               </div>
               {finding.source?.url && (
@@ -304,9 +303,9 @@ export function FindingCard({
                   href={finding.source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[11px] text-[#005a87] hover:underline inline-flex items-center gap-1 font-semibold pt-1"
+                  className="text-[11px] text-black hover:text-[#d98a1a] hover:underline inline-flex items-center gap-1 font-bold pt-1"
                 >
-                  <BookOpen className="w-3.5 h-3.5" />
+                  <BookOpen className="w-3.5 h-3.5 text-[#FBB040]" />
                   <span>Consultar guia completo no site da Unicamp</span>
                 </a>
               )}

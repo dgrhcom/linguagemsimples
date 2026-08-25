@@ -1,184 +1,137 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { ZoomIn, ZoomOut, RotateCcw, Eye, HelpCircle } from "lucide-react";
 import Link from "next/link";
-import { Eye, ExternalLink } from "lucide-react";
 
 export function AccessibilityBar() {
-  const [highContrast, setHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState<"sm" | "md" | "lg" | "xl">("md");
+  const [highContrast, setHighContrast] = useState(false);
 
   useEffect(() => {
-    // Carrega preferências do localStorage
     try {
-      const savedContrast = localStorage.getItem("high_contrast") === "true";
-      const savedSize = (localStorage.getItem("font_size") as "sm" | "md" | "lg" | "xl") || "md";
+      const savedFontSize = (localStorage.getItem("font_size") as "sm" | "md" | "lg" | "xl") || "md";
+      const savedHighContrast = localStorage.getItem("high_contrast") === "true";
+      setFontSize(savedFontSize);
+      setHighContrast(savedHighContrast);
+      document.documentElement.setAttribute("data-font-size", savedFontSize);
+      document.documentElement.setAttribute("data-high-contrast", String(savedHighContrast));
+    } catch (e) {}
+  }, []);
 
-      setHighContrast(savedContrast);
-      setFontSize(savedSize);
-
-      applyContrast(savedContrast);
-      applyFontSize(savedSize);
-    } catch (e) {
-      console.error(e);
-    }
-
-    // Atalhos de teclado (Alt + 1, Alt + 2, Alt + 3, Alt + 4)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey && e.key === "1") {
-        e.preventDefault();
-        document.getElementById("main-content")?.focus();
-      } else if (e.altKey && e.key === "2") {
-        e.preventDefault();
-        document.getElementById("main-nav")?.focus();
-      } else if (e.altKey && e.key === "3") {
-        e.preventDefault();
-        document.getElementById("main-footer")?.focus();
-      } else if (e.altKey && e.key === "4") {
-        e.preventDefault();
-        toggleHighContrast();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [highContrast, fontSize]);
-
-  const applyContrast = (contrast: boolean) => {
-    if (contrast) {
-      document.documentElement.setAttribute("data-high-contrast", "true");
-    } else {
-      document.documentElement.removeAttribute("data-high-contrast");
-    }
+  const handleFontSizeChange = (delta: number) => {
+    const sizes: ("sm" | "md" | "lg" | "xl")[] = ["sm", "md", "lg", "xl"];
+    const currentIndex = sizes.indexOf(fontSize);
+    const newIndex = Math.max(0, Math.min(sizes.length - 1, currentIndex + delta));
+    const newSize = sizes[newIndex];
+    setFontSize(newSize);
+    document.documentElement.setAttribute("data-font-size", newSize);
+    try {
+      localStorage.setItem("font_size", newSize);
+    } catch (e) {}
   };
 
-  const applyFontSize = (size: "sm" | "md" | "lg" | "xl") => {
-    document.documentElement.setAttribute("data-font-size", size);
+  const handleResetFontSize = () => {
+    setFontSize("md");
+    document.documentElement.setAttribute("data-font-size", "md");
+    try {
+      localStorage.setItem("font_size", "md");
+    } catch (e) {}
   };
 
   const toggleHighContrast = () => {
     const next = !highContrast;
     setHighContrast(next);
+    document.documentElement.setAttribute("data-high-contrast", String(next));
     try {
       localStorage.setItem("high_contrast", String(next));
     } catch (e) {}
-    applyContrast(next);
-  };
-
-  const increaseFont = () => {
-    const order: ("sm" | "md" | "lg" | "xl")[] = ["sm", "md", "lg", "xl"];
-    const currIndex = order.indexOf(fontSize);
-    if (currIndex < order.length - 1) {
-      const next = order[currIndex + 1];
-      setFontSize(next);
-      try {
-        localStorage.setItem("font_size", next);
-      } catch (e) {}
-      applyFontSize(next);
-    }
-  };
-
-  const decreaseFont = () => {
-    const order: ("sm" | "md" | "lg" | "xl")[] = ["sm", "md", "lg", "xl"];
-    const currIndex = order.indexOf(fontSize);
-    if (currIndex > 0) {
-      const next = order[currIndex - 1];
-      setFontSize(next);
-      try {
-        localStorage.setItem("font_size", next);
-      } catch (e) {}
-      applyFontSize(next);
-    }
-  };
-
-  const resetFont = () => {
-    setFontSize("md");
-    try {
-      localStorage.setItem("font_size", "md");
-    } catch (e) {}
-    applyFontSize("md");
   };
 
   return (
-    <div className="bg-[#353c43] text-white text-[11px] py-1 px-4 border-b border-[#2b3035] flex justify-between items-center no-print">
-      {/* Atalhos Institucionais Unicamp */}
-      <div className="flex items-center gap-3 sm:gap-5">
-        <a
-          href="#main-content"
-          className="text-slate-200 hover:text-white underline-offset-2 hover:underline focus:bg-[#c2383f] focus:text-white focus:px-2 focus:py-0.5 focus:rounded"
-        >
-          Conteúdo principal <span className="text-slate-400 font-mono">[1]</span>
-        </a>
-        <a
-          href="#main-nav"
-          className="hidden sm:inline text-slate-200 hover:text-white underline-offset-2 hover:underline focus:bg-[#c2383f] focus:text-white focus:px-2 focus:py-0.5 focus:rounded"
-        >
-          Menu principal <span className="text-slate-400 font-mono">[2]</span>
-        </a>
-        <a
-          href="#main-footer"
-          className="hidden md:inline text-slate-200 hover:text-white underline-offset-2 hover:underline focus:bg-[#c2383f] focus:text-white focus:px-2 focus:py-0.5 focus:rounded"
-        >
-          Rodapé <span className="text-slate-400 font-mono">[3]</span>
-        </a>
-      </div>
-
-      {/* Controles de Acessibilidade: Alto Contraste & Tamanho da Fonte */}
-      <div className="flex items-center gap-3">
-        {/* Controle de Fonte */}
-        <div className="flex items-center bg-[#252a2e] rounded-md p-0.5" role="group" aria-label="Ajuste do tamanho da fonte">
-          <button
-            onClick={decreaseFont}
-            title="Diminuir o tamanho da letra"
-            aria-label="Diminuir texto (A-)"
-            className="px-2 py-0.5 hover:bg-[#353c43] text-slate-200 hover:text-white rounded text-[11px] font-bold transition-colors"
+    <aside
+      aria-label="Barra de Acessibilidade"
+      className="bg-[#18181b] text-slate-200 border-b border-zinc-800 text-xs font-semibold py-1.5 px-4 transition-colors no-print"
+    >
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        {/* Atalhos Rápidos de Acessibilidade */}
+        <div className="flex items-center gap-3 text-[11px] text-zinc-300">
+          <span className="hidden sm:inline text-[#FBB040] font-black uppercase tracking-wider">
+            Acessibilidade:
+          </span>
+          <a
+            href="#main-content"
+            className="hover:text-[#FBB040] underline underline-offset-2 transition-colors"
+            title="Ir direto para o conteúdo principal [Alt + 1]"
           >
-            A-
-          </button>
-          <button
-            onClick={resetFont}
-            title="Tamanho padrão da letra"
-            aria-label="Tamanho padrão (A)"
-            className="px-2 py-0.5 hover:bg-[#353c43] text-slate-200 hover:text-white rounded text-[11px] font-bold transition-colors border-x border-slate-600/40"
+            Conteúdo [1]
+          </a>
+          <span className="text-zinc-600">|</span>
+          <a
+            href="#main-nav"
+            className="hover:text-[#FBB040] underline underline-offset-2 transition-colors"
+            title="Ir para o menu de navegação [Alt + 2]"
           >
-            A
-          </button>
-          <button
-            onClick={increaseFont}
-            title="Aumentar o tamanho da letra"
-            aria-label="Aumentar texto (A+)"
-            className="px-2 py-0.5 hover:bg-[#353c43] text-slate-200 hover:text-white rounded text-[11px] font-bold transition-colors"
+            Menu [2]
+          </a>
+          <span className="text-zinc-600">|</span>
+          <Link
+            href="/acessibilidade"
+            className="hover:text-[#FBB040] underline underline-offset-2 transition-colors flex items-center gap-1"
+            title="Ver declaração de acessibilidade e todos os atalhos [Alt + 4]"
           >
-            A+
-          </button>
+            <span>Guia e Atalhos [4]</span>
+          </Link>
         </div>
 
-        {/* Alto Contraste */}
-        <button
-          onClick={toggleHighContrast}
-          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium transition-colors ${
-            highContrast
-              ? "bg-[#ffff00] text-black font-bold"
-              : "bg-[#252a2e] hover:bg-[#353c43] text-slate-200 hover:text-white"
-          }`}
-          title="Alternar modo de Alto Contraste [Alt + 4]"
-          aria-pressed={highContrast}
-        >
-          <Eye className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Alto Contraste</span>
-        </button>
+        {/* Ferramentas de Ajuste Visual */}
+        <div className="flex items-center gap-3">
+          {/* Controle de Tamanho da Fonte */}
+          <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg p-0.5" role="group" aria-label="Ajustar tamanho do texto">
+            <button
+              onClick={() => handleFontSizeChange(-1)}
+              disabled={fontSize === "sm"}
+              className="px-2 py-0.5 text-[11px] font-bold text-zinc-300 hover:text-[#FBB040] hover:bg-zinc-800 rounded disabled:opacity-40 transition-colors"
+              title="Diminuir tamanho da fonte"
+              aria-label="Diminuir fonte"
+            >
+              A-
+            </button>
+            <button
+              onClick={handleResetFontSize}
+              className="px-2 py-0.5 text-[11px] font-bold text-zinc-300 hover:text-[#FBB040] hover:bg-zinc-800 rounded transition-colors"
+              title="Restaurar tamanho padrão da fonte"
+              aria-label="Fonte normal"
+            >
+              A
+            </button>
+            <button
+              onClick={() => handleFontSizeChange(1)}
+              disabled={fontSize === "xl"}
+              className="px-2 py-0.5 text-[11px] font-bold text-zinc-300 hover:text-[#FBB040] hover:bg-zinc-800 rounded disabled:opacity-40 transition-colors"
+              title="Aumentar tamanho da fonte"
+              aria-label="Aumentar fonte"
+            >
+              A+
+            </button>
+          </div>
 
-        {/* Link Unicamp */}
-        <a
-          href="https://www.unicamp.br"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden lg:flex items-center gap-1 text-slate-300 hover:text-white pl-2 border-l border-slate-600"
-        >
-          <span>unicamp.br</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+          {/* Alternador de Alto Contraste */}
+          <button
+            onClick={toggleHighContrast}
+            className={`px-3 py-1 text-[11px] font-bold rounded-lg border flex items-center gap-1.5 transition-all ${
+              highContrast
+                ? "bg-[#FBB040] text-black border-[#FBB040] shadow-xs"
+                : "bg-zinc-900 text-zinc-200 border-zinc-700 hover:border-[#FBB040] hover:text-[#FBB040]"
+            }`}
+            title="Alternar modo de alto contraste [Alt + 3]"
+            aria-pressed={highContrast}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>{highContrast ? "Contraste Ativo" : "Alto Contraste"}</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -101,109 +101,39 @@ export default function AnalisarPage() {
       }
 
       const data: AnalysisResult = await response.json();
-      const findingsWithStatus: Finding[] = (data.findings || []).map(f => ({
-        ...f,
-        status: "pending" as const
-      }));
-
-      setResult({
-        ...data,
-        workingText: data.input.text,
-        findings: findingsWithStatus
-      });
+      data.workingText = data.input.text;
+      setResult(data);
       setActiveTab("overview");
       setSelectedFinding(null);
-    } catch (error: any) {
-      alert(error.message || "Ocorreu um erro ao analisar o texto.");
+      showToast("Texto analisado com sucesso!");
+    } catch (error) {
+      console.error("Erro na análise:", error);
+      alert("Houve um erro ao processar o texto. Verifique a conexão ou tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Aceitar sugestão individual
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
+
   const handleApplySuggestion = (finding: Finding) => {
     if (!result || !finding.suggestedText) return;
 
-    const currentWorking = result.workingText || result.input.text;
-    const updatedWorking = currentWorking.replace(finding.originalText, finding.suggestedText);
+    const currentText = result.workingText || result.input.text;
+    if (!currentText.includes(finding.originalText)) {
+      showToast("O trecho original já foi modificado em uma revisão anterior.");
+      return;
+    }
 
-    const updatedFindings = result.findings.map(f =>
-      f.id === finding.id ? { ...f, status: "applied" as const } : f
-    );
-
-    setResult({
-      ...result,
-      workingText: updatedWorking,
-      findings: updatedFindings
-    });
-
-    showToast(`Alteração aplicada: "${finding.originalText}" → "${finding.suggestedText}"`);
-  };
-
-  // Atualizar sugestão gerada pela IA para um finding
-  const handleUpdateFindingSuggestion = (finding: Finding, newSuggestion: string) => {
-    if (!result) return;
-
-    const updatedFindings = result.findings.map(f =>
-      f.id === finding.id ? { ...f, suggestedText: newSuggestion } : f
-    );
-
-    setResult({
-      ...result,
-      findings: updatedFindings
-    });
-
-    showToast(`Nova sugestão gerada pela IA para o trecho selecionado!`);
-  };
-
-  // Reverter sugestão aplicada
-  const handleRevertSuggestion = (finding: Finding) => {
-    if (!result || !finding.suggestedText) return;
-
-    const currentWorking = result.workingText || result.input.text;
-    const updatedWorking = currentWorking.replace(finding.suggestedText, finding.originalText);
-
-    const updatedFindings = result.findings.map(f =>
-      f.id === finding.id ? { ...f, status: "pending" as const } : f
-    );
-
-    setResult({
-      ...result,
-      workingText: updatedWorking,
-      findings: updatedFindings
-    });
-
-    showToast(`Alteração revertida para: "${finding.originalText}"`);
-  };
-
-  // Ignorar apontamento
-  const handleIgnoreFinding = (finding: Finding) => {
-    if (!result) return;
-
-    const currentStatus = finding.status;
-    const nextStatus = currentStatus === "ignored" ? ("pending" as const) : ("ignored" as const);
-
-    const updatedFindings = result.findings.map(f =>
-      f.id === finding.id ? { ...f, status: nextStatus } : f
-    );
-
-    setResult({
-      ...result,
-      findings: updatedFindings
-    });
-  };
-
-  // Aceitar todas as sugestões pendentes em lote
-  const handleApplyAllSuggestions = () => {
-    if (!result) return;
-
-    let updatedWorking = result.workingText || result.input.text;
-    let appliedCount = 0;
+    const updatedText = currentText.replace(finding.originalText, finding.suggestedText);
 
     const updatedFindings = result.findings.map(f => {
-      if ((!f.status || f.status === "pending") && f.suggestedText) {
-        updatedWorking = updatedWorking.replace(f.originalText, f.suggestedText);
-        appliedCount++;
+      if (f.id === finding.id) {
         return { ...f, status: "applied" as const };
       }
       return f;
@@ -211,58 +141,144 @@ export default function AnalisarPage() {
 
     setResult({
       ...result,
-      workingText: updatedWorking,
+      workingText: updatedText,
       findings: updatedFindings
     });
 
-    showToast(`${appliedCount} sugestões foram aplicadas com sucesso no texto!`);
+    showToast(`Sugestão aplicada para '${finding.originalText}'!`);
   };
 
-  // Aplicar reescrita integral gerada por IA
+  const handleRevertSuggestion = (finding: Finding) => {
+    if (!result || !finding.suggestedText) return;
+
+    const currentText = result.workingText || result.input.text;
+    if (!currentText.includes(finding.suggestedText)) {
+      showToast("Não foi possível reverter automaticamente.");
+      return;
+    }
+
+    const updatedText = currentText.replace(finding.suggestedText, finding.originalText);
+
+    const updatedFindings = result.findings.map(f => {
+      if (f.id === finding.id) {
+        return { ...f, status: "pending" as const };
+      }
+      return f;
+    });
+
+    setResult({
+      ...result,
+      workingText: updatedText,
+      findings: updatedFindings
+    });
+
+    showToast(`Alteração revertida para '${finding.originalText}'!`);
+  };
+
+  const handleIgnoreFinding = (finding: Finding) => {
+    if (!result) return;
+
+    const isCurrentlyIgnored = finding.status === "ignored";
+    const nextStatus = isCurrentlyIgnored ? ("pending" as const) : ("ignored" as const);
+
+    const updatedFindings = result.findings.map(f => {
+      if (f.id === finding.id) {
+        return { ...f, status: nextStatus };
+      }
+      return f;
+    });
+
+    setResult({
+      ...result,
+      findings: updatedFindings
+    });
+
+    showToast(isCurrentlyIgnored ? "Apontamento reativado." : "Apontamento ignorado.");
+  };
+
+  const handleUpdateFindingSuggestion = (finding: Finding, newSuggestion: string) => {
+    if (!result) return;
+
+    const updatedFindings = result.findings.map(f => {
+      if (f.id === finding.id) {
+        return { ...f, suggestedText: newSuggestion };
+      }
+      return f;
+    });
+
+    setResult({
+      ...result,
+      findings: updatedFindings
+    });
+
+    showToast("Nova sugestão de IA gerada para o trecho!");
+  };
+
+  const handleApplyAllSuggestions = () => {
+    if (!result) return;
+
+    let currentText = result.workingText || result.input.text;
+    const actionable = result.findings.filter(f => (!f.status || f.status === "pending") && !!f.suggestedText);
+
+    let appliedCount = 0;
+    const updatedFindings = result.findings.map(f => {
+      if ((!f.status || f.status === "pending") && f.suggestedText) {
+        if (currentText.includes(f.originalText)) {
+          currentText = currentText.replace(f.originalText, f.suggestedText);
+          appliedCount++;
+          return { ...f, status: "applied" as const };
+        }
+      }
+      return f;
+    });
+
+    setResult({
+      ...result,
+      workingText: currentText,
+      findings: updatedFindings
+    });
+
+    showToast(`${appliedCount} sugestões aceitas e aplicadas com sucesso!`);
+  };
+
   const handleApplyFullAiRewrite = () => {
     if (!result || !result.rewrittenText) return;
+
+    const updatedFindings = result.findings.map(f => ({ ...f, status: "applied" as const }));
 
     setResult({
       ...result,
       workingText: result.rewrittenText,
-      findings: result.findings.map(f => ({ ...f, status: "applied" as const }))
+      findings: updatedFindings
     });
 
-    showToast("Versão integral em Linguagem Simples aplicada ao texto de trabalho!");
+    showToast("Versão integral reescrita pela IA aplicada com sucesso!");
   };
 
   const handleResetAnalysis = () => {
     setResult(null);
     setSelectedFinding(null);
-    setActiveTab("overview");
-  };
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4000);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Toast de Notificação */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#164e87] text-white px-5 py-3 rounded-2xl shadow-xl border border-blue-400 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          <span className="text-xs font-semibold">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#18181b] text-white px-5 py-3.5 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5">
+          <CheckCircle2 className="w-5 h-5 text-[#FBB040] shrink-0" />
+          <span className="text-xs font-bold">{toastMessage}</span>
         </div>
       )}
 
       {/* Se não houver resultado, exibe o Editor */}
       {!result && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 pb-4">
             <div>
-              <h1 className="text-2xl font-black text-[#1c2d42] tracking-tight">
+              <h1 className="text-2xl font-black text-black tracking-tight">
                 Avaliação de Texto em Linguagem Simples
               </h1>
-              <p className="text-xs text-slate-600 mt-1">
+              <p className="text-xs text-zinc-600 mt-1 font-medium">
                 Cole sua mensagem, ofício ou relatório para receber diagnóstico multidimensional e propostas de simplificação.
               </p>
             </div>
@@ -270,12 +286,12 @@ export default function AnalisarPage() {
             {/* Status do Provedor de IA */}
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-2 transition-all shadow-2xs"
+              className="self-start sm:self-auto text-xs font-bold px-3.5 py-2 rounded-xl border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 text-black flex items-center gap-2 transition-all shadow-2xs"
               title="Configurar Chaves de API de IA"
             >
-              <Cpu className="w-3.5 h-3.5 text-[#005a87]" />
+              <Cpu className="w-3.5 h-3.5 text-[#FBB040]" />
               <span>{aiProviderName}</span>
-              <Settings className="w-3 h-3 text-slate-400 ml-1" />
+              <Settings className="w-3 h-3 text-zinc-400 ml-1" />
             </button>
           </div>
 
@@ -287,35 +303,35 @@ export default function AnalisarPage() {
       {result && (
         <div className="space-y-6">
           {/* Barra Superior de Ações e Abas */}
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-zinc-200 shadow-xs">
             <div className="flex items-center gap-3">
               <button
                 onClick={handleResetAnalysis}
-                className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors"
+                className="text-xs font-bold text-zinc-700 hover:text-black flex items-center gap-1.5 px-3.5 py-2 rounded-xl hover:bg-zinc-100 transition-colors"
                 title="Voltar ao editor e analisar novo texto"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Nova Análise</span>
               </button>
 
-              <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+              <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
 
               {/* Status do Provedor */}
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="text-xs font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 border border-slate-200"
+                className="text-xs font-bold text-zinc-700 hover:text-black flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-zinc-50 border border-zinc-200"
               >
-                <Cpu className="w-3.5 h-3.5 text-[#005a87]" />
+                <Cpu className="w-3.5 h-3.5 text-[#FBB040]" />
                 <span>{aiProviderName}</span>
               </button>
             </div>
 
             {/* Abas de Navegação */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-[#faf9f5] border border-zinc-200 p-1 rounded-2xl">
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
-                  activeTab === "overview" ? "bg-white text-[#005a87] shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+                className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
+                  activeTab === "overview" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
                 }`}
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
@@ -324,8 +340,8 @@ export default function AnalisarPage() {
 
               <button
                 onClick={() => setActiveTab("findings")}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
-                  activeTab === "findings" ? "bg-white text-[#005a87] shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+                className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
+                  activeTab === "findings" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
                 }`}
               >
                 <CheckSquare className="w-3.5 h-3.5" />
@@ -334,18 +350,18 @@ export default function AnalisarPage() {
 
               <button
                 onClick={() => setActiveTab("comparison")}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
-                  activeTab === "comparison" ? "bg-white text-[#005a87] shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+                className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
+                  activeTab === "comparison" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
                 }`}
               >
                 <GitCompare className="w-3.5 h-3.5" />
-                <span>Comparação (Estilo WordPress)</span>
+                <span>Comparação (WordPress)</span>
               </button>
 
               <button
                 onClick={() => setActiveTab("report")}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors ${
-                  activeTab === "report" ? "bg-white text-[#005a87] shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+                className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
+                  activeTab === "report" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
@@ -357,19 +373,19 @@ export default function AnalisarPage() {
               {result.rewrittenText && (
                 <button
                   onClick={handleApplyFullAiRewrite}
-                  className="text-xs font-bold bg-[#005a87] hover:bg-[#00476b] text-white px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors"
+                  className="text-xs font-black bg-[#18181b] hover:bg-black text-[#FBB040] px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors border border-black"
                   title="Substituir o texto original pela proposta integral reescrita pela IA"
                 >
-                  <Wand2 className="w-3.5 h-3.5 text-amber-300" />
+                  <Wand2 className="w-3.5 h-3.5 text-[#FBB040]" />
                   <span>Aplicar Reescrita IA</span>
                 </button>
               )}
 
               <button
                 onClick={() => setIsExportOpen(true)}
-                className="text-xs font-bold bg-[#c2383f] hover:bg-[#a7282e] text-white px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors"
+                className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-[#111111] px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors border border-[#d98a1a]"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-black" />
                 <span>Exportar</span>
               </button>
             </div>
@@ -383,12 +399,12 @@ export default function AnalisarPage() {
               {result.findings.length > 0 && (
                 <div className="pt-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-black text-black">
                       Principais Oportunidades de Melhoria
                     </h3>
                     <button
                       onClick={() => setActiveTab("findings")}
-                      className="text-xs text-[#005a87] font-semibold hover:underline"
+                      className="text-xs text-black font-bold hover:text-[#d98a1a] hover:underline"
                     >
                       Ver todos os {result.findings.length} apontamentos →
                     </button>
@@ -456,41 +472,30 @@ export default function AnalisarPage() {
           {activeTab === "comparison" && (
             <ComparisonView
               originalText={result.input.text}
-              workingText={result.workingText || result.input.text}
+              workingText={result.workingText}
               rewrittenText={result.rewrittenText || result.input.text}
-              onApplyRewritten={() => {
-                setResult({
-                  ...result,
-                  workingText: result.rewrittenText,
-                  findings: result.findings.map(f => ({ ...f, status: "applied" as const }))
-                });
-                showToast("Versão Simplificada aplicada ao texto de trabalho!");
-              }}
+              semanticValidation={result.semanticValidation}
+              onApplyRewritten={handleApplyFullAiRewrite}
             />
           )}
 
           {activeTab === "report" && (
             <FullReport result={result} />
           )}
-
-          {/* Modal de Exportação */}
-          <ExportModal
-            isOpen={isExportOpen}
-            onClose={() => setIsExportOpen(false)}
-            result={result}
-          />
-
-          {/* Modal de Configurações de IA */}
-          <SettingsModal
-            isOpen={isSettingsOpen}
-            onClose={() => {
-              setIsSettingsOpen(false);
-              updateAiProviderDisplay();
-            }}
-            onSaved={updateAiProviderDisplay}
-          />
         </div>
       )}
+
+      <ExportModal
+        result={result!}
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onSaved={updateAiProviderDisplay}
+      />
     </div>
   );
 }

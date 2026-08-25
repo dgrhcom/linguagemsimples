@@ -11,46 +11,40 @@ export function PillarCard({ pillar }: PillarCardProps) {
 
   const Icon = isEncontrar ? Search : isCompreender ? Lightbulb : CheckCircle2;
 
-  const colorStyles = isEncontrar
-    ? { border: "border-sky-200", bg: "bg-sky-50/60", iconBg: "bg-sky-500 text-white", text: "text-sky-900", progress: "bg-sky-500" }
-    : isCompreender
-    ? { border: "border-indigo-200", bg: "bg-indigo-50/60", iconBg: "bg-indigo-500 text-white", text: "text-indigo-900", progress: "bg-indigo-500" }
-    : { border: "border-emerald-200", bg: "bg-emerald-50/60", iconBg: "bg-emerald-500 text-white", text: "text-emerald-900", progress: "bg-emerald-500" };
-
   return (
-    <div className={`rounded-2xl border ${colorStyles.border} ${colorStyles.bg} p-5 transition-all shadow-xs`}>
+    <div className="rounded-3xl border border-zinc-200 bg-white p-5 transition-all shadow-xs hover:border-[#FBB040]">
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-xl ${colorStyles.iconBg} flex items-center justify-center shadow-xs`}>
+          <div className="w-10 h-10 rounded-2xl bg-[#18181b] text-[#FBB040] flex items-center justify-center shadow-xs">
             <Icon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className={`font-bold text-sm ${colorStyles.text}`}>
+            <h3 className="font-black text-sm text-[#18181b]">
               {pillar.title}
             </h3>
-            <span className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">
+            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
               {pillar.pillar}
             </span>
           </div>
         </div>
 
         <div className="text-right">
-          <span className="text-2xl font-black text-slate-900 tracking-tight">
+          <span className="text-2xl font-black text-black tracking-tight">
             {pillar.score}
           </span>
-          <span className="text-xs text-slate-400 font-semibold">/100</span>
+          <span className="text-xs text-zinc-400 font-bold">/100</span>
         </div>
       </div>
 
       {/* Barra de progresso visual */}
-      <div className="w-full bg-slate-200/80 h-2 rounded-full overflow-hidden mb-3">
+      <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden mb-3 border border-zinc-200">
         <div
-          className={`h-full ${colorStyles.progress} transition-all duration-500 rounded-full`}
+          className="h-full bg-[#FBB040] transition-all duration-500 rounded-full"
           style={{ width: `${Math.max(5, pillar.score)}%` }}
         />
       </div>
 
-      <p className="text-xs text-slate-700 leading-relaxed">
+      <p className="text-xs text-zinc-600 leading-relaxed font-medium">
         {pillar.summary}
       </p>
     </div>

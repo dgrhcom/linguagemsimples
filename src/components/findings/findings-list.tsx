@@ -54,34 +54,34 @@ export function FindingsList({
   return (
     <div className="space-y-4">
       {/* Barra de Filtros e Status */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-zinc-200 shadow-xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Filtro por Status */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-[#faf9f5] border border-zinc-200 p-1 rounded-2xl">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                statusFilter === "all" ? "bg-white text-slate-900 shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+              className={`text-xs font-bold px-3.5 py-1.5 rounded-xl transition-colors ${
+                statusFilter === "all" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
               }`}
             >
               Todos ({findings.length})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${
-                statusFilter === "pending" ? "bg-white text-amber-800 shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+              className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1 transition-colors ${
+                statusFilter === "pending" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
               }`}
             >
-              <Clock className="w-3.5 h-3.5 text-amber-600" />
+              <Clock className="w-3.5 h-3.5 text-[#FBB040]" />
               <span>Pendentes ({pendingCount})</span>
             </button>
             <button
               onClick={() => setStatusFilter("applied")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${
-                statusFilter === "applied" ? "bg-white text-emerald-800 shadow-xs font-bold" : "text-slate-600 hover:text-slate-900"
+              className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1 transition-colors ${
+                statusFilter === "applied" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
               }`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#FBB040]" />
               <span>Aplicadas ({appliedCount})</span>
             </button>
           </div>
@@ -90,23 +90,23 @@ export function FindingsList({
           {pendingActionableCount > 0 && onApplyAllSuggestions && (
             <button
               onClick={onApplyAllSuggestions}
-              className="text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors"
+              className="text-xs font-black text-[#111111] bg-[#FBB040] hover:bg-[#e59b2b] border border-[#d98a1a] px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors"
             >
-              <CheckCheck className="w-4 h-4" />
+              <CheckCheck className="w-4 h-4 text-black" />
               <span>Aceitar Todas as Sugestões ({pendingActionableCount})</span>
             </button>
           )}
         </div>
 
         {/* Filtro por Categoria */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 border-t border-slate-100 pt-2.5">
-          <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-1.5 overflow-x-auto py-1 border-t border-zinc-100 pt-3">
+          <Filter className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`text-xs px-2.5 py-1 rounded-md transition-colors shrink-0 font-medium ${
+            className={`text-xs px-3 py-1.5 rounded-xl transition-colors shrink-0 font-bold ${
               selectedCategory === "all"
-                ? "bg-[#005a87] text-white font-bold"
-                : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                ? "bg-[#18181b] text-[#FBB040]"
+                : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
             }`}
           >
             Todas as Categorias
@@ -115,10 +115,10 @@ export function FindingsList({
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`text-xs px-2.5 py-1 rounded-md capitalize transition-colors shrink-0 font-medium ${
+              className={`text-xs px-3 py-1.5 rounded-xl capitalize transition-colors shrink-0 font-bold ${
                 selectedCategory === cat
-                  ? "bg-[#005a87] text-white font-bold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                  ? "bg-[#18181b] text-[#FBB040]"
+                  : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
               }`}
             >
               {cat} ({findings.filter(f => f.category === cat).length})
@@ -130,7 +130,7 @@ export function FindingsList({
       {/* Lista de Cards */}
       <div className="space-y-3">
         {filteredFindings.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-500">
+          <div className="bg-white rounded-3xl border border-zinc-200 p-8 text-center text-zinc-500 font-medium">
             Nenhum apontamento encontrado com os filtros selecionados.
           </div>
         ) : (

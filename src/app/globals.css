@@ -23,32 +23,38 @@
   }
 
   :root {
-    --background: 210 33% 98%;
-    --foreground: 216 38% 18%;
+    --background: 45 25% 97%; /* Papel suave #faf9f5 */
+    --foreground: 0 0% 9%; /* Preto profundo #171717 */
     --card: 0 0% 100%;
-    --card-foreground: 216 38% 18%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 216 38% 18%;
-    --primary: 211 75% 35%; /* Azul institucional Unicamp #164e87 */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 35% 94%;
-    --secondary-foreground: 216 38% 18%;
-    --muted: 210 30% 95%;
-    --muted-foreground: 215 20% 45%;
-    --accent: 199 89% 48%; /* Ciano/Teal Unicamp #0ea5e9 */
-    --accent-foreground: 210 40% 98%;
-    --destructive: 357 56% 49%; /* Vermelho institucional Unicamp #c2383f */
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 25% 88%;
-    --input: 214 25% 88%;
-    --ring: 211 75% 35%;
-    --radius: 0.75rem;
+    --popover-foreground: 0 0% 9%;
+    --primary: 36 96% 62%; /* Amarelo ouro #FBB040 */
+    --primary-foreground: 0 0% 7%;
+    --secondary: 40 18% 92%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 40 15% 94%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 36 96% 62%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 0% 20%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 40 12% 88%;
+    --input: 40 12% 88%;
+    --ring: 36 96% 62%;
+    --radius: 0.85rem;
   }
 }
 
+/* Fundo geral com textura sutil e confortável de papel */
 body {
-  background-color: #f8fafc;
-  color: #1e293b;
+  background-color: #faf9f5;
+  background-image: 
+    radial-gradient(#e5e2d6 0.75px, transparent 0.75px),
+    radial-gradient(#e5e2d6 0.75px, #faf9f5 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  color: #18181b;
   font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
   display: flex;
@@ -57,16 +63,17 @@ body {
 
 /* Foco visível acessível universal */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-  outline: 3px solid #164e87 !important;
+  outline: 3px solid #FBB040 !important;
   outline-offset: 2px !important;
 }
 
 /* ==========================================================================
-   ALTO CONTRASTE (WCAG AAA - PRETO & AMARELO / BRANCO DE ALTO CONTRASTE)
+   ALTO CONTRASTE (WCAG AAA - PRETO & AMARELO)
    ========================================================================== */
 html[data-high-contrast="true"],
 html[data-high-contrast="true"] body {
   background-color: #000000 !important;
+  background-image: none !important;
   color: #ffff00 !important;
 }
 
@@ -119,40 +126,41 @@ html[data-high-contrast="true"] textarea:focus-visible {
 
 html[data-high-contrast="true"] mark,
 html[data-high-contrast="true"] .diff-inserted {
-  background-color: #003300 !important;
-  color: #55ff55 !important;
-  border: 1px solid #55ff55 !important;
+  background-color: #332600 !important;
+  color: #ffff00 !important;
+  border: 1px solid #ffff00 !important;
 }
 
 html[data-high-contrast="true"] .diff-deleted {
-  background-color: #330000 !important;
-  color: #ff5555 !important;
-  border: 1px solid #ff5555 !important;
+  background-color: #222222 !important;
+  color: #888888 !important;
+  text-decoration: line-through !important;
+  border: 1px solid #666666 !important;
 }
 
 /* ==========================================================================
    ESTILO DE REVISÕES WORDPRESS (DIFF HIGHLIGHTS)
    ========================================================================== */
 .diff-deleted {
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: #f4f4f5;
+  color: #71717a;
   text-decoration: line-through;
   padding: 0.125rem 0.35rem;
   border-radius: 0.25rem;
   margin: 0 0.125rem;
   font-weight: 500;
-  border: 1px solid #fca5a5;
+  border: 1px solid #e4e4e7;
 }
 
 .diff-inserted {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #fef7eb;
+  color: #92400e;
   padding: 0.125rem 0.35rem;
   border-radius: 0.25rem;
   margin: 0 0.125rem;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
-  border: 1px solid #86efac;
+  border: 1px solid #FBB040;
 }
 
 /* Print CSS */
@@ -162,6 +170,7 @@ html[data-high-contrast="true"] .diff-deleted {
   }
   body {
     background: #fff !important;
+    background-image: none !important;
     color: #000 !important;
     font-size: 12pt !important;
   }
