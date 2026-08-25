@@ -4,7 +4,7 @@ import { getLanguageModelProvider } from "@/lib/ai";
 import { validateSemanticPreservation } from "@/lib/analysis/semantic-validator";
 import { AnalysisInput } from "@/types/analysis";
 import { buildSegmentRewritePrompt } from "@/lib/ai/prompts";
-import { rewriteToPlainLanguage } from "@/lib/analysis/plain-language-rewriter";
+import { rewriteToPlainLanguage, guaranteeDifferentSuggestion } from "@/lib/analysis/plain-language-rewriter";
 
 const inputSchema = z.object({
   text: z.string().min(1).max(50000),
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
       let rewritten = output.rewrittenText.trim();
       if (!rewritten || rewritten === text.trim()) {
-        rewritten = unicampBase;
+        rewritten = guaranteeDifferentSuggestion(text, unicampBase);
       }
 
       return NextResponse.json({
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     
     let rewritten = output.rewrittenText.trim();
     if (!rewritten || rewritten === input.text.trim()) {
-      rewritten = unicampBase;
+      rewritten = guaranteeDifferentSuggestion(input.text, unicampBase);
     }
     const semanticValidation = validateSemanticPreservation(input.text, rewritten);
 
@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
       semanticValidation,
       mode: "full"
     });
+
   } catch (error: any) {
     console.error("API /api/rewrite error:", error);
     return NextResponse.json({ error: "Erro ao gerar reescrita", message: error.message }, { status: 500 });

@@ -134,4 +134,14 @@ test("12. Reescrita de Preâmbulos Normativos e Frases Longas de Instrução Nor
   assert.ok(!rewritten.includes("dependerá de comprovação"), "Deve simplificar 'dependerá de comprovação'");
 });
 
+test("13. Reescrita de Artigo Normativo com Mais de 20 Palavras", async () => {
+  const article = "Artigo 1º – A caracterização e a comprovação do tempo de atividade sob condições especiais obedecerão ao disposto na legislação em vigor na época do exercício das atribuições do servidor público.";
+  const rewritten = rewriteToPlainLanguage(article);
+
+  assert.notEqual(rewritten, article, "A reescrita do artigo normativo NÃO pode ser idêntica ao original!");
+  assert.ok(!rewritten.includes("obedecerão ao disposto na legislação em vigor"), "Deve simplificar a fórmula 'obedecerão ao disposto na legislação em vigor'");
+  assert.ok(rewritten.includes("seguem a legislação") || rewritten.includes("regras vigentes") || rewritten.includes("tempo especial"), "Deve conter linguagem simplificada");
+});
+
+
 

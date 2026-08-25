@@ -76,9 +76,38 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
         if (!response.ok) {
           const errBody = await response.text();
           console.warn(`[Gemini API] Falha no modelo ${model} (${response.status}):`, errBody);
+
+          // Tenta chamada com prompt inline se falhar com erro 400 (ex: system_instruction não aceita na versão)
+          try {
+            const inlineRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [
+                    {
+                      role: "user",
+                      parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+                    }
+                  ],
+                  generationConfig: { temperature: 0.2 }
+                })
+              }
+            );
+            if (inlineRes.ok) {
+              const inlineData = await inlineRes.json();
+              const inlineText = inlineData.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (inlineText && inlineText.trim()) {
+                return inlineText.trim();
+              }
+            }
+          } catch (retryErr) {}
+
           lastError = new Error(`Gemini API ${response.status}: ${errBody}`);
           continue; // Tenta o próximo modelo candidato
         }
+
 
         const data = await response.json();
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;

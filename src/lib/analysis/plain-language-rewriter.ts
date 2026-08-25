@@ -159,12 +159,25 @@ function rewriteSingleParagraph(paragraph: string): string {
 
   // 7. Expressões Burocráticas, Fórmulas e Nominalizações
   const phraseTransformations: [RegExp, string][] = [
-    // Fórmulas de tempo e previdência administrativa
+    // Fórmulas de tempo, previdência e atos normativos
     [/\bdepender[aá]\s+de\s+comprova[cç][aã]o\b/gi, "exige comprovação"],
     [/\bde\s+modo\s+permanente,\s*n[aã]o\s+ocasional\s+nem\s+intermitente\b/gi, "de forma contínua e permanente"],
     [/\bsob\s+condi[cç][oõ]es\s+especiais\s+prejudiciais\s+[aà]\s+sa[uú]de\s+ou\s+[aà]\s+integridade\s+f[ií]sica\b/gi, "em condições prejudiciais à saúde ou integridade física"],
+    [/\btempo\s+de\s+atividade\s+sob\s+condi[cç][oõ]es\s+especiais\b/gi, "tempo especial de trabalho"],
     [/\btempo\s+de\s+servi[cç]o\s+p[uú]blico\s+exercido\s+pelos\s+servidores\b/gi, "tempo de serviço público dos servidores"],
+    [/\bobedecer[aã]o\s+ao\s+disposto\s+na\s+legisla[cç][aã]o\s+em\s+vigor\b/gi, "seguem a legislação vigente"],
+    [/\bobedecer[aá]\s+ao\s+disposto\s+na\s+legisla[cç][aã]o\s+em\s+vigor\b/gi, "segue a legislação vigente"],
+    [/\bobedecer[aã]o\s+ao\s+disposto\s+n[eoa]s?\b/gi, "seguem o disposto n$1"],
+    [/\bobedecer[aá]\s+ao\s+disposto\s+n[eoa]s?\b/gi, "segue o disposto n$1"],
+    [/\bobedecer[aã]o\s+ao\s+disposto\b/gi, "seguem as regras"],
+    [/\bobedecer[aá]\s+ao\s+disposto\b/gi, "segue as regras"],
+    [/\bna\s+[eé]poca\s+do\s+exerc[ií]cio\s+das\s+atribui[cç][oõ]es\s+d[eoa]\s+servidor(?:a)?\s+p[uú]blico\b/gi, "na época do trabalho da pessoa servidora"],
+    [/\bna\s+[eé]poca\s+do\s+exerc[ií]cio\s+das\s+atribui[cç][oõ]es\b/gi, "na época em que trabalhou"],
+    [/\bdo\s+exerc[ií]cio\s+das\s+atribui[cç][oõ]es\s+d[eoa]\s+servidor(?:a)?\s+p[uú]blico\b/gi, "do trabalho da pessoa servidora"],
+    [/\bdo\s+exerc[ií]cio\s+das\s+atribui[cç][oõ]es\b/gi, "do trabalho"],
+    [/\bcaracteriza[cç][aã]o\s+e\s+a\s+comprova[cç][aã]o\b/gi, "definição e a comprovação"],
     [/\bmanifesta[cç][aã]o\s+escrita\s+a\s+pr[oó]prio\s+punho\s+declarando\s+seu\s+endere[cç]o\s+de\s+resid[eê]ncia\s+domiciliar\b/gi, "declaração de residência escrita à mão"],
+
     [/\bmanifesta[cç][aã]o\s+escrita\s+a\s+pr[oó]prio\s+punho\b/gi, "declaração escrita à mão"],
     [/\bendere[cç]o\s+de\s+resid[eê]ncia\s+domiciliar\b/gi, "endereço residencial"],
     [/\bresid[eê]ncia\s+domiciliar\b/gi, "residência"],
