@@ -11,10 +11,7 @@ import { AnalysisInput, AnalysisResult, Finding } from "@/types/analysis";
 
 const inputSchema = z.object({
   text: z.string().min(1, "O texto para análise não pode estar vazio.").max(50000, "Texto muito longo (máximo 50.000 caracteres)."),
-  documentType: z.enum([
-    "general", "email", "notice", "official-letter", "memo", "report",
-    "opinion", "declaration", "minutes", "ordinance", "resolution", "instruction", "regulation"
-  ] as const).default("general"),
+  documentType: z.string().default("comunicado"),
   targetAudience: z.string().optional(),
   textGoal: z.string().optional(),
   options: z.object({
@@ -22,6 +19,7 @@ const inputSchema = z.object({
     strictInclusiveMode: z.boolean().optional()
   }).optional()
 });
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +33,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const input: AnalysisInput = parsed.data;
+    const input: AnalysisInput = {
+      ...parsed.data,
+      documentType: parsed.data.documentType as any
+    };
+
 
     // Headers opcionais de API Key enviados pelo cliente
     const customApiKey = req.headers.get("x-ai-api-key") || undefined;

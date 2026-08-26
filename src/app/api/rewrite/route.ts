@@ -11,13 +11,11 @@ const inputSchema = z.object({
   text: z.string().min(1).max(50000),
   mode: z.enum(["full", "segment"]).default("full"),
   segmentIssue: z.string().optional(),
-  documentType: z.enum([
-    "general", "email", "notice", "official-letter", "memo", "report",
-    "opinion", "declaration", "minutes", "ordinance", "resolution", "instruction", "regulation"
-  ] as const).default("general"),
+  documentType: z.string().default("comunicado"),
   targetAudience: z.string().optional(),
   textGoal: z.string().optional()
 });
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,7 +35,8 @@ export async function POST(req: NextRequest) {
     const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
     const isLongSentence = text.split(/\s+/).filter(Boolean).length > 20;
     const unicampBase = isLongSentence ? undefined : rewriteToPlainLanguage(text);
-    const input: AnalysisInput = { text, documentType, targetAudience, textGoal };
+    const input: AnalysisInput = { text, documentType: documentType as any, targetAudience, textGoal };
+
 
     if (mode === "segment") {
       // Reescrita de trecho/frase específica com IA utilizando a base da Unicamp

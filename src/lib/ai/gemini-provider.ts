@@ -20,9 +20,10 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
   constructor(apiKey: string, model: string = "gemini-2.0-flash") {
     this.apiKey = apiKey;
     this.primaryModel = model;
-    this.candidateModels = Array.from(new Set([model, "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"]));
+    this.candidateModels = Array.from(new Set([model, "gemini-2.0-flash", "gemini-1.5-flash"]));
     this.fallback = new MockLanguageModelProvider();
   }
+
 
   private cleanJsonResponse(rawText: string): any {
     try {
@@ -57,6 +58,7 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
             headers: {
               "Content-Type": "application/json"
             },
+            signal: AbortSignal.timeout(8000),
             body: JSON.stringify({
               system_instruction: {
                 parts: [{ text: systemPrompt }]
@@ -74,6 +76,7 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
             })
           }
         );
+
 
         if (!response.ok) {
           const errBody = await response.text();

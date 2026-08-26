@@ -103,9 +103,9 @@ export default function AnalisarPage() {
 				body: JSON.stringify(input)
 			});
 
-
 			if (!response.ok) {
-				throw new Error("Erro ao realizar a análise do texto.");
+				const errData = await response.json().catch(() => ({}));
+				throw new Error(errData.error || errData.message || "Erro ao realizar a análise do texto.");
 			}
 
 			const data: AnalysisResult = await response.json();
@@ -114,13 +114,14 @@ export default function AnalisarPage() {
 			setActiveTab("overview");
 			setSelectedFinding(null);
 			showToast("Texto analisado com sucesso!");
-		} catch (error) {
+		} catch (error: any) {
 			console.error("Erro na análise:", error);
-			alert("Houve um erro ao processar o texto. Verifique a conexão ou tente novamente.");
+			alert(error.message || "Houve um erro ao processar o texto. Tente novamente.");
 		} finally {
 			setLoading(false);
 		}
 	};
+
 
 	const showToast = (msg: string) => {
 		setToastMessage(msg);
