@@ -328,7 +328,33 @@ export default function AnalisarPage() {
 	};
 
 
+	const handleUpdateWorkingText = (newText: string) => {
+		if (!result) return;
+		setResult({
+			...result,
+			workingText: newText
+		});
+		showToast("Texto do documento atualizado!");
+	};
+
+	const handleReanalyze = async (customText?: string) => {
+		const textToAnalyze = (typeof customText === "string" ? customText : (result?.workingText || result?.input.text || "")).trim();
+		if (!textToAnalyze) return;
+
+		await handleAnalyze({
+			text: textToAnalyze,
+			documentType: result?.input.documentType || "general",
+			targetAudience: result?.input.targetAudience,
+			textGoal: result?.input.textGoal
+		});
+	};
+
+	const [draftInitialText, setDraftInitialText] = useState("");
+
 	const handleResetAnalysis = () => {
+		if (result) {
+			setDraftInitialText(result.workingText || result.input.text || "");
+		}
 		setResult(null);
 		setSelectedFinding(null);
 	};
@@ -368,7 +394,7 @@ export default function AnalisarPage() {
 						</button>
 					</div>
 
-					<TextEditor onAnalyze={handleAnalyze} isLoading={loading} />
+					<TextEditor onAnalyze={handleAnalyze} isLoading={loading} initialText={draftInitialText} />
 				</div>
 			)}
 
@@ -377,14 +403,24 @@ export default function AnalisarPage() {
 				<div className="space-y-6">
 					{/* Barra Superior de Ações e Abas */}
 					<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-zinc-200 shadow-2xs">
-						<div className="flex items-center gap-2.5">
+						<div className="flex items-center gap-2">
 							<button
 								onClick={handleResetAnalysis}
 								className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-zinc-100 transition-colors"
-								title="Voltar ao editor e analisar novo texto"
+								title="Voltar ao editor completo"
 							>
 								<RotateCcw className="w-3.5 h-3.5" />
 								<span>Nova Análise</span>
+							</button>
+
+							<button
+								onClick={() => handleReanalyze()}
+								disabled={loading}
+								className="text-xs font-bold text-zinc-800 hover:text-black flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-zinc-100 transition-colors"
+								title="Reanalisar o texto com todas as edições e alterações atuais"
+							>
+								<RotateCcw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#d98a1a]" : "text-[#d98a1a]"}`} />
+								<span>{loading ? "Reanalisando..." : "Reanalisar"}</span>
 							</button>
 
 							<div className="h-4 w-px bg-zinc-200 hidden sm:block" />
@@ -399,6 +435,7 @@ export default function AnalisarPage() {
 								<span className="text-[11px] font-semibold">{aiProviderName}</span>
 							</button>
 						</div>
+
 
 						{/* Abas de Navegação (Segmented Control Elegante) */}
 						<div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 self-start lg:self-center">
@@ -498,9 +535,13 @@ export default function AnalisarPage() {
 										<div className="lg:col-span-6">
 											<AnnotatedText
 												text={result.workingText || result.input.text}
+												originalInputText={result.input.text}
 												findings={result.findings}
 												selectedFinding={selectedFinding}
 												onSelectFinding={setSelectedFinding}
+												onUpdateText={handleUpdateWorkingText}
+												onReanalyze={handleReanalyze}
+												isReanalyzing={loading}
 											/>
 										</div>
 										<div className="lg:col-span-6">
@@ -529,12 +570,17 @@ export default function AnalisarPage() {
 								<div className="sticky top-28">
 									<AnnotatedText
 										text={result.workingText || result.input.text}
+										originalInputText={result.input.text}
 										findings={result.findings}
 										selectedFinding={selectedFinding}
 										onSelectFinding={setSelectedFinding}
+										onUpdateText={handleUpdateWorkingText}
+										onReanalyze={handleReanalyze}
+										isReanalyzing={loading}
 									/>
 								</div>
 							</div>
+
 
 							<div className="lg:col-span-7">
 								<FindingsList

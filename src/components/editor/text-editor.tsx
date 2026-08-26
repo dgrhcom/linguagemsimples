@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import { DocumentType } from "@/types/document";
 import { AnalysisInput } from "@/types/analysis";
 import { Sparkles, Upload, FileText, ChevronDown, CheckCircle, HelpCircle } from "lucide-react";
@@ -19,6 +20,13 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
   const [targetAudience, setTargetAudience] = useState("");
   const [textGoal, setTextGoal] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  useEffect(() => {
+    if (initialText) {
+      setText(initialText);
+    }
+  }, [initialText]);
+
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;
