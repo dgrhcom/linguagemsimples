@@ -27,6 +27,8 @@ import {
 	Settings
 } from "lucide-react";
 
+import { safeStorage } from "@/lib/storage";
+
 export default function AnalisarPage() {
 	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -41,9 +43,9 @@ export default function AnalisarPage() {
 
 	const updateAiProviderDisplay = () => {
 		try {
-			const provider = localStorage.getItem("preferred_ai_provider") || "offline";
-			const geminiKey = localStorage.getItem("custom_gemini_api_key");
-			const openaiKey = localStorage.getItem("custom_openai_api_key");
+			const provider = safeStorage.getItem("preferred_ai_provider") || "offline";
+			const geminiKey = safeStorage.getItem("custom_gemini_api_key");
+			const openaiKey = safeStorage.getItem("custom_openai_api_key");
 
 			if (provider === "gemini" && geminiKey && geminiKey.trim()) {
 				setAiProviderName("Google Gemini (Online)");
@@ -58,6 +60,7 @@ export default function AnalisarPage() {
 			setAiProviderName("Motor Unicamp (Offline)");
 		}
 	};
+
 
 	useEffect(() => {
 		updateAiProviderDisplay();

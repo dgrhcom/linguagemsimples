@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import { ZoomIn, ZoomOut, RotateCcw, Eye, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
+import { safeStorage } from "@/lib/storage";
+
 export function AccessibilityBar() {
   const [fontSize, setFontSize] = useState<"sm" | "md" | "lg" | "xl">("md");
   const [highContrast, setHighContrast] = useState(false);
 
   useEffect(() => {
     try {
-      const savedFontSize = (localStorage.getItem("font_size") as "sm" | "md" | "lg" | "xl") || "md";
-      const savedHighContrast = localStorage.getItem("high_contrast") === "true";
+      const savedFontSize = (safeStorage.getItem("font_size") as "sm" | "md" | "lg" | "xl") || "md";
+      const savedHighContrast = safeStorage.getItem("high_contrast") === "true";
       setFontSize(savedFontSize);
       setHighContrast(savedHighContrast);
       document.documentElement.setAttribute("data-font-size", savedFontSize);
@@ -26,27 +28,22 @@ export function AccessibilityBar() {
     const newSize = sizes[newIndex];
     setFontSize(newSize);
     document.documentElement.setAttribute("data-font-size", newSize);
-    try {
-      localStorage.setItem("font_size", newSize);
-    } catch (e) {}
+    safeStorage.setItem("font_size", newSize);
   };
 
   const handleResetFontSize = () => {
     setFontSize("md");
     document.documentElement.setAttribute("data-font-size", "md");
-    try {
-      localStorage.setItem("font_size", "md");
-    } catch (e) {}
+    safeStorage.setItem("font_size", "md");
   };
 
   const toggleHighContrast = () => {
     const next = !highContrast;
     setHighContrast(next);
     document.documentElement.setAttribute("data-high-contrast", String(next));
-    try {
-      localStorage.setItem("high_contrast", String(next));
-    } catch (e) {}
+    safeStorage.setItem("high_contrast", String(next));
   };
+
 
   return (
     <aside

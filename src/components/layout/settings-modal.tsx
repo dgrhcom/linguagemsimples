@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Sparkles, Key, Check, X, Shield, Cpu, HelpCircle, ExternalLink } from "lucide-react";
+import { safeStorage } from "@/lib/storage";
+
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -17,9 +19,9 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
 
   useEffect(() => {
     try {
-      const storedGemini = localStorage.getItem("custom_gemini_api_key") || "";
-      const storedOpenAI = localStorage.getItem("custom_openai_api_key") || "";
-      const storedProvider = (localStorage.getItem("preferred_ai_provider") as any) || (storedGemini ? "gemini" : storedOpenAI ? "openai" : "offline");
+      const storedGemini = safeStorage.getItem("custom_gemini_api_key") || "";
+      const storedOpenAI = safeStorage.getItem("custom_openai_api_key") || "";
+      const storedProvider = (safeStorage.getItem("preferred_ai_provider") as any) || (storedGemini ? "gemini" : storedOpenAI ? "openai" : "offline");
 
       setGeminiKey(storedGemini);
       setOpenaiKey(storedOpenAI);
@@ -38,17 +40,17 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
         finalProvider = "openai";
       }
 
-      localStorage.setItem("preferred_ai_provider", finalProvider);
+      safeStorage.setItem("preferred_ai_provider", finalProvider);
       if (geminiKey.trim()) {
-        localStorage.setItem("custom_gemini_api_key", geminiKey.trim());
+        safeStorage.setItem("custom_gemini_api_key", geminiKey.trim());
       } else {
-        localStorage.removeItem("custom_gemini_api_key");
+        safeStorage.removeItem("custom_gemini_api_key");
       }
 
       if (openaiKey.trim()) {
-        localStorage.setItem("custom_openai_api_key", openaiKey.trim());
+        safeStorage.setItem("custom_openai_api_key", openaiKey.trim());
       } else {
-        localStorage.removeItem("custom_openai_api_key");
+        safeStorage.removeItem("custom_openai_api_key");
       }
 
       setSavedSuccess(true);

@@ -27,12 +27,14 @@ export function getLanguageModelProvider(customConfig?: { provider?: "gemini" | 
   return new MockLanguageModelProvider();
 }
 
+import { safeStorage } from "@/lib/storage";
+
 export function getStoredAiHeaders(): Record<string, string> {
   if (typeof window === "undefined") return {};
   try {
-    const provider = localStorage.getItem("preferred_ai_provider");
-    const geminiKey = localStorage.getItem("custom_gemini_api_key");
-    const openaiKey = localStorage.getItem("custom_openai_api_key");
+    const provider = safeStorage.getItem("preferred_ai_provider");
+    const geminiKey = safeStorage.getItem("custom_gemini_api_key");
+    const openaiKey = safeStorage.getItem("custom_openai_api_key");
 
     if (provider === "openai" && openaiKey && openaiKey.trim()) {
       return { "x-ai-provider": "openai", "x-ai-api-key": openaiKey.trim() };
@@ -54,6 +56,7 @@ export function getStoredAiHeaders(): Record<string, string> {
   } catch (e) {}
   return {};
 }
+
 
 
 export * from "./provider";
