@@ -243,6 +243,68 @@ test("17. Geração de DOCX Oficial no Padrão Comunicado Unicamp", async () => 
   assert.ok(blob.size > 1000, "O arquivo DOCX gerado deve ter tamanho válido com estrutura Office Open XML");
 });
 
+test("18. Geração de DOCX Universal para Portaria, Ofício e Ata", async () => {
+  const { generateDocumentDocx } = await import("../src/lib/templates/docx-document-generator.ts");
+
+  // Portaria
+  const portariaBlob = await generateDocumentDocx(
+    "portaria",
+    "Art. 1º Fica instituída a comissão especial.\\nArt. 2º Esta Portaria entra em vigor na data de sua publicação.",
+    {
+      unitName: "Gabinete do Reitor",
+      documentNumber: "45/2026",
+      emailSite: "reitoria@unicamp.br | www.unicamp.br",
+      locationAndDate: "Campinas, 26 de agosto de 2026",
+      ementa: "Institui a comissão especial de linguagem simples.",
+      preamble: "O Reitor da Universidade Estadual de Campinas resolve:",
+      authorName: "Reitoria da Unicamp",
+      authorRole: "Reitor"
+    }
+  );
+  assert.ok(portariaBlob && portariaBlob.size > 1000, "Deve gerar DOCX válido de Portaria com Ementa e Artigos");
+
+  // Ofício
+  const oficioBlob = await generateDocumentDocx(
+    "oficio",
+    "Solicitamos a gentileza de encaminhar as informações técnicas.",
+    {
+      unitName: "Diretoria Geral de Recursos Humanos",
+      documentNumber: "123/2026",
+      emailSite: "dgrh@unicamp.br",
+      locationAndDate: "Campinas, 26 de agosto de 2026",
+      recipientName: "Prof. Dr. Diretor de Instituto",
+      recipientRole: "Diretor",
+      subject: "Solicitação de informações",
+      vocativo: "Senhor Diretor,",
+      fecho: "Atenciosamente,",
+      authorName: "Coordenador Geral",
+      authorRole: "Diretoria Geral"
+    }
+  );
+  assert.ok(oficioBlob && oficioBlob.size > 1000, "Deve gerar DOCX válido de Ofício com Destinatário e Vocativo");
+});
+
+test("19. Validação do Catálogo Completo dos 21 Tipos de Documentos Oficiais da Unicamp", async () => {
+  const typesData = JSON.parse(await import("fs").then(m => m.readFileSync("d:/workspace/active/linguagemsimples/src/data/document-types/document-types.json", "utf8")));
+
+  assert.ok(typesData.length >= 21, "Deve conter todos os 21 tipos de documentos oficiais");
+
+  const requiredSlugs = [
+    "ata", "carta", "certificado", "comunicado", "decisao", "declaracao",
+    "despacho", "informacao", "memorando", "oficio", "oficio-circular",
+    "pauta", "parecer", "relatorio", "deliberacao", "instrucao-normativa",
+    "portaria", "regimento", "regulamento", "resolucao", "conceito-atos-normativos"
+  ];
+
+  requiredSlugs.forEach(slug => {
+    const found = typesData.find(d => d.type === slug);
+    assert.ok(found, `O tipo ${slug} deve estar cadastrado no catálogo de modelos`);
+    assert.ok(found.label, `O tipo ${slug} deve possuir rótulo legível`);
+    assert.ok(found.description, `O tipo ${slug} deve possuir descrição`);
+  });
+});
+
+
 
 
 

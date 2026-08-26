@@ -9,9 +9,12 @@ import { ComparisonView } from "@/components/comparison/comparison-view";
 import { FullReport } from "@/components/report/full-report";
 import { ExportModal } from "@/components/export/export-modal";
 import { SettingsModal } from "@/components/layout/settings-modal";
-import { ComunicadoDrawer } from "@/components/templates/comunicado-drawer";
+import { DynamicDocumentDrawer } from "@/components/templates/dynamic-document-drawer";
 import { AnalysisInput, AnalysisResult, Finding } from "@/types/analysis";
+
 import { getStoredAiHeaders } from "@/lib/ai";
+import documentTypesData from "@/data/document-types/document-types.json";
+
 
 import {
 	LayoutDashboard,
@@ -511,11 +514,12 @@ export default function AnalisarPage() {
 								type="button"
 								onClick={() => setIsTemplateDrawerOpen(true)}
 								className="text-xs font-bold text-zinc-900 bg-[#fef7eb] hover:bg-[#fdecd0] border border-[#FBB040] px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs"
-								title="Visualizar o texto formatado no gabarito oficial do Comunicado da Unicamp"
+								title={`Visualizar o texto formatado no modelo oficial de ${documentTypesData.find(dt => dt.type === (result.input.documentType || "comunicado"))?.label || "Documento"}`}
 							>
 								<FileText className="w-3.5 h-3.5 text-[#d98a1a]" />
-								<span>Modelo Comunicado</span>
+								<span>Ver {documentTypesData.find(dt => dt.type === (result.input.documentType || "comunicado"))?.label || "Documento"}</span>
 							</button>
+
 
 							<button
 								onClick={() => setIsExportOpen(true)}
@@ -645,13 +649,14 @@ export default function AnalisarPage() {
 			/>
 
 			{result && (
-				<ComunicadoDrawer
+				<DynamicDocumentDrawer
 					isOpen={isTemplateDrawerOpen}
 					onClose={() => setIsTemplateDrawerOpen(false)}
 					text={result.workingText || result.input.text}
+					docType={result.input.documentType || "comunicado"}
 				/>
 			)}
 		</div>
 	);
-
 }
+

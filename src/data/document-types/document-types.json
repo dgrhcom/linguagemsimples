@@ -1,92 +1,596 @@
 [
   {
-    "type": "general",
-    "label": "Texto Geral / Comunicação Pública",
-    "category": "geral",
-    "description": "Comunicações gerais para o público amplo, informes, posts informativos ou orientações de serviços.",
-    "expectedSections": ["Título Claro", "Objetivo / Mensagem Central", "Informações Práticas / Instruções", "Canais de Dúvidas"],
-    "mandatoryElements": ["Linguagem direta", "Frases curtas (<= 20 palavras)", "Informação acionável"],
-    "competenceNote": "Aplicável a qualquer servidor, comunicador ou setor."
-  },
-  {
-    "type": "email",
-    "label": "Mensagem Eletrônica (E-mail Institucional)",
-    "category": "digital",
-    "description": "Comunicação oficial por correio eletrônico com validade administrativa.",
-    "expectedSections": ["Assunto Claro e Específico", "Saudação / Vocativo Formal", "Mensagem Central Direta", "Próximos Passos / Prazos", "Fecho Padrão (Atenciosamente/Cordialmente)", "Assinatura Institucional Completa"],
-    "mandatoryElements": ["Assunto conciso", "Fecho oficial", "Assinatura com nome, cargo e órgão"],
-    "competenceNote": "Todos os servidores com e-mail institucional."
-  },
-  {
-    "type": "notice",
-    "label": "Comunicado",
-    "category": "administrativo",
-    "description": "Comunicação de ordem geral emitida para prestar informações ou esclarecimentos a uma comunidade.",
-    "expectedSections": ["Cabeçalho Institucional", "Título do Comunicado", "Introdução com Motivo", "Detalhamento e Prazos", "Local e Data", "Identificação do Emissor"],
-    "mandatoryElements": ["Objetivo no primeiro parágrafo", "Prazos em destaque"],
-    "competenceNote": "Diretoria, Coordenadorias e Órgãos da Instituição."
-  },
-  {
-    "type": "official-letter",
-    "label": "Ofício / Ofício Circular",
-    "category": "administrativo",
-    "description": "Comunicação oficial externa ou entre órgãos autônomos para tratar de assuntos administrativos.",
-    "expectedSections": ["Identificação do Documento (Tipo, Número, Ano)", "Local e Data", "Endereçamento com Vocativo Adequado", "Assunto Resumido", "Texto em Ordem Direta", "Fecho Oficial", "Assinatura e Cargo"],
-    "mandatoryElements": ["Vocativo e Pronome corretos (V. Exa. ou V. Sa.)", "Fecho Atenciosamente", "Numeração oficial"],
-    "competenceNote": "Dirigentes, Diretores e Coordenadores."
-  },
-  {
-    "type": "memo",
-    "label": "Memorando",
-    "category": "administrativo",
-    "description": "Comunicação exclusivamente interna entre unidades administrativas de uma mesma instituição.",
-    "expectedSections": ["Identificação (Para, De, Assunto, Data)", "Texto Conciso e Objetivo", "Assinatura"],
-    "mandatoryElements": ["Agilidade e concisão"],
-    "competenceNote": "Chefias e servidores no fluxo interno."
-  },
-  {
-    "type": "report",
-    "label": "Relatório",
-    "category": "administrativo",
-    "description": "Documento que relata circunstanciadamente atividades, fatos, projetos ou auditorias.",
-    "expectedSections": ["Título e Período", "Objetivo / Introdução", "Metodologia / Atividades Realizadas", "Resultados e Análise", "Conclusões / Recomendações", "Local, Data e Assinaturas"],
-    "mandatoryElements": ["Tabelas e gráficos quando aplicável", "Tópicos e subtítulos"],
-    "competenceNote": "Comissões, GTs, pesquisadores e servidores."
-  },
-  {
-    "type": "opinion",
-    "label": "Parecer",
-    "category": "administrativo",
-    "description": "Manifestação técnica ou jurídica fundamentada sobre determinada matéria sujeita a decisão.",
-    "expectedSections": ["Relatório dos Fatos", "Fundamentação Legal / Técnica", "Conclusão / Voto", "Local, Data e Assinatura do Parecerista"],
-    "mandatoryElements": ["Fundamentação clara sem excesso de jargões"],
-    "competenceNote": "Assessores jurídicos, técnicos e comissões."
-  },
-  {
-    "type": "ordinance",
+    "type": "portaria",
     "label": "Portaria",
     "category": "normativo",
-    "description": "Ato normativo interno que expede determinações, designa servidores ou institui comissões e grupos de trabalho.",
-    "expectedSections": ["Epígrafe e Ementa", "Preâmbulo / Fundamento de Competência", "Texto Articulado (Artigos, Parágrafos, Incisos)", "Cláusula de Vigência", "Data e Assinatura da Autoridade"],
-    "mandatoryElements": ["Ementa clara", "Artigos em ordem direta", "Preservação estrita das atribuições"],
-    "competenceNote": "Reitor, Coordenador Geral, Pró-Reitores e Diretores."
+    "description": "Ato que expede determinações, designa servidores ou institui comissões e grupos de trabalho.",
+    "expectedSections": [
+      "Epígrafe e Ementa",
+      "Preâmbulo / Atribuições",
+      "Texto Articulado (Artigos e Parágrafos)",
+      "Cláusula de Vigência",
+      "Data e Assinatura"
+    ],
+    "mandatoryElements": [
+      "Ementa à direita",
+      "Artigos numerados",
+      "Cláusula de vigência"
+    ],
+    "competenceNote": "Reitoria, Pró-Reitorias e Diretorias de Unidades.",
+    "modelImagePath": "/images/models/modelo-portaria.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/portaria/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "preamble",
+      "authorName",
+      "authorRole"
+    ]
   },
   {
-    "type": "resolution",
+    "type": "resolucao",
     "label": "Resolução",
     "category": "normativo",
-    "description": "Ato normativo expedido pela autoridade executiva máxima (Reitora/Reitor).",
-    "expectedSections": ["Epígrafe e Ementa", "Preâmbulo com Atribuição Estatutária", "Disposições Normativas Articuladas", "Cláusula de Vigência", "Data e Assinatura"],
-    "mandatoryElements": ["Articulação legal clara", "Cláusula revocatória se houver"],
-    "competenceNote": "Competência privativa de Reitora ou Reitor."
+    "description": "Ato normativo de competência privativa da Reitoria para disciplinar matérias regimentais.",
+    "expectedSections": [
+      "Epígrafe e Ementa",
+      "Preâmbulo Estatutário",
+      "Disposições Normativas Articuladas",
+      "Cláusula de Vigência",
+      "Data e Assinatura"
+    ],
+    "mandatoryElements": [
+      "Ementa concisa",
+      "Articulação legal clara"
+    ],
+    "competenceNote": "Competência privativa de Reitora ou Reitor.",
+    "modelImagePath": "/images/models/modelo-resolucao.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/resolucao/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "preamble",
+      "authorName",
+      "authorRole"
+    ]
   },
   {
-    "type": "instruction",
+    "type": "deliberacao",
+    "label": "Deliberação",
+    "category": "normativo",
+    "description": "Ato normativo colegiado aprovado por órgãos deliberativos superiores (CONSU, CAD, CEPE ou Congregações).",
+    "expectedSections": [
+      "Epígrafe e Ementa",
+      "Preâmbulo do Colegiado",
+      "Dispositivo Articulado",
+      "Cláusula de Vigência",
+      "Assinatura da Presidência"
+    ],
+    "mandatoryElements": [
+      "Indicação do órgão colegiado",
+      "Aprovação em sessão"
+    ],
+    "competenceNote": "Órgãos colegiados superiores e Congregações.",
+    "modelImagePath": "/images/models/modelo-deliberacao.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/deliberacao/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "preamble",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "instrucao-normativa",
     "label": "Instrução Normativa",
     "category": "normativo",
-    "description": "Ordem escrita e geral sobre o modo e forma de executar serviços públicos regulamentados.",
-    "expectedSections": ["Identificação e Ementa", "Fundamentação", "Procedimentos Operacionais Passo a Passo", "Disposições Finais"],
-    "mandatoryElements": ["Passo a passo acionável", "Clareza operacional"],
-    "competenceNote": "Dirigentes e Pró-Reitores."
+    "description": "Normatização técnica e operacional sobre procedimentos e execução de serviços públicos.",
+    "expectedSections": [
+      "Epígrafe e Ementa",
+      "Fundamentação",
+      "Procedimentos Passo a Passo",
+      "Disposições Finais",
+      "Data e Assinatura"
+    ],
+    "mandatoryElements": [
+      "Linguagem instrucional direta",
+      "Passos claros e acionáveis"
+    ],
+    "competenceNote": "Pró-Reitorias, Diretoria Geral e Coordenadorias.",
+    "modelImagePath": "/images/models/modelo-instrucao-normativa.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/instrucao-normativa/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "preamble",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "regimento",
+    "label": "Regimento",
+    "category": "normativo",
+    "description": "Ato normativo que rege a estrutura, organização e funcionamento interno de um órgão ou colegiado.",
+    "expectedSections": [
+      "Título e Ementa",
+      "Finalidades e Competências",
+      "Estrutura Organizacional",
+      "Atribuições de Cargos",
+      "Disposições Transitórias e Finais"
+    ],
+    "mandatoryElements": [
+      "Capítulos e Seções bem delimitados"
+    ],
+    "competenceNote": "Aprovado por órgão colegiado superior competente.",
+    "modelImagePath": "/images/models/modelo-regimento.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/regimento/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "regulamento",
+    "label": "Regulamento",
+    "category": "normativo",
+    "description": "Conjunto de normas detalhadas para a execução e operacionalização de uma deliberação, programa ou serviço.",
+    "expectedSections": [
+      "Título e Objeto",
+      "Regras de Acesso e Funcionamento",
+      "Direitos e Deveres",
+      "Sanções ou Recursos",
+      "Vigência"
+    ],
+    "mandatoryElements": [
+      "Ordem lógica dos procedimentos"
+    ],
+    "competenceNote": "Órgãos executivos e colegiados.",
+    "modelImagePath": "/images/models/modelo-regulamento.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/regulamento/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "decisao",
+    "label": "Decisão",
+    "category": "normativo",
+    "description": "Manifestação conclusiva de autoridade ou câmara sobre processo administrativo submetido a julgamento.",
+    "expectedSections": [
+      "Ementa",
+      "Relatório Sucinto",
+      "Fundamentação Legal",
+      "Dispositivo / Conclusão Decisória",
+      "Data e Assinatura"
+    ],
+    "mandatoryElements": [
+      "Clareza no deferimento ou indeferimento"
+    ],
+    "competenceNote": "Autoridades e comissões com poder de julgamento.",
+    "modelImagePath": "/images/models/modelo-decisao.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/decisao/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "ementa",
+      "subject",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "despacho",
+    "label": "Despacho",
+    "category": "normativo",
+    "description": "Manifestação de autoridade administrativa em processo ou requerimento (encaminhamento, solicitação de parecer ou decisão).",
+    "expectedSections": [
+      "Identificação do Processo / Assunto",
+      "Teor do Despacho",
+      "Data e Assinatura da Autoridade"
+    ],
+    "mandatoryElements": [
+      "Objetividade e clareza no encaminhamento"
+    ],
+    "competenceNote": "Chefias, Diretores e autoridades administrativas.",
+    "modelImagePath": "/images/models/modelo-despacho.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/despacho/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "subject",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "oficio",
+    "label": "Ofício",
+    "category": "correspondencia",
+    "description": "Comunicação formal externa ou entre autoridades de órgãos autônomos para tratar de matérias administrativas.",
+    "expectedSections": [
+      "Cabeçalho e Numeração",
+      "Local e Data",
+      "Endereçamento com Destinatário",
+      "Assunto Resumido",
+      "Vocativo Formal",
+      "Texto em Ordem Direta",
+      "Fecho Oficial (Atenciosamente)",
+      "Assinatura"
+    ],
+    "mandatoryElements": [
+      "Vocativo adequado",
+      "Assunto destacado",
+      "Fecho padronizado"
+    ],
+    "competenceNote": "Dirigentes, Diretores e Coordenadores.",
+    "modelImagePath": "/images/models/modelo-oficio.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/oficio/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "recipientName",
+      "recipientRole",
+      "recipientAddress",
+      "subject",
+      "vocativo",
+      "fecho",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "oficio-circular",
+    "label": "Ofício Circular",
+    "category": "correspondencia",
+    "description": "Ofício com teor idêntico expedido simultaneamente para múltiplos destinatários ou unidades.",
+    "expectedSections": [
+      "Cabeçalho e Numeração Circular",
+      "Local e Data",
+      "Destinatários Gerais",
+      "Assunto",
+      "Vocativo",
+      "Texto",
+      "Fecho",
+      "Assinatura"
+    ],
+    "mandatoryElements": [
+      "Destinação coletiva explícita"
+    ],
+    "competenceNote": "Órgãos centrais e diretorias.",
+    "modelImagePath": "/images/models/modelo-oficio-circular.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/oficio-circular/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "recipientName",
+      "subject",
+      "vocativo",
+      "fecho",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "comunicado",
+    "label": "Comunicado",
+    "category": "correspondencia",
+    "description": "Comunicação de ordem geral emitida para prestar esclarecimentos, informes ou orientações a uma comunidade.",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Identificação (COMUNICADO Nº)",
+      "Corpo com Informações Claras",
+      "Local e Data",
+      "Assinatura do Emissor"
+    ],
+    "mandatoryElements": [
+      "Mensagem central logo no início",
+      "Prazos em destaque"
+    ],
+    "competenceNote": "Diretorias, Coordenadorias e Órgãos da Instituição.",
+    "modelImagePath": "/images/models/modelo-comunicado.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/comunicado/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "memorando",
+    "label": "Memorando",
+    "category": "correspondencia",
+    "description": "Comunicação exclusivamente interna entre unidades administrativas de uma mesma instituição.",
+    "expectedSections": [
+      "Cabeçalho com Identificação",
+      "Para, De, Assunto e Data",
+      "Texto Sucinto e Objetivo",
+      "Assinatura da Chefia"
+    ],
+    "mandatoryElements": [
+      "Agilidade e concisão",
+      "Campos Para e De explícitos"
+    ],
+    "competenceNote": "Chefias e servidores no fluxo interno.",
+    "modelImagePath": "/images/models/modelo-memorando.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/memorando/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "recipientName",
+      "subject",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "carta",
+    "label": "Carta",
+    "category": "correspondencia",
+    "description": "Comunicação formal personalizada de caráter institucional para convites, agradecimentos ou homenagens.",
+    "expectedSections": [
+      "Local e Data",
+      "Destinatário",
+      "Vocativo Afetuoso ou Respeitoso",
+      "Corpo da Mensagem",
+      "Fecho Cordial",
+      "Assinatura"
+    ],
+    "mandatoryElements": [
+      "Tom cortês e objetivo"
+    ],
+    "competenceNote": "Dirigentes e autoridades.",
+    "modelImagePath": "/images/models/modelo-carta.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/carta/",
+    "fields": [
+      "unitName",
+      "locationAndDate",
+      "recipientName",
+      "recipientRole",
+      "vocativo",
+      "fecho",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "informacao",
+    "label": "Informação",
+    "category": "correspondencia",
+    "description": "Nota técnica ou pronunciamento de setor competente prestando esclarecimentos em um processo.",
+    "expectedSections": [
+      "Identificação do Processo / Interessado",
+      "Assunto",
+      "Exposição Informativa",
+      "Conclusão",
+      "Local, Data e Assinatura"
+    ],
+    "mandatoryElements": [
+      "Rigor técnico e clareza informativa"
+    ],
+    "competenceNote": "Áreas técnicas e administrativas.",
+    "modelImagePath": "/images/models/modelo-informacao.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/informacao/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "subject",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "pauta",
+    "label": "Pauta",
+    "category": "correspondencia",
+    "description": "Documento que lista os assuntos e a ordem do dia que serão deliberados em sessão colegiada ou reunião.",
+    "expectedSections": [
+      "Identificação do Colegiado e Número da Sessão",
+      "Data, Horário e Local",
+      "Expediente e Informes",
+      "Ordem do Dia (Itens Numerados)",
+      "Assinatura da Presidência/Secretaria"
+    ],
+    "mandatoryElements": [
+      "Itens claros e ordenados"
+    ],
+    "competenceNote": "Secretarias de colegiados e comissões.",
+    "modelImagePath": "/images/models/modelo-pauta.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/pauta/",
+    "fields": [
+      "unitName",
+      "meetingNumber",
+      "meetingDate",
+      "meetingPlace",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "ata",
+    "label": "Ata",
+    "category": "correspondencia",
+    "description": "Registro formal e resumido de tudo o que ocorreu e foi deliberado em uma reunião ou sessão de colegiado.",
+    "expectedSections": [
+      "Abertura (Data, Horário, Local e Presidência)",
+      "Presenças e Ausências Justificadas",
+      "Discussões e Votações por Item",
+      "Encerramento e Assinaturas"
+    ],
+    "mandatoryElements": [
+      "Fidelidade às decisões",
+      "Sem rasuras ou ambiguidades"
+    ],
+    "competenceNote": "Secretários e membros de comissões/colegiados.",
+    "modelImagePath": "/images/models/modelo-ata1.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/ata/",
+    "fields": [
+      "unitName",
+      "meetingNumber",
+      "meetingDate",
+      "meetingPlace",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "parecer",
+    "label": "Parecer",
+    "category": "administrativo",
+    "description": "Manifestação técnica, científica ou jurídica fundamentada sobre matéria submetida à apreciação.",
+    "expectedSections": [
+      "Ementa / Assunto",
+      "Relatório dos Fatos",
+      "Fundamentação Técnica / Jurídica",
+      "Conclusão ou Voto do Relator",
+      "Local, Data e Assinatura"
+    ],
+    "mandatoryElements": [
+      "Separação clara entre fatos, fundamentação e conclusão"
+    ],
+    "competenceNote": "Pareceristas, relatores e assessores técnicos.",
+    "modelImagePath": "/images/models/modelo-parecer.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/parecer/",
+    "fields": [
+      "unitName",
+      "documentNumber",
+      "locationAndDate",
+      "subject",
+      "ementa",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "relatorio",
+    "label": "Relatório",
+    "category": "administrativo",
+    "description": "Documento circunstanciado sobre o desenvolvimento de atividades, projetos, inspeções ou gestão anual.",
+    "expectedSections": [
+      "Capa e Título",
+      "Objetivo / Introdução",
+      "Metodologia e Ações Executadas",
+      "Resultados e Indicadores",
+      "Conclusões e Recomendações",
+      "Assinatura da Comissão/Autor"
+    ],
+    "mandatoryElements": [
+      "Uso de tópicos, tabelas e sínteses visuais"
+    ],
+    "competenceNote": "Grupos de trabalho, comissões e gestores.",
+    "modelImagePath": "/images/models/modelo-relatorio.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/relatorio/",
+    "fields": [
+      "unitName",
+      "locationAndDate",
+      "subject",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "declaracao",
+    "label": "Declaração",
+    "category": "administrativo",
+    "description": "Documento oficial no qual a autoridade atesta a existência de um fato, situação ou vínculo funcional.",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Título DECLARAÇÃO",
+      "Texto Atestatório com Dados do Interessado",
+      "Finalidade",
+      "Local e Data",
+      "Assinatura"
+    ],
+    "mandatoryElements": [
+      "Dados precisos da pessoa interessada",
+      "Texto em parágrafo único ou direto"
+    ],
+    "competenceNote": "Secretarias acadêmicas, RH e diretorias.",
+    "modelImagePath": "/images/models/modelo-declaracao.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/declaracao/",
+    "fields": [
+      "unitName",
+      "locationAndDate",
+      "targetPerson",
+      "targetDocument",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "certificado",
+    "label": "Certificado",
+    "category": "administrativo",
+    "description": "Documento comprobatório de participação, conclusão de curso, treinamento ou evento acadêmico.",
+    "expectedSections": [
+      "Logotipos Oficiais",
+      "Título CERTIFICADO",
+      "Texto de Certificação com Carga Horária e Data",
+      "Assinaturas dos Responsáveis"
+    ],
+    "mandatoryElements": [
+      "Nome completo e carga horária explícita"
+    ],
+    "competenceNote": "Coordenações de cursos, eventos e extensão.",
+    "modelImagePath": "/images/models/modelo-certificado.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/certificado/",
+    "fields": [
+      "unitName",
+      "locationAndDate",
+      "targetPerson",
+      "targetDocument",
+      "authorName",
+      "authorRole"
+    ]
+  },
+  {
+    "type": "conceito-atos-normativos",
+    "label": "Conceitos e Tópicos de Atos Normativos",
+    "category": "normativo",
+    "description": "Guia de referência da Unicamp com a hierarquia, conceitos e regras de redação para atos oficiais.",
+    "expectedSections": [
+      "Hierarquia dos Atos",
+      "Estrutura Articulada",
+      "Linguagem e Técnica Legislativa",
+      "Padronização Institucional"
+    ],
+    "mandatoryElements": [
+      "Conformidade com o Manual de Redação da Unicamp"
+    ],
+    "competenceNote": "Referência transversal para todos os órgãos.",
+    "modelImagePath": "/images/models/modelo-portaria.jpg",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/conceito-atos-normativos/",
+    "fields": [
+      "unitName",
+      "locationAndDate",
+      "authorName",
+      "authorRole"
+    ]
   }
 ]

@@ -8,15 +8,23 @@ import documentTypesData from "@/data/document-types/document-types.json";
 
 
 
+import { DocumentTypeSelector } from "./document-type-selector";
+
 interface TextEditorProps {
   onAnalyze: (input: AnalysisInput) => void;
   isLoading: boolean;
   initialText?: string;
+  initialDocumentType?: DocumentType;
 }
 
-export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEditorProps) {
+export function TextEditor({
+  onAnalyze,
+  isLoading,
+  initialText = "",
+  initialDocumentType = "comunicado"
+}: TextEditorProps) {
   const [text, setText] = useState(initialText);
-  const [documentType, setDocumentType] = useState<DocumentType>("general");
+  const [documentType, setDocumentType] = useState<DocumentType>(initialDocumentType);
   const [targetAudience, setTargetAudience] = useState("");
   const [textGoal, setTextGoal] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -25,7 +33,11 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
     setText(initialText || "");
   }, [initialText]);
 
-
+  useEffect(() => {
+    if (initialDocumentType) {
+      setDocumentType(initialDocumentType);
+    }
+  }, [initialDocumentType]);
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;
@@ -59,48 +71,41 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden">
-      {/* Barra superior de ações rápidas */}
-      <div className="bg-[#faf9f5] border-b border-zinc-200 px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-        <div className="flex items-center gap-2">
-          <label htmlFor="doc-type-select" className="text-xs font-black text-black">
-            Tipo de Texto:
-          </label>
-          <select
-            id="doc-type-select"
-            value={documentType}
-            onChange={(e) => setDocumentType(e.target.value as DocumentType)}
-            className="text-xs bg-white border border-zinc-300 rounded-xl px-3 py-1.5 font-bold text-zinc-900 focus:ring-2 focus:ring-[#FBB040] focus:border-[#FBB040] outline-hidden"
-          >
-            {documentTypesData.map(dt => (
-              <option key={dt.type} value={dt.type}>
-                {dt.label}
-              </option>
-            ))}
-          </select>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Seletor Rico de Tipo de Documento com Coleção de Cards e Gabaritos */}
+      <DocumentTypeSelector
+        selectedType={documentType}
+        onSelectType={setDocumentType}
+      />
+
+      <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden">
+        {/* Barra superior de ações rápidas */}
+        <div className="bg-[#faf9f5] border-b border-zinc-200 px-4 py-3 flex justify-between items-center gap-3">
+          <span className="text-xs font-black text-black">
+            Inserir Texto para Simplificação:
+          </span>
+
+          <div className="flex items-center gap-2">
+            {text.trim().length > 0 && (
+              <button
+                type="button"
+                onClick={() => setText("")}
+                className="text-xs font-semibold text-zinc-600 hover:text-red-600 bg-white border border-zinc-300 hover:bg-red-50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs"
+                title="Limpar texto do editor"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Limpar</span>
+              </button>
+            )}
+
+            <label className="cursor-pointer text-xs font-bold text-zinc-700 hover:text-black bg-white border border-zinc-300 hover:bg-zinc-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
+              <Upload className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Importar TXT</span>
+              <input type="file" accept=".txt,.md" onChange={handleFileUpload} className="sr-only" />
+            </label>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {text.trim().length > 0 && (
-            <button
-              type="button"
-              onClick={() => setText("")}
-              className="text-xs font-semibold text-zinc-600 hover:text-red-600 bg-white border border-zinc-300 hover:bg-red-50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs"
-              title="Limpar texto do editor"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Limpar</span>
-            </button>
-          )}
-
-          <label className="cursor-pointer text-xs font-bold text-zinc-700 hover:text-black bg-white border border-zinc-300 hover:bg-zinc-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
-            <Upload className="w-3.5 h-3.5 text-zinc-500" />
-            <span>Importar TXT</span>
-            <input type="file" accept=".txt,.md" onChange={handleFileUpload} className="sr-only" />
-          </label>
-        </div>
-
-      </div>
 
 
       {/* Área do Textarea */}
@@ -168,32 +173,34 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
         </div>
       </div>
 
-      {/* Barra de Rodapé do Editor */}
-      <div className="bg-[#faf9f5] border-t border-zinc-200 px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-        <div className="text-xs text-zinc-600 flex items-center gap-3 font-medium">
-          <span><strong>{wordCount}</strong> palavras</span>
-          <span>•</span>
-          <span><strong>{charCount}</strong> caracteres</span>
-        </div>
+        {/* Barra de Rodapé do Editor */}
+        <div className="bg-[#faf9f5] border-t border-zinc-200 px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+          <div className="text-xs text-zinc-600 flex items-center gap-3 font-medium">
+            <span><strong>{wordCount}</strong> palavras</span>
+            <span>•</span>
+            <span><strong>{charCount}</strong> caracteres</span>
+          </div>
 
-        <button
-          type="submit"
-          disabled={isLoading || !text.trim()}
-          className="bg-[#FBB040] hover:bg-[#e59b2b] disabled:opacity-50 disabled:cursor-not-allowed text-[#111111] font-black px-6 py-2.5 rounded-xl text-sm shadow-sm transition-all flex items-center gap-2 border border-[#d98a1a]"
-        >
-          {isLoading ? (
-            <>
-              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              <span>Avaliando texto...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 text-black" />
-              <span>Analisar e Simplificar Texto</span>
-            </>
-          )}
-        </button>
+          <button
+            type="submit"
+            disabled={isLoading || !text.trim()}
+            className="bg-[#FBB040] hover:bg-[#e59b2b] disabled:opacity-50 disabled:cursor-not-allowed text-[#111111] font-black px-6 py-2.5 rounded-xl text-sm shadow-sm transition-all flex items-center gap-2 border border-[#d98a1a]"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <span>Avaliando texto...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>Analisar e Simplificar Texto</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </form>
   );
 }
+
