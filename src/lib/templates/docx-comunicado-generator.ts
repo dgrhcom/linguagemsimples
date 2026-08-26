@@ -55,7 +55,7 @@ export async function loadImageAsPngDataUrl(
       const naturalW = img.naturalWidth || 240;
       const naturalH = img.naturalHeight || 270;
       const scale = targetHeight / naturalH;
-      const targetWidth = Math.round(naturalW * scale);
+      const targetWidth = Math.max(20, Math.round(naturalW * scale));
 
       const canvas = document.createElement("canvas");
       canvas.width = targetWidth * 2; // Alta densidade
@@ -136,6 +136,14 @@ export async function generateComunicadoDocx(
     ? [new Paragraph({ spacing: { before: 0, after: 0 }, children: logoRuns })]
     : [new Paragraph({ children: [new TextRun({ text: "UNICAMP", bold: true, size: 22, font: "Arial" })] })];
 
+  // Larguras exatas em DXA (twips) para A4: 
+  // Largura total da página = 11.906 dxa
+  // Margem Esquerda = 1.417 dxa (2,5cm) | Margem Direita = 1.134 dxa (2,0cm)
+  // Largura Útil = 9.355 dxa (16,5cm)
+  const leftColWidth = 4200; // ~7,4 cm
+  const rightColWidth = 5155; // ~9,1 cm
+  const totalTableWidth = leftColWidth + rightColWidth; // 9355 dxa
+
   const doc = new Document({
     styles: {
       default: {
@@ -166,11 +174,12 @@ export async function generateComunicadoDocx(
           }
         },
         children: [
-          // 1. Cabeçalho Institucional (Tabela com 2 colunas)
+          // 1. Cabeçalho Institucional (Tabela com larguras absolutas em DXA para compatibilidade total com Google Docs e Word)
           new Table({
+            columnWidths: [leftColWidth, rightColWidth],
             width: {
-              size: 100,
-              type: WidthType.PERCENTAGE
+              size: totalTableWidth,
+              type: WidthType.DXA
             },
             borders: {
               top: { style: BorderStyle.NONE },
@@ -184,11 +193,11 @@ export async function generateComunicadoDocx(
               new TableRow({
                 children: [
                   new TableCell({
-                    width: { size: 45, type: WidthType.PERCENTAGE },
+                    width: { size: leftColWidth, type: WidthType.DXA },
                     children: headerLeftChildren
                   }),
                   new TableCell({
-                    width: { size: 55, type: WidthType.PERCENTAGE },
+                    width: { size: rightColWidth, type: WidthType.DXA },
                     children: [
                       new Paragraph({
                         alignment: AlignmentType.RIGHT,
