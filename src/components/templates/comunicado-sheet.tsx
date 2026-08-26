@@ -28,7 +28,8 @@ export function ComunicadoSheet({
 
   return (
     <div
-      className={`bg-white text-zinc-900 shadow-2xl border border-zinc-300 rounded-sm select-text ${className}`}
+      id="printable-comunicado"
+      className={`bg-white text-black shadow-2xl border border-zinc-300 rounded-sm select-text ${className}`}
       style={{
         width: "100%",
         maxWidth: "210mm",
@@ -38,62 +39,80 @@ export function ComunicadoSheet({
         paddingLeft: "25mm",
         paddingRight: "20mm",
         boxSizing: "border-box",
-        fontFamily: "'Montserrat', Arial, sans-serif",
+        fontFamily: "Arial, Helvetica, sans-serif",
+        fontSize: "12pt",
+        lineHeight: "1.5",
+        color: "#000000",
         transform: scale !== 1 ? `scale(${scale})` : undefined,
         transformOrigin: "top center"
       }}
     >
-      {/* 1. Cabeçalho Institucional */}
-      <header className="border-b border-zinc-400 pb-3 mb-8">
-        <div className="flex items-start justify-between gap-4">
-          {/* Logo e Órgão à Esquerda */}
+      {/* 1. Cabeçalho Institucional (Margem Superior 1,5cm) */}
+      <header className="border-b border-zinc-400 pb-3 mb-6">
+        <div className="flex items-center justify-between gap-4">
+          {/* Logotipos à Esquerda (Unicamp + Unidade opcional) */}
           <div className="flex items-center gap-3">
-            <div className="relative w-16 h-16 shrink-0">
+            <div className="relative w-14 h-14 shrink-0">
               <Image
                 src="/images/logo-unicamp.svg"
-                alt="Logotipo Unicamp"
-                width={64}
-                height={64}
+                alt="Logotipo da Unicamp"
+                width={56}
+                height={56}
                 className="object-contain"
                 priority
               />
             </div>
-            <div className="border-l border-zinc-300 pl-3">
-              <span className="text-[11px] font-black tracking-tight text-zinc-900 block leading-tight">
-                UNICAMP
-              </span>
-              <span className="text-[9px] font-bold text-zinc-600 block uppercase leading-tight mt-0.5">
-                {metadata.unitName || "Unidade / Órgão"}
-              </span>
-            </div>
+
+            {/* Logotipo da Unidade / Órgão (se enviado) */}
+            {metadata.customUnitLogo && (
+              <div className="border-l border-zinc-300 pl-3">
+                <img
+                  src={metadata.customUnitLogo}
+                  alt="Logotipo da Unidade"
+                  className="max-h-12 max-w-[120px] object-contain"
+                />
+              </div>
+            )}
           </div>
 
           {/* Textos Institucionais à Direita */}
-          <div className="text-right text-[11px] text-zinc-800 leading-tight space-y-1">
-            <p className="font-bold text-zinc-900">
+          <div className="text-right leading-tight space-y-1" style={{ fontSize: "10pt" }}>
+            <p className="font-bold text-black">
               Universidade Estadual de Campinas
             </p>
-            <p className="font-medium text-zinc-700">
+            <p className="font-normal text-zinc-800">
               {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
             </p>
-            <p className="text-[10px] text-zinc-500 font-normal">
+            <p className="text-zinc-600 font-normal" style={{ fontSize: "8.5pt" }}>
               {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
             </p>
           </div>
         </div>
       </header>
 
-      {/* 2. Identificação do Documento */}
-      <div className="text-center my-8">
-        <h2 className="text-base sm:text-lg font-black tracking-wide text-zinc-950 uppercase">
+      {/* 1 linha em branco após o cabeçalho */}
+      <div className="h-6" />
+
+      {/* 2. Identificação do Documento (Centralizado, Negrito, Caixa Alta) */}
+      <div className="text-center my-6">
+        <h2
+          className="font-bold tracking-wide uppercase text-black"
+          style={{ fontSize: "12pt" }}
+        >
           {metadata.documentNumber
             ? `COMUNICADO Nº ${metadata.documentNumber}`
             : "COMUNICADO"}
         </h2>
       </div>
 
-      {/* 3. Corpo do Texto com Recuo de Primeira Linha (1,25cm / 32px) */}
-      <main className="space-y-4 text-xs sm:text-sm text-zinc-900 leading-relaxed text-justify">
+      {/* 3. Corpo do Texto (Alinhamento Justificado, Entrelinha 1,5, Recuo 1,25 cm) */}
+      <main
+        className="space-y-4 text-justify"
+        style={{
+          fontSize: "12pt",
+          lineHeight: "1.5"
+        }}
+      >
         {paragraphs.length > 0 ? (
           paragraphs.map((p, idx) => {
             const isBullet =
@@ -104,7 +123,11 @@ export function ComunicadoSheet({
 
             if (isBullet) {
               return (
-                <div key={idx} className="pl-6 text-left my-1 font-medium">
+                <div
+                  key={idx}
+                  style={{ paddingLeft: "1.25cm", textIndent: "0" }}
+                  className="text-left my-2"
+                >
                   {p}
                 </div>
               );
@@ -114,7 +137,7 @@ export function ComunicadoSheet({
               <p
                 key={idx}
                 style={{ textIndent: "1.25cm" }}
-                className="leading-relaxed"
+                className="my-3"
               >
                 {p}
               </p>
@@ -125,26 +148,38 @@ export function ComunicadoSheet({
             style={{ textIndent: "1.25cm" }}
             className="text-zinc-400 italic"
           >
-            [O conteúdo do comunicado será exibido aqui em tempo real conforme as edições e simplificações...]
+            [O texto formatado do comunicado será exibido aqui em tempo real...]
           </p>
         )}
       </main>
 
-      {/* 4. Local e Data */}
+      {/* 4. Local e Data (Alinhado com avanço de parágrafo de 1,25 cm) */}
       <div
-        className="mt-10 mb-14 text-xs sm:text-sm text-zinc-900"
-        style={{ textIndent: "1.25cm" }}
+        className="mt-8 mb-6"
+        style={{
+          textIndent: "1.25cm",
+          fontSize: "12pt",
+          lineHeight: "1.5"
+        }}
       >
         <p>{formattedDate}</p>
       </div>
 
-      {/* 5. Identificação e Assinatura da Autora ou Autor */}
-      <footer className="mt-12 text-center space-y-1">
-        <div className="w-48 border-t border-zinc-400 mx-auto mb-2 opacity-60" />
-        <p className="text-xs sm:text-sm font-bold text-zinc-950">
+      {/* 4 linhas em branco com espaçamento simples antes do nome da pessoa que assina */}
+      <div className="h-16" />
+
+      {/* 5. Identificação da Autora ou Autor (Centralizado, Espaçamento Simples) */}
+      <footer
+        className="text-center space-y-1"
+        style={{
+          fontSize: "12pt",
+          lineHeight: "1.2"
+        }}
+      >
+        <p className="font-bold text-black">
           {metadata.authorName || "Nome da Autora ou Autor"}
         </p>
-        <p className="text-xs text-zinc-600">
+        <p className="text-zinc-800">
           {metadata.authorRole || "Cargo ou Função"}
         </p>
       </footer>

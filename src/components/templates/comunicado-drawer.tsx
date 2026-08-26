@@ -15,7 +15,11 @@ import {
   Sliders,
   ZoomIn,
   ZoomOut,
-  Maximize2
+  Maximize2,
+  Upload,
+  Trash2,
+  Info,
+  CheckCircle2
 } from "lucide-react";
 import { ComunicadoSheet } from "./comunicado-sheet";
 import {
@@ -37,6 +41,7 @@ export function ComunicadoDrawer({
   const [activeView, setActiveView] = useState<"sheet" | "comparison">("sheet");
   const [copied, setCopied] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [showGDocsModal, setShowGDocsModal] = useState(false);
   const [zoom, setZoom] = useState(1);
 
   // Metadados dinâmicos e editáveis do Comunicado
@@ -46,7 +51,8 @@ export function ComunicadoDrawer({
     emailSite: "dgrh@unicamp.br | www.dgrh.unicamp.br",
     locationAndDate: "Campinas, 26 de agosto de 2026",
     authorName: "Coordenação Geral da DGRH",
-    authorRole: "Diretoria Geral de Recursos Humanos"
+    authorRole: "Diretoria Geral de Recursos Humanos",
+    customUnitLogo: undefined
   });
 
   useEffect(() => {
@@ -66,6 +72,29 @@ export function ComunicadoDrawer({
   }, []);
 
   if (!isOpen) return null;
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Por favor, selecione um arquivo de imagem válido (PNG, JPG ou SVG).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      if (base64) {
+        setMetadata(prev => ({ ...prev, customUnitLogo: base64 }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveUnitLogo = () => {
+    setMetadata(prev => ({ ...prev, customUnitLogo: undefined }));
+  };
 
   const handleDownloadDocx = async () => {
     try {
@@ -87,10 +116,12 @@ export function ComunicadoDrawer({
   };
 
   const handleOpenGoogleDocs = async () => {
-    // Copia o conteúdo em HTML formatado para a área de transferência
+    // 1. Copia o conteúdo em HTML formatado com regras da Unicamp para a área de transferência
     await handleCopyRichText();
-    // Abre a página para criação de novo Google Docs
+    // 2. Abre a página de criação de documento no Google Docs
     window.open("https://docs.google.com/document/create", "_blank");
+    // 3. Exibe o modal com instrução clara de Ctrl+V / Colar
+    setShowGDocsModal(true);
   };
 
   const handleCopyRichText = async () => {
@@ -101,28 +132,34 @@ export function ComunicadoDrawer({
         .filter(Boolean);
 
       const htmlContent = `
-        <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #111;">
-          <table style="width: 100%; border-bottom: 1px solid #777; padding-bottom: 10px; margin-bottom: 25px;">
+        <div style="font-family: Arial, Helvetica, sans-serif; font-size: 12pt; line-height: 1.5; color: #000000;">
+          <table style="width: 100%; border-bottom: 1px solid #888888; padding-bottom: 12px; margin-bottom: 24px;">
             <tr>
-              <td style="width: 40%; vertical-align: top;">
-                <strong style="font-size: 16px;">UNICAMP</strong><br />
-                <span style="font-size: 11px; color: #555;">${metadata.unitName}</span>
+              <td style="width: 40%; vertical-align: middle;">
+                <strong style="font-size: 14pt; letter-spacing: 0.5px;">UNICAMP</strong>
+                ${metadata.customUnitLogo ? `<span style="margin-left: 12px; border-left: 1px solid #ccc; padding-left: 12px; font-size: 10pt; color: #555;">[Logotipo da Unidade]</span>` : ""}
               </td>
-              <td style="width: 60%; text-align: right; vertical-align: top; font-size: 11px;">
+              <td style="width: 60%; text-align: right; vertical-align: top; font-size: 10pt; line-height: 1.3;">
                 <strong>Universidade Estadual de Campinas</strong><br />
-                <span>${metadata.unitName}</span><br />
-                <span style="color: #666;">${metadata.emailSite}</span>
+                <span>${metadata.unitName || "Diretoria Geral de Recursos Humanos"}</span><br />
+                <span style="font-size: 8.5pt; color: #555;">${metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}</span>
               </td>
             </tr>
           </table>
-          <h2 style="text-align: center; text-transform: uppercase; font-size: 15px; margin: 25px 0;">
+          <h2 style="text-align: center; text-transform: uppercase; font-size: 12pt; font-weight: bold; margin: 24px 0;">
             ${metadata.documentNumber ? `COMUNICADO Nº ${metadata.documentNumber}` : "COMUNICADO"}
           </h2>
-          ${paragraphs.map(p => `<p style="text-indent: 1.25cm; text-align: justify; margin: 12px 0;">${p}</p>`).join("")}
-          <p style="text-indent: 1.25cm; margin: 30px 0;">${metadata.locationAndDate}.</p>
-          <div style="text-align: center; margin-top: 40px;">
-            <p style="margin: 0; font-weight: bold;">${metadata.authorName}</p>
-            <p style="margin: 0; color: #444; font-size: 13px;">${metadata.authorRole}</p>
+          ${paragraphs.map(p => {
+            const isBullet = p.startsWith("-") || p.startsWith("•") || p.startsWith("*") || /^\d+[\.\)]/.test(p);
+            if (isBullet) {
+              return `<p style="padding-left: 1.25cm; text-indent: 0; text-align: left; margin: 8px 0; font-size: 12pt; line-height: 1.5;">${p}</p>`;
+            }
+            return `<p style="text-indent: 1.25cm; text-align: justify; margin: 12px 0; font-size: 12pt; line-height: 1.5;">${p}</p>`;
+          }).join("")}
+          <p style="text-indent: 1.25cm; margin: 28px 0; font-size: 12pt; line-height: 1.5;">${metadata.locationAndDate.endsWith(".") ? metadata.locationAndDate : metadata.locationAndDate + "."}</p>
+          <div style="text-align: center; margin-top: 56px; font-size: 12pt; line-height: 1.2;">
+            <p style="margin: 0; font-weight: bold;">${metadata.authorName || "Nome da Autora ou Autor"}</p>
+            <p style="margin: 4px 0 0 0; color: #333;">${metadata.authorRole || "Cargo ou Função"}</p>
           </div>
         </div>
       `;
@@ -136,12 +173,12 @@ export function ComunicadoDrawer({
 
       await navigator.clipboard.write([clipboardItem]);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
     } catch (e) {
       console.error("Erro ao copiar formatado:", e);
       navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
     }
   };
 
@@ -151,9 +188,77 @@ export function ComunicadoDrawer({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-end overflow-hidden animate-in fade-in">
+      {/* Modal / Diálogo de Instrução do Google Docs */}
+      {showGDocsModal && (
+        <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-zinc-200 animate-in zoom-in-95 space-y-5 text-zinc-900">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#d98a1a] flex items-center justify-center font-bold shrink-0">
+                <CheckCircle2 className="w-7 h-7 text-[#d98a1a]" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-black">
+                  Documento Aberto no Google Docs!
+                </h3>
+                <p className="text-xs text-zinc-600">
+                  Formatação oficial pronta na sua área de transferência
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#faf9f5] border border-amber-200 rounded-2xl p-4 space-y-3 text-xs leading-relaxed">
+              <div className="flex items-start gap-2">
+                <span className="font-bold text-black bg-[#FBB040] w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">
+                  1
+                </span>
+                <p className="text-zinc-800">
+                  Na nova aba que se abriu no <strong>Google Docs</strong>, clique na folha em branco.
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-bold text-black bg-[#FBB040] w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">
+                  2
+                </span>
+                <p className="text-zinc-800">
+                  Pressione <kbd className="bg-white border border-zinc-300 px-1.5 py-0.5 rounded-md font-mono font-bold shadow-2xs">Ctrl + V</kbd> (ou <kbd className="bg-white border border-zinc-300 px-1.5 py-0.5 rounded-md font-mono font-bold shadow-2xs">Cmd + V</kbd>) para colar o documento completo com cabeçalho e recuos.
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-bold text-black bg-[#FBB040] w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">
+                  3
+                </span>
+                <p className="text-zinc-800">
+                  Pronto! Seu documento estará pronto para edição, compartilhamento ou assinatura eletrônica.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleCopyRichText}
+                className="w-full sm:w-auto text-xs font-bold text-zinc-700 hover:text-black bg-zinc-100 hover:bg-zinc-200 px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                <span>Copiar Novamente</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowGDocsModal(false)}
+                className="w-full sm:w-auto text-xs font-black text-black bg-[#FBB040] hover:bg-[#e59b2b] px-5 py-2.5 rounded-xl transition-all shadow-xs border border-[#d98a1a]"
+              >
+                Entendido!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gaveta Lateral (Drawer) */}
       <div className="bg-[#f4f3ed] w-full max-w-6xl h-full flex flex-col shadow-2xl border-l border-zinc-300 animate-in slide-in-from-right duration-300">
-        {/* Topo do Drawer */}
-        <div className="px-6 py-4 bg-[#18181b] text-white flex items-center justify-between border-b border-zinc-800 shrink-0">
+        {/* Topo do Drawer (Ocultado na impressão via CSS) */}
+        <div className="no-print px-6 py-4 bg-[#18181b] text-white flex items-center justify-between border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-[#FBB040] text-black flex items-center justify-center font-bold">
               <FileText className="w-4 h-4" />
@@ -161,14 +266,14 @@ export function ComunicadoDrawer({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm sm:text-base font-black tracking-tight text-white">
-                  Preview do Modelo Oficial: Comunicado (Unicamp)
+                  Modelo Oficial: Comunicado (Unicamp)
                 </h2>
                 <span className="text-[10px] font-bold text-black bg-[#FBB040] px-2 py-0.5 rounded-full">
-                  Em Tempo Real
+                  Formatação Unicamp
                 </span>
               </div>
               <p className="text-[11px] text-zinc-400 font-normal">
-                Padrão institucional com margens A4, cabeçalho oficial e alinhamentos
+                Padrão A4: Arial 12pt, entrelinha 1,5, recuo de 1,25 cm e margens institucionais
               </p>
             </div>
           </div>
@@ -214,13 +319,18 @@ export function ComunicadoDrawer({
 
         {/* Conteúdo Principal (2 Colunas) */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-          {/* Coluna Esquerda: Controles de Metadados e Ações */}
-          <div className="lg:col-span-4 bg-white border-r border-zinc-200 p-5 overflow-y-auto space-y-6">
+          {/* Coluna Esquerda: Controles de Metadados e Ações (no-print) */}
+          <div className="no-print lg:col-span-4 bg-white border-r border-zinc-200 p-5 overflow-y-auto space-y-6">
             {/* Ações de Exportação e Google Docs */}
             <div className="space-y-3 bg-[#faf9f5] border border-zinc-200 p-4 rounded-2xl">
-              <span className="text-xs font-black text-black uppercase tracking-wider block">
-                Exportação & Google Docs
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-black uppercase tracking-wider block">
+                  Ações do Documento
+                </span>
+                <span className="text-[10px] text-zinc-500 font-bold">
+                  Arial 12pt | A4
+                </span>
+              </div>
 
               <div className="space-y-2">
                 <button
@@ -232,8 +342,8 @@ export function ComunicadoDrawer({
                     <ExternalLink className="w-4 h-4 text-[#FBB040]" />
                     <span>Abrir no Google Docs</span>
                   </div>
-                  <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300">
-                    Copia e abre
+                  <span className="text-[10px] text-[#FBB040] font-bold">
+                    Copia & Abre
                   </span>
                 </button>
 
@@ -247,7 +357,7 @@ export function ComunicadoDrawer({
                     <Download className="w-4 h-4 text-black stroke-[2.5]" />
                     <span>{isExportingDocx ? "Gerando..." : "Baixar DOCX Formatado"}</span>
                   </div>
-                  <span className="text-[10px] text-black/70">.docx</span>
+                  <span className="text-[10px] text-black/70">Com Logotipos</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2 pt-1">
@@ -290,7 +400,56 @@ export function ComunicadoDrawer({
                 </h3>
               </div>
 
-              <div className="space-y-3 text-xs">
+              <div className="space-y-3.5 text-xs">
+                {/* Upload de Logotipo da Unidade (Opcional) */}
+                <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-zinc-800 block">
+                      Logotipo da Unidade / Órgão:
+                    </label>
+                    <span className="text-[10px] text-zinc-500 font-normal">
+                      (Opcional)
+                    </span>
+                  </div>
+
+                  {metadata.customUnitLogo ? (
+                    <div className="flex items-center justify-between gap-3 bg-white p-2 border border-zinc-300 rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={metadata.customUnitLogo}
+                          alt="Logotipo da Unidade"
+                          className="w-10 h-10 object-contain rounded-md border border-zinc-200 p-0.5 bg-white"
+                        />
+                        <span className="text-[11px] font-bold text-zinc-700">
+                          Logo carregado
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveUnitLogo}
+                        className="text-xs text-red-600 hover:text-red-800 font-semibold p-1 rounded-lg hover:bg-red-50 flex items-center gap-1"
+                        title="Remover e deixar em branco"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remover</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer border-2 border-dashed border-zinc-300 hover:border-[#FBB040] bg-white p-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                      <Upload className="w-4 h-4 text-zinc-500" />
+                      <span className="font-bold text-zinc-700 text-xs">
+                        Adicionar logo da Unidade
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="sr-only"
+                      />
+                    </label>
+                  )}
+                </div>
+
                 <div>
                   <label className="font-bold text-zinc-800 block mb-1">
                     Nome da Unidade / Órgão:
@@ -374,8 +533,8 @@ export function ComunicadoDrawer({
 
           {/* Coluna Direita: Visualizador da Folha A4 em Tempo Real */}
           <div className="lg:col-span-8 bg-[#e8e6dc]/70 p-6 overflow-y-auto flex flex-col items-center">
-            {/* Barra de Controle de Zoom */}
-            <div className="mb-4 bg-white/90 backdrop-blur-xs border border-zinc-300 rounded-xl px-3 py-1.5 flex items-center gap-3 shadow-xs">
+            {/* Barra de Controle de Zoom (no-print) */}
+            <div className="no-print mb-4 bg-white/90 backdrop-blur-xs border border-zinc-300 rounded-xl px-3 py-1.5 flex items-center gap-3 shadow-xs">
               <span className="text-[11px] font-bold text-zinc-700">Zoom:</span>
               <button
                 type="button"
@@ -414,7 +573,7 @@ export function ComunicadoDrawer({
 
             {/* Modo 2: Comparação lado a lado com a imagem oficial */}
             {activeView === "comparison" && (
-              <div className="w-full max-w-4xl space-y-6 pb-12">
+              <div className="no-print w-full max-w-4xl space-y-6 pb-12">
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-950 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#FBB040] shrink-0" />
                   <span>
