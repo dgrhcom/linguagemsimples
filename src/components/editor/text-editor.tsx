@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { DocumentType } from "@/types/document";
 import { AnalysisInput } from "@/types/analysis";
-import { Sparkles, Upload } from "lucide-react";
+import { Sparkles, Upload, Trash2 } from "lucide-react";
 import documentTypesData from "@/data/document-types/document-types.json";
+
 
 
 interface TextEditorProps {
@@ -22,10 +22,9 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   useEffect(() => {
-    if (initialText) {
-      setText(initialText);
-    }
+    setText(initialText || "");
   }, [initialText]);
+
 
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -82,12 +81,25 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
         </div>
 
         <div className="flex items-center gap-2">
+          {text.trim().length > 0 && (
+            <button
+              type="button"
+              onClick={() => setText("")}
+              className="text-xs font-semibold text-zinc-600 hover:text-red-600 bg-white border border-zinc-300 hover:bg-red-50 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs"
+              title="Limpar texto do editor"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Limpar</span>
+            </button>
+          )}
+
           <label className="cursor-pointer text-xs font-bold text-zinc-700 hover:text-black bg-white border border-zinc-300 hover:bg-zinc-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs">
             <Upload className="w-3.5 h-3.5 text-zinc-500" />
             <span>Importar TXT</span>
             <input type="file" accept=".txt,.md" onChange={handleFileUpload} className="sr-only" />
           </label>
         </div>
+
       </div>
 
 
