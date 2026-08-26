@@ -174,18 +174,41 @@ export class OpenAILanguageModelProvider implements LanguageModelProvider {
         })
       });
 
-      if (!response.ok) return this.fallback.rewriteText(input, options);
+      if (!response.ok) {
+        const errText = await response.text();
+        return {
+          rewrittenText: input.text,
+          isOffline: false,
+          status: "ai_error",
+          error: `Erro na OpenAI (${response.status}): ${errText}`
+        };
+      }
 
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content;
       let cleaned = (text || "").replace(/^["']|["']$/g, "").trim();
 
       const finalRewritten = guaranteeDifferentSuggestion(input.text, cleaned || baseRewrite);
-      return { rewrittenText: finalRewritten };
-    } catch (e) {
-      return this.fallback.rewriteText(input, options);
+      const isUnchanged = finalRewritten.trim() === input.text.trim();
+
+      return {
+        rewrittenText: finalRewritten,
+        isOffline: false,
+        status: isUnchanged ? "unchanged" : "success",
+        message: isUnchanged
+          ? "A IA analisou a frase e considerou que ela não necessita de alteração ou não permite simplificação sem alteração de termos técnicos. Você pode personalizar o texto pelo botão 'Editar'."
+          : undefined
+      };
+    } catch (e: any) {
+      return {
+        rewrittenText: input.text,
+        isOffline: false,
+        status: "ai_error",
+        error: e?.message || "Erro de conexão com a OpenAI."
+      };
     }
   }
+
 
   async explainFinding(finding: Finding): Promise<AIExplainOutput> {
     return this.fallback.explainFinding(finding);

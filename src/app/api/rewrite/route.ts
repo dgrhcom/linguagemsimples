@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     const aiProvider = getLanguageModelProvider({ provider: customProvider, apiKey: customApiKey });
     const isLongSentence = text.split(/\s+/).filter(Boolean).length > 20;
-    const unicampBase = isLongSentence ? generateShortSentenceSuggestion(text) : rewriteToPlainLanguage(text);
+    const unicampBase = isLongSentence ? undefined : rewriteToPlainLanguage(text);
     const input: AnalysisInput = { text, documentType, targetAudience, textGoal };
 
     if (mode === "segment") {
@@ -48,22 +48,26 @@ export async function POST(req: NextRequest) {
         targetAudience
       });
 
-      let rewritten = output.rewrittenText
+      let rewritten = (output.rewrittenText || "")
         .replace(/^```(?:text|markdown)?\s*\n?/i, "")
         .replace(/\n?```\s*$/i, "")
         .replace(/^(?:Aqui está a (?:frase|versão|reescrita)[^:\n]*:?\s*|Sugestão[^:\n]*:?\s*|Reescrita[^:\n]*:?\s*)/i, "")
         .replace(/^["'“”«»]+|["'“”«»]+$/g, "")
         .trim();
 
-      if (!rewritten || rewritten === text.trim()) {
-        rewritten = isLongSentence ? generateShortSentenceSuggestion(text) : guaranteeDifferentSuggestion(text, unicampBase);
-      }
+      const isUnchanged = !rewritten || rewritten.trim() === text.trim();
+      const status = output.status || (isUnchanged ? (output.isOffline ? "offline_mode" : "unchanged") : "success");
 
       return NextResponse.json({
-        rewrittenText: rewritten,
-        mode: "segment"
+        rewrittenText: rewritten || text,
+        mode: "segment",
+        status,
+        isOffline: output.isOffline,
+        message: output.message,
+        error: output.error
       });
     }
+
 
 
     // Reescrita Completa com IA utilizando a base da Unicamp

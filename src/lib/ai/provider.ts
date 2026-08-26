@@ -7,7 +7,12 @@ export interface AIAnalysisOutput {
 
 export interface AIRewriteOutput {
   rewrittenText: string;
+  isOffline?: boolean;
+  status?: "success" | "unchanged" | "offline_mode" | "ai_error";
+  message?: string;
+  error?: string;
 }
+
 
 export interface AIExplainOutput {
   detailedExplanation: string;

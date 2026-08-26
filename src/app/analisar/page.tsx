@@ -58,6 +58,9 @@ export default function AnalisarPage() {
 	useEffect(() => {
 		updateAiProviderDisplay();
 
+		const handleOpenSettings = () => setIsSettingsOpen(true);
+		window.addEventListener("open-ai-settings", handleOpenSettings);
+
 		// Carrega exemplo se veio da home ou de exemplos
 		if (typeof window !== "undefined") {
 			const pending = sessionStorage.getItem("pending_analysis");
@@ -71,7 +74,12 @@ export default function AnalisarPage() {
 				}
 			}
 		}
+
+		return () => {
+			window.removeEventListener("open-ai-settings", handleOpenSettings);
+		};
 	}, []);
+
 
 	const handleAnalyze = async (input: AnalysisInput) => {
 		setLoading(true);

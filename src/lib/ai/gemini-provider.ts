@@ -224,7 +224,7 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
 
   async rewriteText(input: AnalysisInput, options?: RewriteOptions): Promise<AIRewriteOutput> {
     const isSegmentMode = options?.mode === "segment";
-    const baseRewrite = options?.unicampBase || (isSegmentMode ? generateShortSentenceSuggestion(input.text) : rewriteToPlainLanguage(input.text));
+    const baseRewrite = options?.unicampBase || rewriteToPlainLanguage(input.text);
 
     try {
       let prompt: string;
@@ -249,12 +249,27 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
 
       const candidate = cleaned || baseRewrite;
       const finalRewritten = guaranteeDifferentSuggestion(input.text, candidate);
-      return { rewrittenText: finalRewritten };
-    } catch (e) {
-      console.error("[Gemini Provider] Erro no rewriteText, utilizando motor Unicamp enriquecido:", e);
-      return this.fallback.rewriteText(input, options);
+      const isUnchanged = finalRewritten.trim() === input.text.trim();
+
+      return {
+        rewrittenText: finalRewritten,
+        isOffline: false,
+        status: isUnchanged ? "unchanged" : "success",
+        message: isUnchanged
+          ? "A IA analisou este trecho e considerou que ele não necessita de alteração ou não permite simplificação sem prejuízo ao sentido técnico. Você pode personalizar o texto pelo botão 'Editar'."
+          : undefined
+      };
+    } catch (e: any) {
+      console.error("[Gemini Provider] Erro no rewriteText:", e);
+      return {
+        rewrittenText: input.text,
+        isOffline: false,
+        status: "ai_error",
+        error: e?.message || "Não foi possível comunicar com o Google Gemini. Verifique sua chave de API nas configurações."
+      };
     }
   }
+
 
 
   async explainFinding(finding: Finding): Promise<AIExplainOutput> {

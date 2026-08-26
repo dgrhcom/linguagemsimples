@@ -14,7 +14,9 @@ import {
   AlignLeft,
   HeartHandshake,
   AlertCircle,
-  FileCheck2
+  FileCheck2,
+  Settings,
+  Info
 } from "lucide-react";
 import { getStoredAiHeaders } from "@/lib/ai";
 
@@ -45,6 +47,11 @@ export function FindingCard({
   const [detailedLoading, setDetailedLoading] = useState(false);
   const [detailedData, setDetailedData] = useState<{ whyItMatters?: string; pedagogicalTip?: string } | null>(null);
   const [aiRewriting, setAiRewriting] = useState(false);
+  const [rewriteNotice, setRewriteNotice] = useState<{
+    type: "offline" | "error" | "unchanged";
+    message: string;
+    detail?: string;
+  } | null>(null);
 
   // Estados de edição inline
   const [isEditing, setIsEditing] = useState(false);
@@ -108,6 +115,7 @@ export function FindingCard({
   const handleAiRewriteSegment = async () => {
     if (aiRewriting) return;
     setAiRewriting(true);
+    setRewriteNotice(null);
     try {
       const res = await fetch("/api/rewrite", {
         method: "POST",
@@ -123,16 +131,52 @@ export function FindingCard({
           documentType: documentType || "general"
         })
       });
+
       if (res.ok) {
         const data = await res.json();
-        if (data.rewrittenText && onUpdateFindingSuggestion) {
-          onUpdateFindingSuggestion(finding, data.rewrittenText);
-          setCustomDraft(data.rewrittenText);
-          setIsCustomized(false);
+        const isDifferent = data.rewrittenText && data.rewrittenText.trim() !== finding.originalText.trim();
+
+        if (isDifferent) {
+          setRewriteNotice(null);
+          if (onUpdateFindingSuggestion) {
+            onUpdateFindingSuggestion(finding, data.rewrittenText);
+            setCustomDraft(data.rewrittenText);
+            setIsCustomized(false);
+          }
+        } else if (data.status === "offline_mode" || data.isOffline) {
+          setRewriteNotice({
+            type: "offline",
+            message: "Motor Unicamp Offline ativo (sem IA generativa configurada).",
+            detail: "Para reescrever frases longas com inteligência artificial, adicione sua chave de API (Google Gemini ou OpenAI) nas configurações, ou personalize manualmente no botão 'Editar'."
+          });
+        } else if (data.status === "ai_error" || data.error) {
+          setRewriteNotice({
+            type: "error",
+            message: "Falha na comunicação com a API de IA.",
+            detail: data.error || "Verifique se a chave de API nas configurações está ativa e com cota disponível."
+          });
+        } else {
+          setRewriteNotice({
+            type: "unchanged",
+            message: "A IA manteve a frase original inalterada.",
+            detail: "A oração foi avaliada como técnica ou sem margem para divisão segura. Você pode personalizá-la no botão 'Editar'."
+          });
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setRewriteNotice({
+          type: "error",
+          message: "Erro ao processar reescrita com IA.",
+          detail: errData.message || errData.error || "Verifique suas configurações de IA ou tente novamente."
+        });
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Erro ao reescrever trecho com IA:", e);
+      setRewriteNotice({
+        type: "error",
+        message: "Erro de conexão com o serviço de IA.",
+        detail: e?.message || "Verifique sua conexão com a internet."
+      });
     } finally {
       setAiRewriting(false);
     }
@@ -146,6 +190,7 @@ export function FindingCard({
     }
     setIsCustomized(true);
     setIsEditing(false);
+    setRewriteNotice(null);
   };
 
   const handleSaveAndApply = () => {
@@ -159,6 +204,7 @@ export function FindingCard({
     }
     setIsCustomized(true);
     setIsEditing(false);
+    setRewriteNotice(null);
   };
 
   return (
@@ -282,7 +328,7 @@ export function FindingCard({
             </div>
           </div>
         ) : (
-          <div className="pt-1">
+          <div className="pt-1 space-y-2">
             <div className="bg-amber-50/70 border border-amber-200/80 rounded-lg p-3 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
               <div>
                 <p className="font-bold text-amber-950">Frase longa ({finding.originalText.split(/\s+/).filter(Boolean).length} palavras)</p>
@@ -301,9 +347,72 @@ export function FindingCard({
                 <span>{aiRewriting ? "Reescrevendo..." : "Reescrever com IA"}</span>
               </button>
             </div>
+
+            {/* Aviso Explicativo e Ação Rápida */}
+            {rewriteNotice && (
+              <div
+                className={`p-3 rounded-xl text-xs space-y-2 border animate-in fade-in slide-in-from-top-1 ${
+                  rewriteNotice.type === "offline"
+                    ? "bg-amber-50 border-amber-300 text-amber-950"
+                    : rewriteNotice.type === "error"
+                    ? "bg-rose-50 border-rose-300 text-rose-950"
+                    : "bg-blue-50 border-blue-300 text-blue-950"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-1">
+                    <div className="font-bold flex items-center gap-1.5">
+                      {rewriteNotice.type === "offline" ? (
+                        <Info className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                      ) : rewriteNotice.type === "error" ? (
+                        <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+                      ) : (
+                        <Info className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                      )}
+                      <span>{rewriteNotice.message}</span>
+                    </div>
+                    {rewriteNotice.detail && (
+                      <p className="text-[11px] opacity-90 leading-relaxed">
+                        {rewriteNotice.detail}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setRewriteNotice(null)}
+                    className="text-zinc-400 hover:text-zinc-700 p-0.5"
+                    title="Fechar aviso"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent("open-ai-settings"))}
+                    className="text-[11px] font-bold bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100 px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-2xs"
+                  >
+                    <Settings className="w-3 h-3 text-[#FBB040]" />
+                    <span>Configurar Chave de IA</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCustomDraft(finding.suggestedText || finding.originalText);
+                      setIsEditing(true);
+                      setRewriteNotice(null);
+                    }}
+                    className="text-[11px] font-medium text-zinc-700 hover:text-zinc-900 px-2 py-1 rounded-lg hover:bg-black/5"
+                  >
+                    <span>Editar manualmente</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
+
 
       {/* 4. Barra Inferior de Ações (Unificada e sem duplicações) */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2">

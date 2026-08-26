@@ -61,8 +61,18 @@ export class MockLanguageModelProvider implements LanguageModelProvider {
   async rewriteText(input: AnalysisInput, options?: RewriteOptions): Promise<AIRewriteOutput> {
     const base = options?.unicampBase || rewriteToPlainLanguage(input.text);
     const rewrittenText = guaranteeDifferentSuggestion(input.text, base);
-    return { rewrittenText };
+    const isUnchanged = rewrittenText.trim() === input.text.trim();
+
+    return {
+      rewrittenText,
+      isOffline: true,
+      status: isUnchanged ? "offline_mode" : "success",
+      message: isUnchanged
+        ? "Você está utilizando o Motor Unicamp Offline. Para gerar reescritas neurais com inteligência artificial para frases longas, adicione uma chave gratuita de API (Google Gemini ou OpenAI) nas configurações."
+        : undefined
+    };
   }
+
 
   async explainFinding(finding: Finding): Promise<AIExplainOutput> {
     return {
