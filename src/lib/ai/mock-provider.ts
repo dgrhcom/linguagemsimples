@@ -13,16 +13,13 @@ export class MockLanguageModelProvider implements LanguageModelProvider {
     const additionalFindings: Finding[] = [];
     const baseRewrite = unicampBaseRewrite || rewriteToPlainLanguage(text);
 
-    // 1. Garante que todos os achados determinísticos tenham uma sugestão simplificada válida
+    // 1. Garante que achados lexicais e de clichês tenham uma sugestão simplificada válida
     for (const df of deterministicFindings) {
-      if (!df.suggestedText || df.suggestedText === df.originalText) {
-        if (df.category === "sentence") {
-          df.suggestedText = generateShortSentenceSuggestion(df.originalText);
-        } else {
-          df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
-        }
+      if (df.category !== "sentence" && (!df.suggestedText || df.suggestedText === df.originalText)) {
+        df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
       }
     }
+
 
 
     // 2. Verificação de voz passiva ou inversões sintáticas comuns

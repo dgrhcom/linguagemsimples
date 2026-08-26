@@ -347,23 +347,9 @@ export function guaranteeDifferentSuggestion(original: string, candidate?: strin
     return forced;
   }
 
-  // 3. Se for uma frase longa (> 20 palavras), divide obrigatoriamente
-  const words = cleanOriginal.split(/\s+/).filter(Boolean);
-  if (words.length > 20) {
-    // Procura vírgulas para dividir
-    const commaIndex = cleanOriginal.indexOf(",");
-    if (commaIndex > 10 && commaIndex < cleanOriginal.length - 10) {
-      const part1 = cleanOriginal.substring(0, commaIndex).trim();
-      const part2 = cleanOriginal.substring(commaIndex + 1).trim();
-      if (part1 && part2) {
-        const capPart2 = part2.charAt(0).toUpperCase() + part2.slice(1);
-        return `${part1}. ${capPart2}`;
-      }
-    }
-  }
-
   return cleanCandidate && cleanCandidate !== cleanOriginal ? cleanCandidate : forced;
 }
+
 
 
 

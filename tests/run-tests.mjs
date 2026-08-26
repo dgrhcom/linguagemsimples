@@ -82,15 +82,16 @@ test("7. Preservação Rigorosa de Marcas de Parágrafo e Quebras de Linha", () 
   assert.ok(rewritten.includes("\n\n"), "As quebras de parágrafo NÃO devem ser substituídas por espaços simples");
 });
 
-test("8. Geração Automática de Sugestões para Frases Longas", () => {
+test("8. Detecção de Frases Longas para Reescrita por IA", () => {
   const longSentenceText = "Informamos a todos os interessados que o processo de submissão de propostas para o presente edital de extensão comunitária da universidade foi prorrogado, tendo em vista que ocorreram instabilidades técnicas significativas no sistema institucional de cadastramento durante o final de semana passado.";
   const findings = runDeterministicAnalysis({ text: longSentenceText, documentType: "general" });
 
   const lengthFinding = findings.find(f => f.ruleId === "unicamp-sentence-length");
-  assert.ok(lengthFinding, "Deve identificar frase longa");
-  assert.ok(lengthFinding.suggestedText, "Deve fornecer suggestedText automático para frase longa");
-  assert.notEqual(lengthFinding.suggestedText, lengthFinding.originalText, "A sugestão deve ser diferente da frase original longa");
+  assert.ok(lengthFinding, "Deve identificar frase longa com mais de 20 palavras");
+  assert.equal(lengthFinding.suggestedText, undefined, "Não deve aplicar diminuição mecânica forçada");
+  assert.ok(lengthFinding.explanation.includes("palavras"), "A explicação deve informar a quantidade de palavras");
 });
+
 
 test("9. Garantia de Sugestão Diferente e Inversão de Voz Passiva", () => {
   const passive = "Esta reunião foi convocada pela diretoria a fim de que os colaboradores pudessem discutir.";
@@ -190,24 +191,39 @@ test("15. Editor de Sugestões: Aplicação de Versão Customizada pelo Usuário
   );
 });
 
-test("16. Garantia de Reescrita de Frases Longas e Sugestões para Comparação", () => {
+test("16. Identificação de Frases Longas Sem Corte Mecânico e Reescrita Fluida por IA", async () => {
   const longSentence = "A comissão deliberativa especial de avaliação realizou a conferência de todos os documentos apresentados pelos candidatos no prazo estipulado, sendo que todas as pendências foram devidamente encaminhadas para regularização perante o órgão competente.";
   
+  // 1. No motor determinístico, a frase é apontada como problema, mas SEM mutilação mecânica
   const findings = runDeterministicAnalysis({ text: longSentence });
   const sentenceFinding = findings.find(f => f.category === "sentence");
 
-  assert.ok(sentenceFinding, "Deve identificar apontamento de frase longa");
-  assert.ok(sentenceFinding.suggestedText, "A frase longa DEVE ter sugestão gerada");
-  assert.notEqual(
-    sentenceFinding.suggestedText.trim(),
-    sentenceFinding.originalText.trim(),
-    "A sugestão para frase longa NUNCA pode ser idêntica ao original!"
+  assert.ok(sentenceFinding, "Deve identificar apontamento de frase longa com mais de 20 palavras");
+  assert.equal(
+    sentenceFinding.suggestedText,
+    undefined,
+    "Frases longas não devem sofrer corte mecânico forçado no motor determinístico"
   );
   assert.ok(
-    sentenceFinding.suggestedText.includes(". Assim,") || sentenceFinding.suggestedText.includes(". "),
-    "A sugestão deve conter divisão em frases mais curtas"
+    sentenceFinding.recommendation.includes("IA") || sentenceFinding.recommendation.includes("ordem direta"),
+    "A recomendação deve orientar o uso de frases curtas na ordem direta e IA"
+  );
+
+  // 2. Na reescrita por IA, uma versão simplificada e fluida é produzida
+  const provider = new MockLanguageModelProvider();
+  const rewriteResult = await provider.rewriteText(
+    { text: longSentence, documentType: "general" },
+    { mode: "segment", segmentIssue: sentenceFinding.explanation }
+  );
+
+  assert.ok(rewriteResult.rewrittenText, "A IA deve retornar a reescrita da frase longa");
+  assert.notEqual(
+    rewriteResult.rewrittenText.trim(),
+    longSentence.trim(),
+    "A reescrita fluida não pode ser idêntica ao original"
   );
 });
+
 
 
 

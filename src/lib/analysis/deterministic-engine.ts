@@ -21,86 +21,8 @@ function createPortugueseWordRegex(term: string): RegExp {
 
 
 export function generateShortSentenceSuggestion(sentence: string): string {
-  let rewritten = rewriteToPlainLanguage(sentence);
-
-  // 1. Transformações de preâmbulos e fórmulas normativas
-  rewritten = rewritten
-    .replace(/^Considerando\s+que\s+/i, "A regra estabelece que ")
-    .replace(/\bbaixa\s+a\s+seguinte\s+Instru[cç][aã]o\s+Normativa:?/gi, "publica esta Instrução Normativa:")
-    .replace(/\bbaixa\s+a\s+seguinte\s+Portaria:?/gi, "publica esta Portaria:")
-    .replace(/\bbaixa\s+a\s+seguinte\s+Resolu[cç][aã]o:?/gi, "publica esta Resolução:");
-
-  // 2. Conjunções e conectivos coordenativos/subordinativos
-  const conjunctions: [RegExp, string][] = [
-    [/,\s*(pois|porque|uma\s+vez\s+que|haja\s+vista\s+que|tendo\s+em\s+vista\s+que|visto\s+que)\s+/gi, ". Isso ocorreu porque "],
-    [/\b(uma\s+vez\s+que|haja\s+vista\s+que|tendo\s+em\s+vista\s+que)\s+/gi, ". Isso ocorre porque "],
-    [/,\s*(mas|por[eé]m|contudo|todavia|entretanto|no\s+entanto)\s+/gi, ". No entanto, "],
-    [/,\s*(sendo\s+que|de\s+modo\s+que|de\s+forma\s+que|de\s+maneira\s+que)\s+/gi, ". Assim, "],
-    [/\b(sendo\s+que|de\s+modo\s+que|de\s+forma\s+que)\s+/gi, ". Assim, "],
-    [/,\s*(portanto|por\s+conseguinte|logo|por\s+isso)\s+/gi, ". Por isso, "],
-    [/,\s*(bem\s+como|al[eé]m\s+do\s+mais|e\s+tamb[eé]m|al[eé]m\s+disso)\s+/gi, ". Além disso, "],
-    [/,\s*(a\s+fim\s+de\s+que|para\s+que|com\s+vistas\s+a|visando\s+a)\s+/gi, ". Para isso, "],
-    [/,\s*cabendo\s+a[o|a]?\s+/gi, ". Essa tarefa cabe a "],
-    [/,\s*devendo\s+(?:o|a|os|as)?\s+/gi, ". É necessário que "],
-    [/,\s*(?:com|sob)\s+o\s+objetivo\s+de\s+/gi, ". O objetivo é "],
-    [/,\s*onde\s+/gi, ". Nesse local, "],
-    [/,\s*quando\s+/gi, ". Nesse momento, "],
-    [/,\s*ficando\s+/gi, ". Fica "],
-    [/,\s*obedecendo\s+a[o|a]?\s+/gi, ". A medida segue "],
-    [/\s+[–—-]\s+/g, ". "],
-    [/;\s*/g, ". "]
-  ];
-
-  for (const [conj, replacement] of conjunctions) {
-    if (conj.test(rewritten)) {
-      rewritten = rewritten.replace(conj, replacement);
-    }
-  }
-
-  // 3. Se a frase tiver mais de 20 palavras e apenas 1 sentença, divide obrigatoriamente
-  const words = rewritten.split(/\s+/).filter(Boolean);
-  const sentenceCount = splitSentences(rewritten).length;
-
-  if (words.length > 20 && sentenceCount <= 1) {
-    // Tenta dividir na vírgula mais central
-    if (rewritten.includes(",")) {
-      const commas: number[] = [];
-      for (let i = 0; i < rewritten.length; i++) {
-        if (rewritten[i] === ",") commas.push(i);
-      }
-      if (commas.length > 0) {
-        const mid = rewritten.length / 2;
-        const bestComma = commas.reduce((prev, curr) => Math.abs(curr - mid) < Math.abs(prev - mid) ? curr : prev);
-        const part1 = rewritten.substring(0, bestComma).trim();
-        const part2 = rewritten.substring(bestComma + 1).trim();
-        if (part1.length > 10 && part2.length > 10) {
-          const capPart2 = part2.charAt(0).toUpperCase() + part2.slice(1);
-          rewritten = `${part1}. ${capPart2}`;
-        }
-      }
-    } else {
-      // Se não houver vírgulas, procura conectivos ou divide no meio
-      const midWordIdx = Math.floor(words.length / 2);
-      const part1 = words.slice(0, midWordIdx).join(" ");
-      let part2 = words.slice(midWordIdx).join(" ");
-      part2 = part2.charAt(0).toUpperCase() + part2.slice(1);
-      rewritten = `${part1}. ${part2}`;
-    }
-  }
-
-  rewritten = rewritten.replace(/([.!?])\s*([a-záéíóúç])/g, (m, p, l) => `${p} ${l.toUpperCase()}`);
-  rewritten = rewriteToPlainLanguage(rewritten);
-
-  // Garantia absoluta: se por acaso ainda for idêntica, força divisão
-  if (rewritten.trim() === sentence.trim() && words.length > 20) {
-    const half = Math.floor(words.length / 2);
-    const p1 = words.slice(0, half).join(" ");
-    let p2 = words.slice(half).join(" ");
-    p2 = p2.charAt(0).toUpperCase() + p2.slice(1);
-    rewritten = `${p1}. ${p2}`;
-  }
-
-  return rewritten.trim();
+  // Aplica simplificações lexicais e de clichês do motor Unicamp sem cortes mecânicos
+  return rewriteToPlainLanguage(sentence);
 }
 
 
@@ -124,14 +46,13 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
     });
   }
 
-  // 1. REGRA: Frases com mais de 20 palavras
+  // 1. REGRA: Frases com mais de 20 palavras (Sem corte mecânico arbitrário - reescrita reservada para IA)
   const sentences = splitSentences(text);
   for (let sIndex = 0; sIndex < sentences.length; sIndex++) {
     const s = sentences[sIndex];
     if (s.wordCount > 20) {
       const startIndex = text.indexOf(s.sentence, s.index >= 0 ? s.index : 0);
       const endIndex = startIndex >= 0 ? startIndex + s.sentence.length : -1;
-      const suggested = generateShortSentenceSuggestion(s.sentence);
 
       addFinding({
         ruleId: "unicamp-sentence-length",
@@ -140,8 +61,8 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
         originalText: s.sentence,
         location: startIndex >= 0 ? { startIndex, endIndex, sentenceIndex: sIndex } : undefined,
         explanation: `Esta frase possui ${s.wordCount} palavras. A recomendação da Unicamp é evitar frases com mais de 20 palavras para não sobrecarregar a leitura.`,
-        recommendation: "Divida este período em duas ou mais frases curtas com ordem direta (sujeito + verbo + complemento).",
-        suggestedText: suggested,
+        recommendation: "Divida este período em duas ou mais frases curtas com ordem direta (sujeito + verbo + complemento). Utilize a reescrita por IA para uma reestruturação natural.",
+        suggestedText: undefined,
         source: {
           title: "Linguagem Simples Unicamp - Escreva",
           url: "https://linguagemsimples.unicamp.br/escreva/",
@@ -151,6 +72,7 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
       });
     }
   }
+
 
 
   // 2. REGRA: Verbosidade e Expressões Arcaicas

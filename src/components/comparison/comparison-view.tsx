@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { SemanticValidation } from "@/types/analysis";
-import { computeWordDiff, calculateDiffStats, DiffPart } from "@/lib/analysis/diff-utils";
-import { Copy, Check, ShieldCheck, AlertTriangle, GitCompare, Columns, FileText, Sparkles, CheckCircle2, History } from "lucide-react";
+import { computeWordDiff, calculateDiffStats } from "@/lib/analysis/diff-utils";
+import { Copy, Check, ShieldCheck, AlertTriangle, GitCompare, Columns, FileText } from "lucide-react";
 
 interface ComparisonViewProps {
   originalText: string;
@@ -20,7 +20,6 @@ export function ComparisonView({
   semanticValidation,
   onApplyRewritten
 }: ComparisonViewProps) {
-  // Alvo da comparação: ou o texto com as revisões aceitas pelo usuário, ou a versão 100% simplificada
   const [targetVersion, setTargetVersion] = useState<"working" | "full_simplified">(
     workingText && workingText !== originalText ? "working" : "full_simplified"
   );
@@ -29,7 +28,6 @@ export function ComparisonView({
 
   const activeTargetText = targetVersion === "working" ? (workingText || originalText) : (rewrittenText || originalText);
 
-  // Computa o diff palavra a palavra
   const diffParts = computeWordDiff(originalText, activeTargetText);
   const diffStats = calculateDiffStats(diffParts);
 
@@ -42,147 +40,133 @@ export function ComparisonView({
   const isPreserved = semanticValidation ? (semanticValidation.isSemanticPreserved ?? semanticValidation.isValid ?? true) : true;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Alerta de Validação Semântica */}
       {semanticValidation && (
-        <div className={`p-5 rounded-3xl border flex items-start gap-3 text-xs leading-relaxed ${
+        <div className={`p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed ${
           isPreserved
-            ? "bg-[#faf9f5] border-zinc-200 text-zinc-900"
-            : "bg-[#fef7eb] border-[#FBB040] text-zinc-950"
+            ? "bg-zinc-50 border-zinc-200 text-zinc-800"
+            : "bg-amber-50 border-amber-200 text-amber-950"
         }`}>
           {isPreserved ? (
-            <ShieldCheck className="w-5 h-5 text-black shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-5 h-5 text-[#d98a1a] shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           )}
-          <div className="space-y-1">
-            <div className="font-black text-sm text-black">
+          <div className="space-y-0.5">
+            <span className="font-bold text-zinc-900 block">
               {isPreserved
-                ? "Preservação Semântica e Normativa Verificada (100%)"
+                ? "Preservação Semântica e Normativa Verificada"
                 : `Atenção na Preservação de Fatos (${semanticValidation.preservationScore ?? 85}%)`}
-            </div>
-            <p className="font-medium text-zinc-600">
+            </span>
+            <p className="text-zinc-600">
               {semanticValidation.summary || (isPreserved
-                ? "Todas as datas, valores, leis, obrigações e informações essenciais foram mantidas na versão simplificada."
+                ? "Datas, valores, regras e obrigações foram preservadas na versão simplificada."
                 : (semanticValidation.warnings || []).join(" "))}
             </p>
           </div>
         </div>
       )}
 
-      {/* Barra de Controle de Versões e Visualização Estilo WordPress */}
-      <div className="bg-white p-5 rounded-3xl border border-zinc-200 shadow-xs space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          {/* Seletor da Versão Comparada */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-black flex items-center gap-1.5">
-              <History className="w-4 h-4 text-[#FBB040]" />
-              <span>Comparar Original com:</span>
-            </span>
-            <div className="flex items-center bg-[#faf9f5] border border-zinc-200 p-1 rounded-2xl">
+      {/* Barra de Controles Unificada */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-zinc-200 shadow-2xs space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          {/* Seletor de Versão (Segmented Control) */}
+          <div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 self-start">
+            <button
+              onClick={() => setTargetVersion("working")}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                targetVersion === "working"
+                  ? "bg-white text-zinc-900 shadow-xs font-bold"
+                  : "text-zinc-500 hover:text-zinc-900"
+              }`}
+            >
+              Alterações Aceitas por Você
+            </button>
+            <button
+              onClick={() => setTargetVersion("full_simplified")}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                targetVersion === "full_simplified"
+                  ? "bg-white text-zinc-900 shadow-xs font-bold"
+                  : "text-zinc-500 hover:text-zinc-900"
+              }`}
+            >
+              Versão Integral IA
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            {/* Seletor de Modo de Exibição */}
+            <div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60">
               <button
-                onClick={() => setTargetVersion("working")}
-                className={`text-xs font-bold px-3.5 py-1.5 rounded-xl transition-colors ${
-                  targetVersion === "working"
-                    ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black"
-                    : "text-zinc-600 hover:text-black"
+                onClick={() => setViewMode("inline_wordpress")}
+                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+                  viewMode === "inline_wordpress"
+                    ? "bg-white text-zinc-900 shadow-xs font-bold"
+                    : "text-zinc-500 hover:text-zinc-900"
                 }`}
+                title="Modo Diff Unificado"
               >
-                Alterações Aceitas por Você
+                <GitCompare className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Diff Unificado</span>
               </button>
               <button
-                onClick={() => setTargetVersion("full_simplified")}
-                className={`text-xs font-bold px-3.5 py-1.5 rounded-xl transition-colors ${
-                  targetVersion === "full_simplified"
-                    ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black"
-                    : "text-zinc-600 hover:text-black"
+                onClick={() => setViewMode("split")}
+                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+                  viewMode === "split"
+                    ? "bg-white text-zinc-900 shadow-xs font-bold"
+                    : "text-zinc-500 hover:text-zinc-900"
                 }`}
+                title="Modo Lado a Lado"
               >
-                Versão 100% Simplificada (Unicamp + IA)
+                <Columns className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Lado a Lado</span>
+              </button>
+              <button
+                onClick={() => setViewMode("clean")}
+                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+                  viewMode === "clean"
+                    ? "bg-white text-zinc-900 shadow-xs font-bold"
+                    : "text-zinc-500 hover:text-zinc-900"
+                }`}
+                title="Texto Final Limpo"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Texto Final</span>
               </button>
             </div>
-          </div>
 
-          {/* Botão Copiar */}
-          <button
-            onClick={handleCopy}
-            className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-[#111111] px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors border border-[#d98a1a]"
-          >
-            {copied ? <Check className="w-4 h-4 text-black" /> : <Copy className="w-4 h-4 text-black" />}
-            <span>{copied ? "Copiado!" : "Copiar Versão Revisada"}</span>
-          </button>
+            {/* Botão Copiar */}
+            <button
+              onClick={handleCopy}
+              className="text-xs font-bold bg-[#FBB040] hover:bg-[#e59b2b] text-black px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all border border-[#d98a1a]"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? "Copiado!" : "Copiar"}</span>
+            </button>
+          </div>
         </div>
 
-        {/* Estatísticas de Diff e Seletor de Modo de Exibição */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-zinc-100">
-          {/* Badges de Alterações */}
-          <div className="flex items-center gap-3 text-xs">
-            <span className="font-bold text-zinc-700">Diferenças:</span>
-            <span className="bg-[#fef7eb] text-black font-black px-2.5 py-0.5 rounded-lg border border-[#FBB040]">
-              +{diffStats.insertions} inserções
+        {/* Resumo de Alterações */}
+        <div className="flex items-center gap-3 text-[11px] text-zinc-500 pt-2 border-t border-zinc-100 font-medium">
+          <span>Diferenças:</span>
+          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">
+            +{diffStats.insertions} inserções
+          </span>
+          <span className="text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md font-bold">
+            -{diffStats.deletions} remoções
+          </span>
+          {targetVersion === "working" && workingText === originalText && (
+            <span className="text-zinc-400 italic">
+              (Nenhuma alteração individual aceita ainda)
             </span>
-            <span className="bg-zinc-100 text-zinc-600 font-bold px-2.5 py-0.5 rounded-lg border border-zinc-300 line-through">
-              -{diffStats.deletions} remoções
-            </span>
-            {targetVersion === "working" && workingText === originalText && (
-              <span className="text-zinc-500 italic">
-                (Nenhuma sugestão aceita ainda. Você pode aceitar na aba &quot;Problemas&quot; ou visualizar a &quot;Versão 100% Simplificada&quot;).
-              </span>
-            )}
-          </div>
-
-          {/* Seletor de Modo de Exibição (WordPress Inline vs Split vs Clean) */}
-          <div className="flex items-center bg-[#faf9f5] border border-zinc-200 p-1 rounded-2xl">
-            <button
-              onClick={() => setViewMode("inline_wordpress")}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
-                viewMode === "inline_wordpress" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-              }`}
-              title="Exibição unificada com remoções e inserções destacadas no mesmo texto"
-            >
-              <GitCompare className="w-3.5 h-3.5" />
-              <span>Modo WordPress (Inline Diff)</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode("split")}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
-                viewMode === "split" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-              }`}
-              title="Exibição em duas colunas"
-            >
-              <Columns className="w-3.5 h-3.5" />
-              <span>Lado a Lado (Split)</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode("clean")}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${
-                viewMode === "clean" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-              }`}
-              title="Apenas o texto final limpo"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>Versão Final Limpa</span>
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* 1. MODO WORDPRESS (INLINE DIFF) */}
+      {/* 1. MODO INLINE DIFF */}
       {viewMode === "inline_wordpress" && (
-        <div className="bg-white rounded-3xl border border-zinc-200 p-8 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-            <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-2">
-              <GitCompare className="w-4 h-4 text-[#FBB040]" />
-              <span>Comparação de Revisão (Estilo WordPress)</span>
-            </span>
-            <div className="text-xs text-zinc-600 flex items-center gap-2">
-              <span className="inline-block w-3 h-3 bg-zinc-200 border border-zinc-300 rounded-xs" /> Texto removido
-              <span className="inline-block w-3 h-3 bg-[#fef7eb] border border-[#FBB040] rounded-xs ml-2" /> Texto adicionado
-            </div>
-          </div>
-
+        <div className="bg-white rounded-2xl border border-zinc-200 p-6 sm:p-8 shadow-2xs space-y-3">
           <div className="text-base text-zinc-900 leading-relaxed font-sans whitespace-pre-wrap">
             {diffParts.map((part, index) => {
               if (part.type === "delete") {
@@ -205,20 +189,19 @@ export function ComparisonView({
         </div>
       )}
 
-      {/* 2. MODO LADO A LADO (SPLIT VIEW) */}
+      {/* 2. MODO LADO A LADO */}
       {viewMode === "split" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Coluna Esquerda: Original */}
-          <div className="bg-white rounded-3xl border border-zinc-200 p-6 shadow-xs space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-              <span className="text-xs font-black uppercase tracking-wider text-black">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-2xs space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                 Texto Original
               </span>
-              <span className="text-xs text-zinc-500 font-bold">
+              <span className="text-xs text-zinc-400 font-medium">
                 {originalText.split(/\s+/).filter(Boolean).length} palavras
               </span>
             </div>
-            <div className="text-sm text-zinc-800 leading-relaxed whitespace-pre-wrap font-sans">
+            <div className="text-sm text-zinc-700 leading-relaxed whitespace-pre-wrap font-sans">
               {diffParts.map((part, index) => {
                 if (part.type === "delete") {
                   return (
@@ -227,28 +210,22 @@ export function ComparisonView({
                     </span>
                   );
                 }
-                if (part.type === "insert") {
-                  return null;
-                }
+                if (part.type === "insert") return null;
                 return <span key={index}>{part.value}</span>;
               })}
             </div>
           </div>
 
-          {/* Coluna Direita: Revisado */}
-          <div className="bg-[#faf9f5] rounded-3xl border border-zinc-300 p-6 shadow-xs space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
-              <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-[#FBB040]" />
-                <span>
-                  {targetVersion === "working" ? "Texto com Alterações Aceitas" : "Versão 100% Simplificada"}
-                </span>
+          <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-2xs space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+                {targetVersion === "working" ? "Alterações Aceitas" : "Versão Integral IA"}
               </span>
-              <span className="text-xs text-black font-bold">
+              <span className="text-xs text-zinc-400 font-medium">
                 {activeTargetText.split(/\s+/).filter(Boolean).length} palavras
               </span>
             </div>
-            <div className="text-sm text-zinc-900 leading-relaxed whitespace-pre-wrap font-sans font-medium">
+            <div className="text-sm text-zinc-900 leading-relaxed whitespace-pre-wrap font-sans">
               {diffParts.map((part, index) => {
                 if (part.type === "insert") {
                   return (
@@ -257,9 +234,7 @@ export function ComparisonView({
                     </span>
                   );
                 }
-                if (part.type === "delete") {
-                  return null;
-                }
+                if (part.type === "delete") return null;
                 return <span key={index}>{part.value}</span>;
               })}
             </div>
@@ -267,17 +242,14 @@ export function ComparisonView({
         </div>
       )}
 
-      {/* 3. MODO LIMPO (CLEAN VIEW) */}
+      {/* 3. MODO LIMPO */}
       {viewMode === "clean" && (
-        <div className="bg-white rounded-3xl border border-zinc-200 p-8 shadow-xs max-w-3xl mx-auto space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-            <span className="text-sm font-black text-black flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#FBB040]" />
-              <span>
-                {targetVersion === "working" ? "Texto com Suas Revisões Aplicadas" : "Versão Final Simplificada"}
-              </span>
+        <div className="bg-white rounded-2xl border border-zinc-200 p-6 sm:p-8 shadow-2xs max-w-3xl mx-auto space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+              {targetVersion === "working" ? "Texto com Alterações Aceitas" : "Versão Final Simplificada"}
             </span>
-            <span className="text-xs text-zinc-500 font-bold">
+            <span className="text-xs text-zinc-400 font-medium">
               {activeTargetText.split(/\s+/).filter(Boolean).length} palavras
             </span>
           </div>
@@ -289,3 +261,4 @@ export function ComparisonView({
     </div>
   );
 }
+

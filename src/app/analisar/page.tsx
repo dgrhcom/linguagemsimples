@@ -368,11 +368,11 @@ export default function AnalisarPage() {
 			{result && (
 				<div className="space-y-6">
 					{/* Barra Superior de Ações e Abas */}
-					<div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-3xl border border-zinc-200 shadow-xs">
-						<div className="flex items-center gap-3">
+					<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-zinc-200 shadow-2xs">
+						<div className="flex items-center gap-2.5">
 							<button
 								onClick={handleResetAnalysis}
-								className="text-xs font-bold text-zinc-700 hover:text-black flex items-center gap-1.5 px-3.5 py-2 rounded-xl hover:bg-zinc-100 transition-colors"
+								className="text-xs font-semibold text-zinc-600 hover:text-zinc-950 flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-zinc-100 transition-colors"
 								title="Voltar ao editor e analisar novo texto"
 							>
 								<RotateCcw className="w-3.5 h-3.5" />
@@ -384,19 +384,23 @@ export default function AnalisarPage() {
 							{/* Status do Provedor */}
 							<button
 								onClick={() => setIsSettingsOpen(true)}
-								className="text-xs font-bold text-zinc-700 hover:text-black flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-zinc-50 border border-zinc-200"
+								className="text-xs font-medium text-zinc-600 hover:text-zinc-900 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-zinc-100 transition-colors"
+								title="Configurações de IA"
 							>
-								<Cpu className="w-3.5 h-3.5 text-[#FBB040]" />
-								<span>{aiProviderName}</span>
+								<Cpu className="w-3.5 h-3.5 text-zinc-500" />
+								<span className="text-[11px] font-semibold">{aiProviderName}</span>
 							</button>
 						</div>
 
-						{/* Abas de Navegação */}
-						<div className="flex items-center gap-1 bg-[#faf9f5] border border-zinc-200 p-1 rounded-2xl">
+						{/* Abas de Navegação (Segmented Control Elegante) */}
+						<div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 self-start lg:self-center">
 							<button
 								onClick={() => setActiveTab("overview")}
-								className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${activeTab === "overview" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-									}`}
+								className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+									activeTab === "overview"
+										? "bg-white text-zinc-900 shadow-xs font-bold"
+										: "text-zinc-500 hover:text-zinc-900"
+								}`}
 							>
 								<LayoutDashboard className="w-3.5 h-3.5" />
 								<span>Visão Geral</span>
@@ -404,8 +408,11 @@ export default function AnalisarPage() {
 
 							<button
 								onClick={() => setActiveTab("findings")}
-								className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${activeTab === "findings" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-									}`}
+								className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+									activeTab === "findings"
+										? "bg-white text-zinc-900 shadow-xs font-bold"
+										: "text-zinc-500 hover:text-zinc-900"
+								}`}
 							>
 								<CheckSquare className="w-3.5 h-3.5" />
 								<span>Problemas ({result.findings.length})</span>
@@ -413,8 +420,11 @@ export default function AnalisarPage() {
 
 							<button
 								onClick={() => setActiveTab("comparison")}
-								className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${activeTab === "comparison" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-									}`}
+								className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+									activeTab === "comparison"
+										? "bg-white text-zinc-900 shadow-xs font-bold"
+										: "text-zinc-500 hover:text-zinc-900"
+								}`}
 							>
 								<GitCompare className="w-3.5 h-3.5" />
 								<span>Comparação</span>
@@ -422,35 +432,40 @@ export default function AnalisarPage() {
 
 							<button
 								onClick={() => setActiveTab("report")}
-								className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors ${activeTab === "report" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
-									}`}
+								className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+									activeTab === "report"
+										? "bg-white text-zinc-900 shadow-xs font-bold"
+										: "text-zinc-500 hover:text-zinc-900"
+								}`}
 							>
 								<FileText className="w-3.5 h-3.5" />
 								<span>Relatório</span>
 							</button>
 						</div>
 
-						<div className="flex items-center gap-2">
+						{/* Ações Rápidas */}
+						<div className="flex items-center gap-2 self-start lg:self-auto">
 							{result.rewrittenText && (
 								<button
 									onClick={handleApplyFullAiRewrite}
-									className="text-xs font-black bg-[#18181b] hover:bg-black text-[#FBB040] px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors border border-black"
-									title="Substituir o texto original pela proposta integral reescrita pela IA"
+									className="text-xs font-semibold text-zinc-800 bg-zinc-100 hover:bg-zinc-200 px-3 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
+									title="Substituir todo o texto pela versão integral reescrita pela IA"
 								>
-									<Wand2 className="w-3.5 h-3.5 text-[#FBB040]" />
-									<span>Aplicar Reescrita IA</span>
+									<Wand2 className="w-3.5 h-3.5 text-zinc-600" />
+									<span>Versão Integral IA</span>
 								</button>
 							)}
 
 							<button
 								onClick={() => setIsExportOpen(true)}
-								className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-[#111111] px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors border border-[#d98a1a]"
+								className="text-xs font-bold bg-[#FBB040] hover:bg-[#e59b2b] text-black px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all border border-[#d98a1a]"
 							>
-								<Download className="w-4 h-4 text-black" />
+								<Download className="w-3.5 h-3.5 text-black stroke-[2.5]" />
 								<span>Exportar</span>
 							</button>
 						</div>
 					</div>
+
 
 					{/* Conteúdo Dinâmico da Aba Ativa */}
 					{activeTab === "overview" && (

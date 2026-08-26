@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Finding } from "@/types/analysis";
 import { FindingCard } from "./finding-card";
-import { Filter, CheckCheck, Clock, CheckCircle2, EyeOff } from "lucide-react";
+import { CheckCheck, CheckCircle2, Sparkles, SlidersHorizontal } from "lucide-react";
 
 interface FindingsListProps {
   findings: Finding[];
@@ -34,127 +34,138 @@ export function FindingsList({
 }: FindingsListProps) {
   const activeSelectedId = selectedFinding?.id || selectedFindingId;
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "applied" | "ignored">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "applied">("all");
 
   const categories = Array.from(new Set(findings.map(f => f.category)));
 
   const pendingCount = findings.filter(f => !f.status || f.status === "pending").length;
   const appliedCount = findings.filter(f => f.status === "applied").length;
-  const ignoredCount = findings.filter(f => f.status === "ignored").length;
 
   const filteredFindings = findings.filter(f => {
     const matchCategory = selectedCategory === "all" || f.category === selectedCategory;
     const currentStatus = f.status || "pending";
-    const matchStatus = statusFilter === "all" || currentStatus === statusFilter;
+    const matchStatus =
+      statusFilter === "all" ||
+      (statusFilter === "pending" && currentStatus === "pending") ||
+      (statusFilter === "applied" && currentStatus === "applied");
     return matchCategory && matchStatus;
   });
 
-  const pendingActionableCount = findings.filter(f => (!f.status || f.status === "pending") && !!f.suggestedText).length;
+  const pendingActionableCount = findings.filter(
+    f => (!f.status || f.status === "pending") && Boolean(f.suggestedText && f.suggestedText.trim() !== f.originalText.trim())
+  ).length;
+
+  const categoryLabels: Record<string, string> = {
+    spelling: "Ortografia",
+    grammar: "Gramática",
+    clarity: "Clareza",
+    concision: "Concisão",
+    sentence: "Frases Longas",
+    vocabulary: "Vocabulário",
+    inclusivity: "Inclusão",
+    formatting: "Formatação",
+    jargon: "Jargões",
+    acronym: "Siglas"
+  };
 
   return (
     <div className="space-y-4">
-      {/* Barra de Filtros e Status */}
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-zinc-200 shadow-xs space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {/* Filtro por Status */}
-          <div className="flex items-center gap-1 bg-[#faf9f5] border border-zinc-200 p-1 rounded-2xl">
+      {/* Barra Unificada de Filtros e Ações em Massa */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-zinc-200 shadow-2xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Segmented Control de Status */}
+          <div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 self-start">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`text-xs font-bold px-3.5 py-1.5 rounded-xl transition-colors ${
-                statusFilter === "all" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                statusFilter === "all"
+                  ? "bg-white text-zinc-900 shadow-xs font-bold"
+                  : "text-zinc-500 hover:text-zinc-900"
               }`}
             >
               Todos ({findings.length})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}
-              className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1 transition-colors ${
-                statusFilter === "pending" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                statusFilter === "pending"
+                  ? "bg-white text-zinc-900 shadow-xs font-bold"
+                  : "text-zinc-500 hover:text-zinc-900"
               }`}
             >
-              <Clock className="w-3.5 h-3.5 text-[#FBB040]" />
-              <span>Pendentes ({pendingCount})</span>
+              Pendentes ({pendingCount})
             </button>
             <button
               onClick={() => setStatusFilter("applied")}
-              className={`text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1 transition-colors ${
-                statusFilter === "applied" ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black" : "text-zinc-600 hover:text-black"
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
+                statusFilter === "applied"
+                  ? "bg-white text-zinc-900 shadow-xs font-bold"
+                  : "text-zinc-500 hover:text-zinc-900"
               }`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#FBB040]" />
-              <span>Aplicadas ({appliedCount})</span>
+              Aplicadas ({appliedCount})
             </button>
           </div>
 
-          {/* Botão de Aplicar Todas */}
+          {/* Ação em Massa: Aceitar Todas as Prontas */}
           {pendingActionableCount > 0 && onApplyAllSuggestions && (
             <button
               onClick={onApplyAllSuggestions}
-              className="text-xs font-black text-[#111111] bg-[#FBB040] hover:bg-[#e59b2b] border border-[#d98a1a] px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors"
+              className="text-xs font-black text-black bg-[#FBB040] hover:bg-[#e59b2b] border border-[#d98a1a] px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all self-start sm:self-auto"
             >
-              <CheckCheck className="w-4 h-4 text-black" />
+              <CheckCheck className="w-4 h-4 text-black stroke-[2.5]" />
               <span>Aceitar Todas as Sugestões ({pendingActionableCount})</span>
             </button>
           )}
         </div>
 
-        {/* Filtro por Categoria */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 border-t border-zinc-100 pt-3">
-          <Filter className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-          <button
-            onClick={() => setSelectedCategory("all")}
-            className={`text-xs px-3 py-1.5 rounded-xl transition-colors shrink-0 font-bold ${
-              selectedCategory === "all"
-                ? "bg-[#18181b] text-[#FBB040]"
-                : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-            }`}
-          >
-            Todas ({findings.length})
-          </button>
-          {categories.map(cat => {
-            const count = findings.filter(f => f.category === cat).length;
-            const categoryLabels: Record<string, string> = {
-              spelling: "Ortografia & Gramática",
-              grammar: "Gramática",
-              clarity: "Clareza",
-              concision: "Concisão",
-              sentence: "Frases Longas",
-              vocabulary: "Vocabulário",
-              inclusivity: "Inclusão",
-              formatting: "Padronização",
-              jargon: "Jargões",
-              acronym: "Siglas",
-              organization: "Organização",
-              instruction: "Instruções"
-            };
-            const label = categoryLabels[cat] || cat;
-
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`text-xs px-3 py-1.5 rounded-xl transition-colors shrink-0 font-bold flex items-center gap-1 ${
-                  selectedCategory === cat
-                    ? "bg-[#18181b] text-[#FBB040]"
-                    : cat === "spelling"
-                    ? "bg-[#fef7eb] border border-[#FBB040] text-black hover:bg-[#fdecd0]"
-                    : "bg-[#faf9f5] border border-zinc-200 text-zinc-700 hover:bg-zinc-100"
-                }`}
-              >
-                <span>{label}</span>
-                <span className="text-[11px] opacity-80">({count})</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Filtros por Categoria (Scroll sutil e limpo) */}
+        {categories.length > 1 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-zinc-100 scrollbar-none">
+            <SlidersHorizontal className="w-3 h-3 text-zinc-400 shrink-0 ml-0.5" />
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className={`text-[11px] px-2.5 py-1 rounded-lg transition-colors shrink-0 font-medium ${
+                selectedCategory === "all"
+                  ? "bg-zinc-900 text-white font-bold"
+                  : "bg-zinc-100/70 text-zinc-600 hover:bg-zinc-200/60"
+              }`}
+            >
+              Todas as categorias
+            </button>
+            {categories.map(cat => {
+              const count = findings.filter(f => f.category === cat).length;
+              const label = categoryLabels[cat] || cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg transition-colors shrink-0 font-medium flex items-center gap-1 ${
+                    selectedCategory === cat
+                      ? "bg-zinc-900 text-white font-bold"
+                      : "bg-zinc-100/70 text-zinc-600 hover:bg-zinc-200/60"
+                  }`}
+                >
+                  <span>{label}</span>
+                  <span className="opacity-60 text-[10px]">({count})</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
-
 
       {/* Lista de Cards */}
       <div className="space-y-3">
         {filteredFindings.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-zinc-200 p-8 text-center text-zinc-500 font-medium">
-            Nenhum apontamento encontrado com os filtros selecionados.
+          <div className="bg-white rounded-2xl border border-zinc-200/80 p-8 text-center space-y-2">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <h4 className="text-sm font-bold text-zinc-900">Tudo limpo por aqui!</h4>
+            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+              Nenhum apontamento pendente com os filtros selecionados.
+            </p>
           </div>
         ) : (
           filteredFindings.map(finding => (
@@ -176,3 +187,4 @@ export function FindingsList({
     </div>
   );
 }
+

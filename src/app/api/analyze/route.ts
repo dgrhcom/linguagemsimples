@@ -63,16 +63,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Garante que todo apontamento possua suggestedText preenchido e simplificado
+    // Garante que termos, clichês e ortografia tenham sugestão; frases longas aguardam reescrita fluida por IA ou edição
     for (const f of combinedFindings) {
-      if (!f.suggestedText || f.suggestedText === f.originalText) {
-        if (f.category === "sentence") {
-          f.suggestedText = generateShortSentenceSuggestion(f.originalText);
-        } else {
-          f.suggestedText = guaranteeDifferentSuggestion(f.originalText, rewriteToPlainLanguage(f.originalText));
-        }
+      if (f.category !== "sentence" && (!f.suggestedText || f.suggestedText === f.originalText)) {
+        f.suggestedText = guaranteeDifferentSuggestion(f.originalText, rewriteToPlainLanguage(f.originalText));
       }
     }
+
 
 
     // 5. Cálculo do Score Multidimensional

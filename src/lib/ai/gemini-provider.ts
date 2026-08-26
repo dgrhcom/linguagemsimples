@@ -177,14 +177,11 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
 
         if (aiSuggestion && aiSuggestion !== df.originalText) {
           df.suggestedText = aiSuggestion;
-        } else if (!df.suggestedText || df.suggestedText === df.originalText) {
-          if (df.category === "sentence") {
-            df.suggestedText = generateShortSentenceSuggestion(df.originalText);
-          } else {
-            df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
-          }
+        } else if (df.category !== "sentence" && (!df.suggestedText || df.suggestedText === df.originalText)) {
+          df.suggestedText = guaranteeDifferentSuggestion(df.originalText, rewriteToPlainLanguage(df.originalText));
         }
       }
+
 
       // 2. Achados adicionais identificados contextualmente pela IA
       const rawAdditional: any[] = Array.isArray(parsed.additionalFindings) ? parsed.additionalFindings : [];
