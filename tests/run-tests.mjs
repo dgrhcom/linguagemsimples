@@ -224,6 +224,26 @@ test("16. Identificação de Frases Longas Sem Corte Mecânico e Reescrita Fluid
   );
 });
 
+test("17. Geração de DOCX Oficial no Padrão Comunicado Unicamp", async () => {
+  const { generateComunicadoDocx } = await import("../src/lib/templates/docx-comunicado-generator.ts");
+
+  const blob = await generateComunicadoDocx(
+    "Informamos a toda a comunidade universitária que o período de inscrições foi prorrogado.",
+    {
+      unitName: "Diretoria Geral de Recursos Humanos",
+      documentNumber: "01/2026",
+      emailSite: "dgrh@unicamp.br | www.dgrh.unicamp.br",
+      locationAndDate: "Campinas, 26 de agosto de 2026",
+      authorName: "Coordenação Geral da DGRH",
+      authorRole: "Diretoria Geral de Recursos Humanos"
+    }
+  );
+
+  assert.ok(blob, "Deve gerar o blob DOCX");
+  assert.ok(blob.size > 1000, "O arquivo DOCX gerado deve ter tamanho válido com estrutura Office Open XML");
+});
+
+
 
 
 

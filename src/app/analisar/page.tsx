@@ -9,8 +9,10 @@ import { ComparisonView } from "@/components/comparison/comparison-view";
 import { FullReport } from "@/components/report/full-report";
 import { ExportModal } from "@/components/export/export-modal";
 import { SettingsModal } from "@/components/layout/settings-modal";
+import { ComunicadoDrawer } from "@/components/templates/comunicado-drawer";
 import { AnalysisInput, AnalysisResult, Finding } from "@/types/analysis";
 import { getStoredAiHeaders } from "@/lib/ai";
+
 import {
 	LayoutDashboard,
 	CheckSquare,
@@ -32,7 +34,9 @@ export default function AnalisarPage() {
 	const [activeTab, setActiveTab] = useState<"overview" | "findings" | "comparison" | "report">("overview");
 	const [isExportOpen, setIsExportOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+	const [isTemplateDrawerOpen, setIsTemplateDrawerOpen] = useState(false);
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
+
 	const [aiProviderName, setAiProviderName] = useState<string>("Motor Unicamp (Offline)");
 
 	const updateAiProviderDisplay = () => {
@@ -502,12 +506,23 @@ export default function AnalisarPage() {
 							)}
 
 							<button
+								type="button"
+								onClick={() => setIsTemplateDrawerOpen(true)}
+								className="text-xs font-bold text-zinc-900 bg-[#fef7eb] hover:bg-[#fdecd0] border border-[#FBB040] px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs"
+								title="Visualizar o texto formatado no gabarito oficial do Comunicado da Unicamp"
+							>
+								<FileText className="w-3.5 h-3.5 text-[#d98a1a]" />
+								<span>Modelo Comunicado</span>
+							</button>
+
+							<button
 								onClick={() => setIsExportOpen(true)}
 								className="text-xs font-bold bg-[#FBB040] hover:bg-[#e59b2b] text-black px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all border border-[#d98a1a]"
 							>
 								<Download className="w-3.5 h-3.5 text-black stroke-[2.5]" />
 								<span>Exportar</span>
 							</button>
+
 						</div>
 					</div>
 
@@ -626,6 +641,15 @@ export default function AnalisarPage() {
 				onClose={() => setIsSettingsOpen(false)}
 				onSaved={updateAiProviderDisplay}
 			/>
+
+			{result && (
+				<ComunicadoDrawer
+					isOpen={isTemplateDrawerOpen}
+					onClose={() => setIsTemplateDrawerOpen(false)}
+					text={result.workingText || result.input.text}
+				/>
+			)}
 		</div>
 	);
+
 }
