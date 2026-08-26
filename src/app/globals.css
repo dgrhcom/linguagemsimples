@@ -210,5 +210,13 @@ html[data-high-contrast="true"] .diff-deleted {
   #printable-comunicado * {
     visibility: visible !important;
   }
+
+  #printable-comunicado img {
+    visibility: visible !important;
+    display: inline-block !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
+
 

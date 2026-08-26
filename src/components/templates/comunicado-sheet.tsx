@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { ComunicadoMetadata } from "@/lib/templates/docx-comunicado-generator";
 
 interface ComunicadoSheetProps {
@@ -29,7 +28,7 @@ export function ComunicadoSheet({
   return (
     <div
       id="printable-comunicado"
-      className={`bg-white text-black shadow-2xl border border-zinc-300 rounded-sm select-text ${className}`}
+      className={`bg-white text-black shadow-2xl border border-zinc-300 rounded-sm select-text printable-document ${className}`}
       style={{
         width: "100%",
         maxWidth: "210mm",
@@ -47,29 +46,39 @@ export function ComunicadoSheet({
         transformOrigin: "top center"
       }}
     >
-      {/* 1. Cabeçalho Institucional (Margem Superior 1,5cm) */}
-      <header className="border-b border-zinc-400 pb-3 mb-6">
+      {/* 1. Cabeçalho Institucional (Div para evitar conflitos com regras de print em tags <header>) */}
+      <div className="border-b border-zinc-400 pb-3 mb-6 block">
         <div className="flex items-center justify-between gap-4">
-          {/* Logotipos à Esquerda (Unicamp + Unidade opcional) */}
+          {/* Logotipos à Esquerda */}
           <div className="flex items-center gap-3">
-            <div className="relative w-14 h-14 shrink-0">
-              <Image
+            {/* Logotipo da Unicamp (se não estiver ocultado) */}
+            {!metadata.hideUnicampLogo && (
+              <img
                 src="/images/logo-unicamp.svg"
                 alt="Logotipo da Unicamp"
-                width={56}
-                height={56}
-                className="object-contain"
-                priority
+                style={{
+                  height: "56px",
+                  width: "auto",
+                  display: "inline-block",
+                  objectFit: "contain"
+                }}
+                className="print:inline-block"
               />
-            </div>
+            )}
 
-            {/* Logotipo da Unidade / Órgão (se enviado) */}
+            {/* Logotipo da Unidade / Órgão (mesma altura que o da Unicamp) */}
             {metadata.customUnitLogo && (
-              <div className="border-l border-zinc-300 pl-3">
+              <div className={!metadata.hideUnicampLogo ? "border-l border-zinc-300 pl-3" : ""}>
                 <img
                   src={metadata.customUnitLogo}
                   alt="Logotipo da Unidade"
-                  className="max-h-12 max-w-[120px] object-contain"
+                  style={{
+                    height: "56px",
+                    width: "auto",
+                    display: "inline-block",
+                    objectFit: "contain"
+                  }}
+                  className="print:inline-block"
                 />
               </div>
             )}
@@ -88,7 +97,7 @@ export function ComunicadoSheet({
             </p>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* 1 linha em branco após o cabeçalho */}
       <div className="h-6" />
@@ -106,7 +115,7 @@ export function ComunicadoSheet({
       </div>
 
       {/* 3. Corpo do Texto (Alinhamento Justificado, Entrelinha 1,5, Recuo 1,25 cm) */}
-      <main
+      <div
         className="space-y-4 text-justify"
         style={{
           fontSize: "12pt",
@@ -151,7 +160,7 @@ export function ComunicadoSheet({
             [O texto formatado do comunicado será exibido aqui em tempo real...]
           </p>
         )}
-      </main>
+      </div>
 
       {/* 4. Local e Data (Alinhado com avanço de parágrafo de 1,25 cm) */}
       <div
@@ -169,7 +178,7 @@ export function ComunicadoSheet({
       <div className="h-16" />
 
       {/* 5. Identificação da Autora ou Autor (Centralizado, Espaçamento Simples) */}
-      <footer
+      <div
         className="text-center space-y-1"
         style={{
           fontSize: "12pt",
@@ -182,7 +191,7 @@ export function ComunicadoSheet({
         <p className="text-zinc-800">
           {metadata.authorRole || "Cargo ou Função"}
         </p>
-      </footer>
+      </div>
     </div>
   );
 }

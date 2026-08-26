@@ -19,7 +19,9 @@ import {
   Upload,
   Trash2,
   Info,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { ComunicadoSheet } from "./comunicado-sheet";
 import {
@@ -52,7 +54,8 @@ export function ComunicadoDrawer({
     locationAndDate: "Campinas, 26 de agosto de 2026",
     authorName: "Coordenação Geral da DGRH",
     authorRole: "Diretoria Geral de Recursos Humanos",
-    customUnitLogo: undefined
+    customUnitLogo: undefined,
+    hideUnicampLogo: false
   });
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export function ComunicadoDrawer({
   };
 
   const handleOpenGoogleDocs = async () => {
-    // 1. Copia o conteúdo em HTML formatado com regras da Unicamp para a área de transferência
+    // 1. Copia o conteúdo em HTML formatado para a área de transferência
     await handleCopyRichText();
     // 2. Abre a página de criação de documento no Google Docs
     window.open("https://docs.google.com/document/create", "_blank");
@@ -131,22 +134,32 @@ export function ComunicadoDrawer({
         .map(p => p.trim())
         .filter(Boolean);
 
+      // Usamos a URL pública oficial para que o Google Docs consiga importar a imagem ao colar
+      const unicampLogoHtml = !metadata.hideUnicampLogo
+        ? '<img src="https://linguagemsimples.unicamp.br/wp-content/themes/bx-unicamp-multisite/assets/img/logo-unicamp.svg" height="56" alt="Unicamp" style="height: 56px; vertical-align: middle; margin-right: 12px;" />'
+        : "";
+
+      const unitLogoHtml = metadata.customUnitLogo
+        ? `<img src="${metadata.customUnitLogo}" height="56" alt="Unidade" style="height: 56px; vertical-align: middle;" />`
+        : "";
+
       const htmlContent = `
         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 12pt; line-height: 1.5; color: #000000;">
-          <table style="width: 100%; border-bottom: 1px solid #888888; padding-bottom: 12px; margin-bottom: 24px;">
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; border-bottom: 2px solid #888888; padding-bottom: 12px; margin-bottom: 24px;">
             <tr>
-              <td style="width: 40%; vertical-align: middle;">
-                <strong style="font-size: 14pt; letter-spacing: 0.5px;">UNICAMP</strong>
-                ${metadata.customUnitLogo ? `<span style="margin-left: 12px; border-left: 1px solid #ccc; padding-left: 12px; font-size: 10pt; color: #555;">[Logotipo da Unidade]</span>` : ""}
+              <td width="45%" align="left" valign="middle" style="padding-bottom: 8px;">
+                ${unicampLogoHtml}
+                ${unitLogoHtml}
               </td>
-              <td style="width: 60%; text-align: right; vertical-align: top; font-size: 10pt; line-height: 1.3;">
-                <strong>Universidade Estadual de Campinas</strong><br />
-                <span>${metadata.unitName || "Diretoria Geral de Recursos Humanos"}</span><br />
-                <span style="font-size: 8.5pt; color: #555;">${metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}</span>
+              <td width="55%" align="right" valign="top" style="text-align: right; font-size: 10pt; line-height: 1.3; padding-bottom: 8px;">
+                <strong style="font-size: 10.5pt;">Universidade Estadual de Campinas</strong><br />
+                <span style="font-size: 9.5pt;">${metadata.unitName || "Diretoria Geral de Recursos Humanos"}</span><br />
+                <span style="font-size: 8.5pt; color: #555555;">${metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}</span>
               </td>
             </tr>
           </table>
-          <h2 style="text-align: center; text-transform: uppercase; font-size: 12pt; font-weight: bold; margin: 24px 0;">
+          <p style="margin: 16px 0;">&nbsp;</p>
+          <h2 align="center" style="text-align: center; text-transform: uppercase; font-size: 12pt; font-weight: bold; margin: 24px 0;">
             ${metadata.documentNumber ? `COMUNICADO Nº ${metadata.documentNumber}` : "COMUNICADO"}
           </h2>
           ${paragraphs.map(p => {
@@ -157,9 +170,10 @@ export function ComunicadoDrawer({
             return `<p style="text-indent: 1.25cm; text-align: justify; margin: 12px 0; font-size: 12pt; line-height: 1.5;">${p}</p>`;
           }).join("")}
           <p style="text-indent: 1.25cm; margin: 28px 0; font-size: 12pt; line-height: 1.5;">${metadata.locationAndDate.endsWith(".") ? metadata.locationAndDate : metadata.locationAndDate + "."}</p>
-          <div style="text-align: center; margin-top: 56px; font-size: 12pt; line-height: 1.2;">
+          <p style="margin: 36px 0;">&nbsp;</p>
+          <div align="center" style="text-align: center; margin-top: 48px; font-size: 12pt; line-height: 1.2;">
             <p style="margin: 0; font-weight: bold;">${metadata.authorName || "Nome da Autora ou Autor"}</p>
-            <p style="margin: 4px 0 0 0; color: #333;">${metadata.authorRole || "Cargo ou Função"}</p>
+            <p style="margin: 4px 0 0 0; color: #222222;">${metadata.authorRole || "Cargo ou Função"}</p>
           </div>
         </div>
       `;
@@ -225,10 +239,10 @@ export function ComunicadoDrawer({
               </div>
               <div className="flex items-start gap-2">
                 <span className="font-bold text-black bg-[#FBB040] w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px]">
-                  3
+                  💡
                 </span>
-                <p className="text-zinc-800">
-                  Pronto! Seu documento estará pronto para edição, compartilhamento ou assinatura eletrônica.
+                <p className="text-zinc-700">
+                  <strong>Alternativa sem copiar/colar:</strong> Baixe o arquivo <strong>.DOCX</strong> pelo botão abaixo e arraste-o para dentro do seu <strong>Google Drive</strong> para abri-lo diretamente como Google Docs!
                 </p>
               </div>
             </div>
@@ -257,7 +271,7 @@ export function ComunicadoDrawer({
 
       {/* Gaveta Lateral (Drawer) */}
       <div className="bg-[#f4f3ed] w-full max-w-6xl h-full flex flex-col shadow-2xl border-l border-zinc-300 animate-in slide-in-from-right duration-300">
-        {/* Topo do Drawer (Ocultado na impressão via CSS) */}
+        {/* Topo do Drawer */}
         <div className="no-print px-6 py-4 bg-[#18181b] text-white flex items-center justify-between border-b border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-[#FBB040] text-black flex items-center justify-center font-bold">
@@ -269,11 +283,11 @@ export function ComunicadoDrawer({
                   Modelo Oficial: Comunicado (Unicamp)
                 </h2>
                 <span className="text-[10px] font-bold text-black bg-[#FBB040] px-2 py-0.5 rounded-full">
-                  Formatação Unicamp
+                  Formatação Oficial
                 </span>
               </div>
               <p className="text-[11px] text-zinc-400 font-normal">
-                Padrão A4: Arial 12pt, entrelinha 1,5, recuo de 1,25 cm e margens institucionais
+                Padrão A4: Arial 12pt, entrelinha 1,5, recuo de 1,25 cm e margens oficiais
               </p>
             </div>
           </div>
@@ -319,7 +333,7 @@ export function ComunicadoDrawer({
 
         {/* Conteúdo Principal (2 Colunas) */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-          {/* Coluna Esquerda: Controles de Metadados e Ações (no-print) */}
+          {/* Coluna Esquerda: Controles de Metadados e Ações */}
           <div className="no-print lg:col-span-4 bg-white border-r border-zinc-200 p-5 overflow-y-auto space-y-6">
             {/* Ações de Exportação e Google Docs */}
             <div className="space-y-3 bg-[#faf9f5] border border-zinc-200 p-4 rounded-2xl">
@@ -355,7 +369,7 @@ export function ComunicadoDrawer({
                 >
                   <div className="flex items-center gap-2">
                     <Download className="w-4 h-4 text-black stroke-[2.5]" />
-                    <span>{isExportingDocx ? "Gerando..." : "Baixar DOCX Formatado"}</span>
+                    <span>{isExportingDocx ? "Gerando..." : "Baixar DOCX Oficial"}</span>
                   </div>
                   <span className="text-[10px] text-black/70">Com Logotipos</span>
                 </button>
@@ -401,6 +415,27 @@ export function ComunicadoDrawer({
               </div>
 
               <div className="space-y-3.5 text-xs">
+                {/* Opção para Ocultar Logotipo da Unicamp */}
+                <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-2xl flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <span className="font-bold text-zinc-900 block text-xs">
+                      Logotipo da Unicamp
+                    </span>
+                    <span className="text-[11px] text-zinc-500">
+                      Exibir brasão oficial no cabeçalho
+                    </span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!metadata.hideUnicampLogo}
+                      onChange={(e) => setMetadata({ ...metadata, hideUnicampLogo: !e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-zinc-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#FBB040]"></div>
+                  </label>
+                </div>
+
                 {/* Upload de Logotipo da Unidade (Opcional) */}
                 <div className="bg-zinc-50 border border-zinc-200 p-3 rounded-2xl space-y-2">
                   <div className="flex items-center justify-between">
@@ -418,7 +453,7 @@ export function ComunicadoDrawer({
                         <img
                           src={metadata.customUnitLogo}
                           alt="Logotipo da Unidade"
-                          className="w-10 h-10 object-contain rounded-md border border-zinc-200 p-0.5 bg-white"
+                          className="h-10 w-auto object-contain rounded-md border border-zinc-200 p-0.5 bg-white"
                         />
                         <span className="text-[11px] font-bold text-zinc-700">
                           Logo carregado
@@ -533,7 +568,7 @@ export function ComunicadoDrawer({
 
           {/* Coluna Direita: Visualizador da Folha A4 em Tempo Real */}
           <div className="lg:col-span-8 bg-[#e8e6dc]/70 p-6 overflow-y-auto flex flex-col items-center">
-            {/* Barra de Controle de Zoom (no-print) */}
+            {/* Barra de Controle de Zoom */}
             <div className="no-print mb-4 bg-white/90 backdrop-blur-xs border border-zinc-300 rounded-xl px-3 py-1.5 flex items-center gap-3 shadow-xs">
               <span className="text-[11px] font-bold text-zinc-700">Zoom:</span>
               <button
