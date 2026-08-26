@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 
 import { DocumentType } from "@/types/document";
 import { AnalysisInput } from "@/types/analysis";
-import { Sparkles, Upload, FileText, ChevronDown, CheckCircle, HelpCircle } from "lucide-react";
+import { Sparkles, Upload } from "lucide-react";
 import documentTypesData from "@/data/document-types/document-types.json";
-import casosUnicampData from "@/data/examples/casos-unicamp.json";
+
 
 interface TextEditorProps {
   onAnalyze: (input: AnalysisInput) => void;
@@ -30,16 +30,6 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
 
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const charCount = text.length;
-
-  const handleLoadExample = (exampleId: string) => {
-    const example = casosUnicampData.find(e => e.id === exampleId);
-    if (example) {
-      setText(example.textoOriginal);
-      setDocumentType(example.tipoDocumento as DocumentType);
-      setTargetAudience(example.publicoAlvo);
-      setTextGoal("Comunicação clara e acessível");
-    }
-  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,32 +87,9 @@ export function TextEditor({ onAnalyze, isLoading, initialText = "" }: TextEdito
             <span>Importar TXT</span>
             <input type="file" accept=".txt,.md" onChange={handleFileUpload} className="sr-only" />
           </label>
-
-          <div className="relative group">
-            <button
-              type="button"
-              className="text-xs font-black text-black bg-[#fef7eb] border border-[#FBB040] hover:bg-[#fdecd0] px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs"
-            >
-              <FileText className="w-3.5 h-3.5 text-[#d98a1a]" />
-              <span>Carregar Exemplo da Unicamp</span>
-              <ChevronDown className="w-3 h-3 text-zinc-600" />
-            </button>
-            <div className="absolute right-0 mt-1 w-64 bg-white border border-zinc-200 rounded-2xl shadow-xl py-2 z-20 hidden group-hover:block group-focus-within:block">
-              {casosUnicampData.map(ex => (
-                <button
-                  key={ex.id}
-                  type="button"
-                  onClick={() => handleLoadExample(ex.id)}
-                  className="w-full text-left px-3.5 py-2 text-xs text-zinc-700 hover:bg-[#fef7eb] hover:text-black transition-colors block"
-                >
-                  <div className="font-bold text-black">{ex.titulo}</div>
-                  <div className="text-[10px] text-zinc-500 truncate">{ex.textoOriginal}</div>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
+
 
       {/* Área do Textarea */}
       <div className="p-4 sm:p-6 bg-white">
