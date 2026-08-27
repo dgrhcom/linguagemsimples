@@ -284,16 +284,16 @@ test("18. Geração de DOCX Universal para Portaria, Ofício e Ata", async () =>
   assert.ok(oficioBlob && oficioBlob.size > 1000, "Deve gerar DOCX válido de Ofício com Destinatário e Vocativo");
 });
 
-test("19. Validação do Catálogo Completo dos 21 Tipos de Documentos Oficiais da Unicamp", async () => {
+test("19. Validação do Catálogo Completo dos 20 Modelos de Documentos Oficiais da Unicamp", async () => {
   const typesData = JSON.parse(await import("fs").then(m => m.readFileSync("d:/workspace/active/linguagemsimples/src/data/document-types/document-types.json", "utf8")));
 
-  assert.ok(typesData.length >= 21, "Deve conter todos os 21 tipos de documentos oficiais");
+  assert.equal(typesData.length, 20, "Deve conter exatamente os 20 modelos de documentos oficiais");
 
   const requiredSlugs = [
     "ata", "carta", "certificado", "comunicado", "decisao", "declaracao",
     "despacho", "informacao", "memorando", "oficio", "oficio-circular",
     "pauta", "parecer", "relatorio", "deliberacao", "instrucao-normativa",
-    "portaria", "regimento", "regulamento", "resolucao", "conceito-atos-normativos"
+    "portaria", "regimento", "regulamento", "resolucao"
   ];
 
   requiredSlugs.forEach(slug => {
@@ -303,6 +303,7 @@ test("19. Validação do Catálogo Completo dos 21 Tipos de Documentos Oficiais 
     assert.ok(found.description, `O tipo ${slug} deve possuir descrição`);
   });
 });
+
 
 
 

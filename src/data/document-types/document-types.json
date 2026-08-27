@@ -418,36 +418,6 @@
     }
   },
   {
-    "type": "conceito-atos-normativos",
-    "label": "Conceitos e Tópicos (Atos Normativos)",
-    "category": "normativo",
-    "description": "Guia de técnica legislativa da Unicamp com a divisão em 9 tópicos fundamentais da redação normativa.",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/conceito-atos-normativos/",
-    "modelImagePath": "/images/models/modelo-conceito-atos-normativos.svg",
-    "modelImagePages": [
-      "/images/models/modelo-conceito-atos-normativos.svg"
-    ],
-    "competence": "Órgãos Normativos e Redatores Oficiais",
-    "expectedSections": [
-      "Epígrafe",
-      "Ementa",
-      "Preâmbulo / Fundamentação Legal",
-      "Artigos e Desdobramentos",
-      "Parágrafos (§)",
-      "Incisos e Alíneas",
-      "Cláusula de Vigência",
-      "Cláusula de Revogação",
-      "Assinatura"
-    ],
-    "defaultMetadata": {
-      "ementa": "Estabelece diretrizes de redação oficial e técnica legislativa para atos normativos na Unicamp.",
-      "preamble": "O Reitor da Universidade Estadual de Campinas resolve:",
-      "effectiveClause": "Este ato normativo entra em vigor na data de sua publicação.",
-      "authorName": "Reitoria da Unicamp",
-      "authorRole": "Reitor"
-    }
-  },
-  {
     "type": "deliberacao",
     "label": "Deliberação",
     "category": "normativo",

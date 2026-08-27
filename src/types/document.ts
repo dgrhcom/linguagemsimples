@@ -10,8 +10,8 @@ export type DocumentType =
   | "regulamento"
   | "decisao"
   | "despacho"
-  | "conceito-atos-normativos"
   // Correspondência Oficial
+
   | "oficio"
   | "oficio-circular"
   | "carta"

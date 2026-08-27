@@ -38,8 +38,9 @@ export function DocumentTypeSelector({
   const selectedDocInfo = documentTypesData.find(dt => dt.type === selectedType) || documentTypesData[0];
 
   const categories = [
-    { id: "all", label: "Todos os 21 Tipos", count: documentTypesData.length },
+    { id: "all", label: "Todos os 20 Modelos", count: documentTypesData.length },
     { id: "normativo", label: "Atos Normativos e Decisórios", count: documentTypesData.filter(d => d.category === "normativo").length },
+
     { id: "correspondencia", label: "Correspondência Oficial", count: documentTypesData.filter(d => d.category === "correspondencia").length },
     { id: "administrativo", label: "Administrativo, Atas e Colegiados", count: documentTypesData.filter(d => d.category === "administrativo").length }
   ];

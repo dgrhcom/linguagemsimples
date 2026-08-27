@@ -66,8 +66,9 @@ export async function generateDocumentDocx(
 
   const isNormative = [
     "portaria", "resolucao", "deliberacao", "instrucao-normativa",
-    "ordinance", "resolution", "instruction", "regulation", "conceito-atos-normativos"
+    "ordinance", "resolution", "instruction", "regulation"
   ].includes(docType);
+
 
   const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
   const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);
@@ -95,11 +96,12 @@ export async function generateDocumentDocx(
         logoRuns.push(
           new ImageRun({
             data: defaultLogoBytes,
-            transformation: { width: 130, height: 50 },
+            transformation: { width: 50, height: 53 },
             type: "png"
           })
         );
       } catch (err) {}
+
     }
   }
 

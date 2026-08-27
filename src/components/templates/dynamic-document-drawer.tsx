@@ -99,8 +99,9 @@ export function DynamicDocumentDrawer({
   // Classificação dos grupos de formulário
   const isNormative = [
     "portaria", "resolucao", "deliberacao", "instrucao-normativa",
-    "ordinance", "resolution", "instruction", "regulation", "conceito-atos-normativos"
+    "ordinance", "resolution", "instruction", "regulation"
   ].includes(docType);
+
 
   const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
   const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);

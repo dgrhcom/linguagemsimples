@@ -42,9 +42,9 @@ export function DynamicDocumentSheet({
   const isRelatorio = ["relatorio", "report"].includes(docType);
   const isDeclaracao = ["declaracao", "declaration"].includes(docType);
   const isCertificado = ["certificado"].includes(docType);
-  const isConceitos = ["conceito-atos-normativos"].includes(docType);
 
   return (
+
     <div
       id="printable-document-sheet"
       className="bg-white text-zinc-900 shadow-xl border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-between"
@@ -60,28 +60,26 @@ export function DynamicDocumentSheet({
               {/* Logotipos Institucionais à Esquerda */}
               <div className="flex items-center gap-3 shrink-0">
                 {!metadata.hideUnicampLogo && (
-                  <div className="relative h-14 w-32 shrink-0">
-                    <Image
-                      src="/images/logo-unicamp.png"
+                  <div className="relative h-14 w-32 shrink-0 flex items-center">
+                    <img
+                      src="/images/logo-unicamp.svg"
                       alt="Logo Unicamp"
-                      fill
-                      className="object-contain object-left"
-                      priority
-                      unoptimized
+                      className="h-14 w-auto max-h-14 object-contain object-left"
                     />
                   </div>
                 )}
 
                 {metadata.customUnitLogo && (
-                  <div className="relative h-14 w-32 shrink-0 border-l border-zinc-200 pl-3">
+                  <div className="relative h-14 w-32 shrink-0 border-l border-zinc-200 pl-3 flex items-center">
                     <img
                       src={metadata.customUnitLogo}
                       alt="Logo da Unidade"
-                      className="h-full w-auto object-contain object-left"
+                      className="h-14 w-auto max-h-14 object-contain object-left"
                     />
                   </div>
                 )}
               </div>
+
 
               {/* Informações da Unidade e Contato à Direita */}
               <div className="text-right space-y-0.5">
@@ -471,17 +469,15 @@ export function DynamicDocumentSheet({
           <div className="border-4 border-double border-[#d98a1a] rounded-2xl p-6 sm:p-8 space-y-6 text-center bg-gradient-to-b from-white to-amber-50/20 shadow-inner">
             {/* Logo Unicamp Centralizada */}
             <div className="flex justify-center">
-              <div className="relative h-16 w-36">
-                <Image
-                  src="/images/logo-unicamp.png"
+              <div className="relative h-16 w-36 flex items-center justify-center">
+                <img
+                  src="/images/logo-unicamp.svg"
                   alt="Logo Unicamp"
-                  fill
-                  className="object-contain"
-                  priority
-                  unoptimized
+                  className="h-16 w-auto max-h-16 object-contain"
                 />
               </div>
             </div>
+
 
             <div className="space-y-1">
               <h1 className="text-xs font-bold text-zinc-700 uppercase tracking-widest">
