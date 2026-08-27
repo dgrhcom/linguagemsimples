@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-const montserrat = Montserrat({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-montserrat",
+  weight: ["400", "600"],
+  variable: "--font-inter",
+  display: "swap"
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-gt-pressura-standard",
   display: "swap"
 });
 
@@ -23,8 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={montserrat.variable}>
-      <body className="antialiased flex flex-col min-h-screen font-sans bg-[#f6f9fc] text-[#1c2d42]">
+    <html lang="pt-BR" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <body className="antialiased flex flex-col min-h-screen">
         <Header />
         <main id="main-content" className="flex-1">
           {children}

@@ -5,6 +5,7 @@ import { ZoomIn, ZoomOut, RotateCcw, Eye, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 import { safeStorage } from "@/lib/storage";
+import { Button } from "@/components/ui/button";
 
 export function AccessibilityBar() {
   const [fontSize, setFontSize] = useState<"sm" | "md" | "lg" | "xl">("md");
@@ -48,33 +49,33 @@ export function AccessibilityBar() {
   return (
     <aside
       aria-label="Barra de Acessibilidade"
-      className="bg-[#18181b] text-slate-200 border-b border-zinc-800 text-xs font-semibold py-1.5 px-4 transition-colors no-print"
+      className="bg-ink text-slate-200 border-b border-deep-stone text-xs font-semibold py-1.5 px-4 transition-colors no-print"
     >
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         {/* Atalhos Rápidos de Acessibilidade */}
-        <div className="flex items-center gap-3 text-[11px] text-zinc-300">
-          <span className="hidden sm:inline text-[#FBB040] font-black uppercase tracking-wider">
+        <div className="flex items-center gap-3 text-micro-label text-stone">
+          <span className="hidden sm:inline text-amber font-semibold uppercase tracking-micro">
             Acessibilidade:
           </span>
           <a
             href="#main-content"
-            className="hover:text-[#FBB040] underline underline-offset-2 transition-colors"
+            className="hover:text-amber underline underline-offset-2 transition-colors"
             title="Ir direto para o conteúdo principal [Alt + 1]"
           >
             Conteúdo [1]
           </a>
-          <span className="text-zinc-600">|</span>
+          <span className="text-deep-stone">|</span>
           <a
             href="#main-nav"
-            className="hover:text-[#FBB040] underline underline-offset-2 transition-colors"
+            className="hover:text-amber underline underline-offset-2 transition-colors"
             title="Ir para o menu de navegação [Alt + 2]"
           >
             Menu [2]
           </a>
-          <span className="text-zinc-600">|</span>
+          <span className="text-deep-stone">|</span>
           <Link
             href="/acessibilidade"
-            className="hover:text-[#FBB040] underline underline-offset-2 transition-colors flex items-center gap-1"
+            className="hover:text-amber underline underline-offset-2 transition-colors flex items-center gap-1"
             title="Ver declaração de acessibilidade e todos os atalhos [Alt + 4]"
           >
             <span>Guia e Atalhos [4]</span>
@@ -84,49 +85,57 @@ export function AccessibilityBar() {
         {/* Ferramentas de Ajuste Visual */}
         <div className="flex items-center gap-3">
           {/* Controle de Tamanho da Fonte */}
-          <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg p-0.5" role="group" aria-label="Ajustar tamanho do texto">
-            <button
+          <div className="flex items-center bg-deep-stone border border-slate rounded-btn p-0.5" role="group" aria-label="Ajustar tamanho do texto">
+            <Button
               onClick={() => handleFontSizeChange(-1)}
               disabled={fontSize === "sm"}
-              className="px-2 py-0.5 text-[11px] font-bold text-zinc-300 hover:text-[#FBB040] hover:bg-zinc-800 rounded disabled:opacity-40 transition-colors"
+              variant="ghost"
+              size="xs"
+              className="px-2 py-0.5 text-micro-label text-stone hover:text-amber hover:bg-ink rounded-btn"
               title="Diminuir tamanho da fonte"
               aria-label="Diminuir fonte"
             >
               A-
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleResetFontSize}
-              className="px-2 py-0.5 text-[11px] font-bold text-zinc-300 hover:text-[#FBB040] hover:bg-zinc-800 rounded transition-colors"
+              variant="ghost"
+              size="xs"
+              className="px-2 py-0.5 text-micro-label text-stone hover:text-amber hover:bg-ink rounded-btn"
               title="Restaurar tamanho padrão da fonte"
               aria-label="Fonte normal"
             >
               A
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleFontSizeChange(1)}
               disabled={fontSize === "xl"}
-              className="px-2 py-0.5 text-[11px] font-bold text-zinc-300 hover:text-[#FBB040] hover:bg-zinc-800 rounded disabled:opacity-40 transition-colors"
+              variant="ghost"
+              size="xs"
+              className="px-2 py-0.5 text-micro-label text-stone hover:text-amber hover:bg-ink rounded-btn"
               title="Aumentar tamanho da fonte"
               aria-label="Aumentar fonte"
             >
               A+
-            </button>
+            </Button>
           </div>
 
           {/* Alternador de Alto Contraste */}
-          <button
+          <Button
             onClick={toggleHighContrast}
-            className={`px-3 py-1 text-[11px] font-bold rounded-lg border flex items-center gap-1.5 transition-all ${
+            variant={highContrast ? "primary" : "secondary"}
+            size="sm"
+            className={`px-3 py-1 text-micro-label font-semibold rounded-btn border flex items-center gap-1.5 transition-all ${
               highContrast
-                ? "bg-[#FBB040] text-black border-[#FBB040] shadow-xs"
-                : "bg-zinc-900 text-zinc-200 border-zinc-700 hover:border-[#FBB040] hover:text-[#FBB040]"
+                ? "bg-amber text-ink border-amber"
+                : "bg-deep-stone text-stone border-slate hover:border-amber hover:text-amber"
             }`}
             title="Alternar modo de alto contraste [Alt + 3]"
             aria-pressed={highContrast}
+            leftIcon={<Eye className="w-3.5 h-3.5" />}
           >
-            <Eye className="w-3.5 h-3.5" />
-            <span>{highContrast ? "Contraste Ativo" : "Alto Contraste"}</span>
-          </button>
+            {highContrast ? "Contraste Ativo" : "Alto Contraste"}
+          </Button>
         </div>
       </div>
     </aside>

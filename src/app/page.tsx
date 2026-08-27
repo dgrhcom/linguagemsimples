@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TextEditor } from "@/components/editor/text-editor";
 import { AnalysisInput } from "@/types/analysis";
-import { Search, Lightbulb, CheckCircle2, ArrowRight, ShieldCheck, Sparkles, BookOpen, FileCheck, Layers, Award } from "lucide-react";
+import { Search, Lightbulb, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
 import casosUnicampData from "@/data/examples/casos-unicamp.json";
 
 export default function HomePage() {
@@ -18,22 +18,25 @@ export default function HomePage() {
   };
 
   return (
-    <div className="space-y-16 pb-16">
-      {/* Seção Hero com Identidade Visual Editorial (Papel, Preto & Amarelo #FBB040) */}
-      <section className="pt-10 pb-14 border-b border-[#e8e5dc]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-10">
-            <div className="inline-flex items-center gap-2 bg-[#18181b] text-[#FBB040] text-xs font-black px-4 py-1.5 rounded-full border border-black shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#FBB040]" />
-              <span>Baseado no Projeto Linguagem Simples e Inclusiva da Unicamp</span>
-            </div>
-            
-            <h1 className="text-3xl sm:text-5xl font-black text-[#18181b] tracking-tight leading-tight">
+    <div className="space-y-section-lg pb-section-lg">
+      {/* ==========================================================================
+          HERO — Editorial masthead on Paper Cream canvas
+          ========================================================================== */}
+      <section className="pt-section pb-section border-b border-sand">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto space-y-6 mb-12">
+            {/* Micro-label */}
+            <span className="editorial-label block">
+              Projeto Linguagem Simples e Inclusiva da Unicamp
+            </span>
+
+            {/* Masthead Display Heading */}
+            <h1 className="font-display text-heading sm:text-heading-lg lg:text-display text-ink leading-[0.92] tracking-editorial">
               Avalie e simplifique seu texto
             </h1>
-            
-            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed font-medium">
-              Descubra se sua comunicação está clara, inclusiva e fácil de entender — e veja como transformar seus textos aplicando os princípios de <span className="bg-[#FBB040]/30 px-1.5 py-0.5 rounded font-bold text-black">Linguagem Simples</span>.
+
+            <p className="text-body text-charcoal leading-relaxed max-w-xl mx-auto">
+              Descubra se sua comunicação está clara, inclusiva e fácil de entender — e veja como transformar seus textos aplicando os princípios de Linguagem Simples.
             </p>
           </div>
 
@@ -43,97 +46,100 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Os Três Pilares da Metodologia Unicamp */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-[#18181b] tracking-tight">
+      {/* ==========================================================================
+          OS TRÊS PILARES — Feature split section
+          ========================================================================== */}
+      <section className="max-w-[1200px] mx-auto px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+          <span className="editorial-label block">Metodologia Oficial</span>
+          <h2 className="font-display text-heading sm:text-heading-sm text-ink">
             Seu texto está fácil de encontrar, compreender e usar?
           </h2>
-          <p className="text-sm text-zinc-600 leading-relaxed font-medium">
+          <p className="text-body text-charcoal leading-relaxed">
             A metodologia oficial da Unicamp orienta que toda comunicação pública deve permitir que o leitor atinja seu objetivo na primeira leitura.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-3xl border border-zinc-200 p-7 shadow-xs space-y-3 hover:border-[#FBB040] transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-bold shadow-xs">
-              <Search className="w-6 h-6" />
+          {[
+            {
+              num: "1",
+              title: "Encontrar",
+              desc: "A pessoa consegue localizar rapidamente a informação que procura? Avalia títulos, subtítulos, tópicos com marcadores e hierarquia das informações.",
+              Icon: Search,
+            },
+            {
+              num: "2",
+              title: "Compreender",
+              desc: "A pessoa entende o conteúdo na primeira leitura? Avalia frases curtas (≤ 20 palavras), ordem direta, eliminação de verbosidade, jargões e siglas sem explicação.",
+              Icon: Lightbulb,
+            },
+            {
+              num: "3",
+              title: "Usar",
+              desc: "Depois de ler, a pessoa consegue agir? Avalia instruções passo a passo, prazos, formas de tratamento oficiais e linguagem não-sexista.",
+              Icon: CheckCircle2,
+            },
+          ].map((pillar) => (
+            <div
+              key={pillar.num}
+              className="bg-paper border border-sand rounded-card p-8 space-y-4 hover:border-deep-stone transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-micro-label font-sans text-stone">{pillar.num}.</span>
+                <pillar.Icon className="w-5 h-5 text-amber" />
+              </div>
+              <h3 className="font-display text-subheading text-ink">{pillar.title}</h3>
+              <p className="text-body-sm text-charcoal leading-relaxed">
+                {pillar.desc}
+              </p>
             </div>
-            <h3 className="text-lg font-black text-[#18181b]">1. Encontrar</h3>
-            <p className="text-xs text-zinc-600 leading-relaxed">
-              A pessoa consegue localizar rapidamente a informação que procura? Avalia títulos, subtítulos, tópicos com marcadores e hierarquia das informações.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-3xl border border-zinc-200 p-7 shadow-xs space-y-3 hover:border-[#FBB040] transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-bold shadow-xs">
-              <Lightbulb className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-black text-[#18181b]">2. Compreender</h3>
-            <p className="text-xs text-zinc-600 leading-relaxed">
-              A pessoa entende o conteúdo na primeira leitura? Avalia a regra de frases curtas (&le; 20 palavras), ordem direta, eliminação de verbosidade, jargões e siglas sem explicação.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-3xl border border-zinc-200 p-7 shadow-xs space-y-3 hover:border-[#FBB040] transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-bold shadow-xs">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-black text-[#18181b]">3. Usar</h3>
-            <p className="text-xs text-zinc-600 leading-relaxed">
-              Depois de ler, a pessoa consegue agir? Avalia instruções passo a passo, prazos, formas de tratamento oficiais (sem DD./Ilmo.) e linguagem não-sexista.
-            </p>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Casos Práticos Antes/Depois da Unicamp */}
-      <section className="bg-white py-16 border-y border-[#e8e5dc]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      {/* ==========================================================================
+          EXEMPLOS — Before/After showcase
+          ========================================================================== */}
+      <section className="py-section border-y border-sand">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8 space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div>
-              <span className="text-xs font-black text-[#18181b] uppercase tracking-wider block mb-1">
-                Exemplos Oficiais
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#18181b] tracking-tight">
+              <span className="editorial-label block mb-2">Exemplos Oficiais</span>
+              <h2 className="font-display text-heading sm:text-heading-sm text-ink">
                 Veja a transformação na prática
               </h2>
             </div>
             <Link
               href="/exemplos"
-              className="text-xs font-bold text-black hover:text-[#d98a1a] flex items-center gap-1 transition-colors"
+              className="ghost-link text-body-sm font-sans text-charcoal flex items-center gap-1.5"
             >
-              <span>Ver todos os exemplos catalogados</span>
-              <ArrowRight className="w-4 h-4 text-[#FBB040]" />
+              <span>Ver todos os exemplos</span>
+              <ArrowRight className="w-4 h-4 text-amber" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {casosUnicampData.slice(0, 2).map((ex) => (
-              <div key={ex.id} className="bg-[#faf9f5] rounded-3xl border border-zinc-200 p-6 sm:p-7 shadow-xs space-y-4">
-                <h3 className="font-black text-[#18181b] text-base">{ex.titulo}</h3>
-                
+              <div key={ex.id} className="bg-paper border border-sand rounded-card p-8 space-y-5">
+                <h3 className="font-display text-subheading text-ink">{ex.titulo}</h3>
+
                 <div className="space-y-2">
-                  <div className="text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
-                    Antes (Texto Burocrático / Complexo)
-                  </div>
-                  <div className="bg-white border border-zinc-300 p-3.5 rounded-xl text-xs text-zinc-800 font-mono">
+                  <span className="text-micro-label font-sans text-stone block">Antes</span>
+                  <div className="bg-sand/50 border border-sand p-4 rounded-tile text-body-sm text-charcoal font-mono leading-relaxed">
                     {ex.textoOriginal}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-[11px] font-bold text-black uppercase tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-[#FBB040]" />
-                    <span>Depois (Linguagem Simples)</span>
-                  </div>
-                  <div className="bg-[#fef7eb] border border-[#FBB040] p-3.5 rounded-xl text-xs text-zinc-950 font-bold whitespace-pre-wrap">
+                  <span className="text-micro-label font-sans text-stone block">Depois</span>
+                  <div className="bg-paper-light border border-amber/30 p-4 rounded-tile text-body-sm text-ink font-semibold leading-relaxed">
                     {ex.textoSimplificado}
                   </div>
                 </div>
 
-                <p className="text-xs text-zinc-600 leading-relaxed border-t border-zinc-200 pt-3">
-                  <strong className="text-black">Por que melhorou?</strong> {ex.explicacao}
+                <p className="text-body-sm text-charcoal leading-relaxed border-t border-sand pt-4">
+                  <strong className="text-ink">Por que melhorou?</strong> {ex.explicacao}
                 </p>
               </div>
             ))}
@@ -141,30 +147,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Compromisso Ético e Privacidade */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#18181b] text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden border border-black">
-          <div className="max-w-2xl space-y-4 relative z-10">
-            <div className="inline-flex items-center gap-2 bg-black text-[#FBB040] text-xs font-black px-3.5 py-1 rounded-full border border-zinc-800">
-              <ShieldCheck className="w-4 h-4 text-[#FBB040]" />
-              <span>Privacidade e Soberania</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+      {/* ==========================================================================
+          PRIVACIDADE — Ink Field inverted section
+          ========================================================================== */}
+      <section className="max-w-[1200px] mx-auto px-6 lg:px-8">
+        <div className="bg-ink rounded-card p-10 sm:p-14 relative overflow-hidden border border-slate">
+          <div className="max-w-2xl space-y-5 relative z-10">
+            <span className="text-micro-label font-sans text-amber tracking-micro block">
+              Privacidade e Soberania
+            </span>
+            <h2 className="font-display text-heading sm:text-heading-sm text-paper">
               Uma ferramenta pública, transparente e segura
             </h2>
-            <p className="text-sm text-zinc-300 leading-relaxed font-normal">
+            <p className="text-body text-stone leading-relaxed">
               Não armazenamos seus textos. Todas as análises são processadas sob demanda e validadas semanticamente para garantir que obrigações, prazos e referências legais sejam sempre preservados.
             </p>
             <div className="pt-2 flex flex-wrap gap-4">
               <Link
                 href="/como-funciona"
-                className="bg-[#FBB040] hover:bg-[#e59b2b] text-[#111111] font-black text-xs px-5 py-2.5 rounded-xl shadow-xs transition-colors border border-[#d98a1a]"
+                className="text-body-sm font-sans text-paper border-b border-stone hover:border-paper pb-px transition-colors"
               >
                 Entenda como analisamos
               </Link>
               <Link
                 href="/criterios"
-                className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-colors border border-zinc-700"
+                className="text-body-sm font-sans text-stone border-b border-slate hover:border-stone pb-px transition-colors"
               >
                 Consultar catálogo de regras
               </Link>

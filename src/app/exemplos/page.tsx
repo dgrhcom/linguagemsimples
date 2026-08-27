@@ -4,30 +4,30 @@ import { Sparkles, ArrowRight, BookOpen, Check } from "lucide-react";
 
 export default function ExemplosPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-section space-y-section">
       <div className="text-center space-y-3">
-        <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
+        <h1 className="font-display text-heading sm:text-heading-lg text-ink">
           Exemplos Práticos: Antes e Depois
         </h1>
-        <p className="text-base text-zinc-600 max-w-2xl mx-auto leading-relaxed font-medium">
+        <p className="text-body text-charcoal max-w-2xl mx-auto leading-relaxed">
           Casos reais catalogados a partir do Projeto de Linguagem Simples e Inclusiva da Unicamp, demonstrando como transformar textos burocráticos em comunicações claras.
         </p>
       </div>
 
       <div className="space-y-8">
         {casosUnicampData.map((caso) => (
-          <div key={caso.id} className="bg-white rounded-3xl border border-zinc-200 p-6 sm:p-8 shadow-xs space-y-6 hover:border-[#FBB040] transition-all">
-            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-zinc-100 pb-4">
+          <div key={caso.id} className="bg-paper rounded-card border border-sand p-6 sm:p-8 space-y-6 hover:border-amber/40 transition-all">
+            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-sand pb-4">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#18181b] text-[#FBB040]">
+                <span className="text-micro-label text-stone px-2.5 py-1 rounded-btn bg-ink text-amber">
                   {caso.tipoDocumento}
                 </span>
-                <h2 className="text-lg font-black text-black mt-2">
+                <h2 className="text-subheading font-display text-ink mt-2">
                   {caso.titulo}
                 </h2>
               </div>
-              <span className="text-xs text-zinc-500 font-medium">
-                Público-alvo: <strong className="text-black">{caso.publicoAlvo}</strong>
+              <span className="text-body-sm text-stone">
+                Público-alvo: <strong className="text-ink">{caso.publicoAlvo}</strong>
               </span>
             </div>
 
@@ -35,43 +35,43 @@ export default function ExemplosPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Antes */}
               <div className="space-y-2">
-                <div className="flex items-center gap-1 text-xs font-bold text-zinc-600 uppercase tracking-wider">
+                <div className="flex items-center gap-1 text-micro-label text-stone">
                   <span>❌ Texto Original</span>
                 </div>
-                <div className="bg-[#faf9f5] border border-zinc-200 p-4 rounded-2xl text-xs text-zinc-800 font-mono leading-relaxed">
+                <div className="bg-sand/30 border border-sand p-4 rounded-card text-body-sm text-charcoal font-mono leading-relaxed">
                   {caso.textoOriginal}
                 </div>
               </div>
 
               {/* Depois */}
               <div className="space-y-2">
-                <div className="flex items-center gap-1 text-xs font-black text-black uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5 text-[#FBB040]" />
+                <div className="flex items-center gap-1 text-micro-label text-ink">
+                  <Sparkles className="w-3.5 h-3.5 text-amber" />
                   <span>✅ Versão em Linguagem Simples</span>
                 </div>
-                <div className="bg-[#fef7eb] border border-[#FBB040] p-4 rounded-2xl text-xs text-black font-bold whitespace-pre-wrap leading-relaxed">
+                <div className="bg-amber/10 border border-amber/40 p-4 rounded-card text-body-sm text-ink font-semibold whitespace-pre-wrap leading-relaxed">
                   {caso.textoSimplificado}
                 </div>
               </div>
             </div>
 
             {/* Problemas identificados */}
-            <div className="bg-[#faf9f5] p-5 rounded-2xl border border-zinc-200 space-y-2">
-              <span className="text-xs font-black text-black block">
+            <div className="bg-sand/30 p-5 rounded-card border border-sand space-y-2">
+              <span className="text-body-sm font-semibold text-ink block">
                 Problemas Identificados no Texto Original:
               </span>
-              <ul className="list-disc list-inside text-xs text-zinc-600 space-y-1 font-medium">
+              <ul className="list-disc list-inside text-body-sm text-charcoal space-y-1">
                 {caso.problemasIdentificados.map((prob, i) => (
                   <li key={i}>{prob}</li>
                 ))}
               </ul>
             </div>
 
-            <div className="text-xs text-zinc-700 leading-relaxed border-t border-zinc-100 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-medium">
+            <div className="text-body-sm text-charcoal leading-relaxed border-t border-sand pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <p>
-                <strong className="text-black">Por que melhorou?</strong> {caso.explicacao}
+                <strong className="text-ink">Por que melhorou?</strong> {caso.explicacao}
               </p>
-              <span className="text-[11px] text-zinc-400 shrink-0">
+              <span className="text-micro-label text-stone shrink-0">
                 Fonte: {caso.fonte}
               </span>
             </div>

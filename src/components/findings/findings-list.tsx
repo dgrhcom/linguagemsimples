@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Finding } from "@/types/analysis";
 import { FindingCard } from "./finding-card";
-import { CheckCheck, CheckCircle2, Sparkles, SlidersHorizontal } from "lucide-react";
+import { CheckCheck, CheckCircle2, SlidersHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface FindingsListProps {
   findings: Finding[];
@@ -70,85 +71,69 @@ export function FindingsList({
 
   return (
     <div className="space-y-4">
-      {/* Barra Unificada de Filtros e Ações em Massa */}
-      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-zinc-200 shadow-2xs space-y-3">
+      {/* Filtros e Ações */}
+      <div className="bg-paper p-4 rounded-card border border-sand space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          {/* Segmented Control de Status */}
-          <div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 self-start">
-            <button
+          <div className="inline-flex p-1 bg-sand/50 rounded-btn border border-sand self-start">
+            <Button
               onClick={() => setStatusFilter("all")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                statusFilter === "all"
-                  ? "bg-white text-zinc-900 shadow-xs font-bold"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              variant={statusFilter === "all" ? "primary" : "ghost"}
+              size="sm"
             >
               Todos ({findings.length})
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setStatusFilter("pending")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                statusFilter === "pending"
-                  ? "bg-white text-zinc-900 shadow-xs font-bold"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              variant={statusFilter === "pending" ? "primary" : "ghost"}
+              size="sm"
             >
               Pendentes ({pendingCount})
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setStatusFilter("applied")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                statusFilter === "applied"
-                  ? "bg-white text-zinc-900 shadow-xs font-bold"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              variant={statusFilter === "applied" ? "primary" : "ghost"}
+              size="sm"
             >
               Aplicadas ({appliedCount})
-            </button>
+            </Button>
           </div>
 
-          {/* Ação em Massa: Aceitar Todas as Prontas */}
           {pendingActionableCount > 0 && onApplyAllSuggestions && (
-            <button
+            <Button
               onClick={onApplyAllSuggestions}
-              className="text-xs font-black text-black bg-[#FBB040] hover:bg-[#e59b2b] border border-[#d98a1a] px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all self-start sm:self-auto"
+              variant="success"
+              size="sm"
+              leftIcon={<CheckCheck className="w-4 h-4 stroke-[2.5]" />}
+              className="self-start sm:self-auto"
             >
-              <CheckCheck className="w-4 h-4 text-black stroke-[2.5]" />
-              <span>Aceitar Todas as Sugestões ({pendingActionableCount})</span>
-            </button>
+              Aceitar Todas ({pendingActionableCount})
+            </Button>
           )}
         </div>
 
-        {/* Filtros por Categoria (Scroll sutil e limpo) */}
         {categories.length > 1 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-zinc-100 scrollbar-none">
-            <SlidersHorizontal className="w-3 h-3 text-zinc-400 shrink-0 ml-0.5" />
-            <button
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-sand scrollbar-none">
+            <SlidersHorizontal className="w-3 h-3 text-stone shrink-0 ml-0.5" />
+            <Button
               onClick={() => setSelectedCategory("all")}
-              className={`text-[11px] px-2.5 py-1 rounded-lg transition-colors shrink-0 font-medium ${
-                selectedCategory === "all"
-                  ? "bg-zinc-900 text-white font-bold"
-                  : "bg-zinc-100/70 text-zinc-600 hover:bg-zinc-200/60"
-              }`}
+              variant={selectedCategory === "all" ? "primary" : "secondary"}
+              size="xs"
             >
-              Todas as categorias
-            </button>
+              Todas
+            </Button>
             {categories.map(cat => {
               const count = findings.filter(f => f.category === cat).length;
               const label = categoryLabels[cat] || cat;
               return (
-                <button
+                <Button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg transition-colors shrink-0 font-medium flex items-center gap-1 ${
-                    selectedCategory === cat
-                      ? "bg-zinc-900 text-white font-bold"
-                      : "bg-zinc-100/70 text-zinc-600 hover:bg-zinc-200/60"
-                  }`}
+                  variant={selectedCategory === cat ? "primary" : "secondary"}
+                  size="xs"
                 >
                   <span>{label}</span>
                   <span className="opacity-60 text-[10px]">({count})</span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -158,12 +143,12 @@ export function FindingsList({
       {/* Lista de Cards */}
       <div className="space-y-3">
         {filteredFindings.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-zinc-200/80 p-8 text-center space-y-2">
-            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
+          <div className="bg-paper rounded-card border border-sand p-8 text-center space-y-2">
+            <div className="w-10 h-10 rounded-full bg-success-light text-success mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-zinc-900">Tudo limpo por aqui!</h4>
-            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+            <h4 className="text-body font-display text-ink">Tudo limpo!</h4>
+            <p className="text-body-sm text-stone max-w-sm mx-auto">
               Nenhum apontamento pendente com os filtros selecionados.
             </p>
           </div>
@@ -187,4 +172,3 @@ export function FindingsList({
     </div>
   );
 }
-

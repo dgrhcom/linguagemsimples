@@ -7,6 +7,7 @@ import { exportToMarkdown } from "@/lib/exporters/markdown-exporter";
 import { exportToHtml } from "@/lib/exporters/html-exporter";
 import { exportToDocxBlob } from "@/lib/exporters/docx-exporter";
 import { Download, FileText, Printer, X, Check, Code, File } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ExportModalProps {
   result: AnalysisResult;
@@ -67,175 +68,183 @@ export function ExportModal({ result, isOpen, onClose }: ExportModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl border border-zinc-200 shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-paper rounded-card border border-slate max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95">
         {/* Topo do Modal */}
-        <div className="px-6 py-4 bg-[#18181b] text-white flex items-center justify-between border-b border-zinc-800">
-          <h3 className="text-base font-black text-white flex items-center gap-2">
-            <Download className="w-5 h-5 text-[#FBB040]" />
+        <div className="px-6 py-4 bg-ink flex items-center justify-between border-b border-slate">
+          <h3 className="text-body font-display text-paper flex items-center gap-2">
+            <Download className="w-5 h-5 text-amber" />
             <span>Exportar Resultado</span>
           </h3>
-          <button
+          <Button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white p-1 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+            variant="ghost"
+            size="sm"
+            className="text-stone hover:text-paper p-1"
+            leftIcon={<X className="w-5 h-5" />}
+          />
         </div>
 
         {/* Corpo do Modal */}
-        <div className="p-6 space-y-5 bg-[#faf9f5]">
+        <div className="p-6 space-y-5">
           <div>
-            <label className="text-xs font-black text-black block mb-2">
+            <label className="text-micro-label font-sans text-stone block mb-2">
               Selecione o Conteúdo do Arquivo:
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-white border border-zinc-200 p-1 rounded-2xl">
-              <button
+            <div className="grid grid-cols-2 gap-2 bg-sand/30 border border-sand p-1 rounded-btn">
+              <Button
                 type="button"
                 onClick={() => setExportMode("full_report")}
-                className={`text-xs font-bold py-2 px-3 rounded-xl transition-colors ${
-                  exportMode === "full_report"
-                    ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black"
-                    : "text-zinc-600 hover:text-black"
-                }`}
+                variant={exportMode === "full_report" ? "primary" : "ghost"}
+                size="sm"
+                className="w-full"
               >
                 Relatório Completo
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setExportMode("simplified_only")}
-                className={`text-xs font-bold py-2 px-3 rounded-xl transition-colors ${
-                  exportMode === "simplified_only"
-                    ? "bg-[#18181b] text-[#FBB040] shadow-xs font-black"
-                    : "text-zinc-600 hover:text-black"
-                }`}
+                variant={exportMode === "simplified_only" ? "primary" : "ghost"}
+                size="sm"
+                className="w-full"
               >
                 Apenas Texto Simplificado
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="space-y-2.5">
-            <label className="text-xs font-black text-black block mb-1">
+            <label className="text-micro-label font-sans text-stone block mb-1">
               Escolha o Formato:
             </label>
 
             {/* DOCX */}
-            <button
+            <Button
               onClick={handleExportDocx}
               disabled={downloading}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200 bg-white hover:border-[#FBB040] hover:bg-[#fef7eb] transition-all text-left group shadow-2xs"
+              variant="secondary"
+              size="md"
+              className="w-full justify-between p-3.5 h-auto"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-black text-xs">
+                <div className="w-8 h-8 rounded-tile bg-ink text-amber flex items-center justify-center font-bold text-xs">
                   DOCX
                 </div>
                 <div>
-                  <div className="text-xs font-black text-black group-hover:text-black">
+                  <div className="text-body-sm font-semibold text-ink">
                     Microsoft Word (.docx)
                   </div>
-                  <div className="text-[11px] text-zinc-500 font-medium">
+                  <div className="text-micro-label text-stone">
                     Documento editável formatado
                   </div>
                 </div>
               </div>
-              <Download className="w-4 h-4 text-zinc-400 group-hover:text-black" />
-            </button>
+              <Download className="w-4 h-4 text-stone" />
+            </Button>
 
             {/* PDF / Imprimir */}
-            <button
+            <Button
               onClick={handlePrintPdf}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200 bg-white hover:border-[#FBB040] hover:bg-[#fef7eb] transition-all text-left group shadow-2xs"
+              variant="secondary"
+              size="md"
+              className="w-full justify-between p-3.5 h-auto"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-black text-xs">
+                <div className="w-8 h-8 rounded-tile bg-ink text-amber flex items-center justify-center font-bold text-xs">
                   PDF
                 </div>
                 <div>
-                  <div className="text-xs font-black text-black group-hover:text-black">
+                  <div className="text-body-sm font-semibold text-ink">
                     Imprimir / Salvar em PDF
                   </div>
-                  <div className="text-[11px] text-zinc-500 font-medium">
+                  <div className="text-micro-label text-stone">
                     Relatório visual diagramado
                   </div>
                 </div>
               </div>
-              <Printer className="w-4 h-4 text-zinc-400 group-hover:text-black" />
-            </button>
+              <Printer className="w-4 h-4 text-stone" />
+            </Button>
 
             {/* Markdown */}
-            <button
+            <Button
               onClick={handleExportMarkdown}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200 bg-white hover:border-[#FBB040] hover:bg-[#fef7eb] transition-all text-left group shadow-2xs"
+              variant="secondary"
+              size="md"
+              className="w-full justify-between p-3.5 h-auto"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-black text-xs">
+                <div className="w-8 h-8 rounded-tile bg-ink text-amber flex items-center justify-center font-bold text-xs">
                   MD
                 </div>
                 <div>
-                  <div className="text-xs font-black text-black group-hover:text-black">
+                  <div className="text-body-sm font-semibold text-ink">
                     Markdown (.md)
                   </div>
-                  <div className="text-[11px] text-zinc-500 font-medium">
+                  <div className="text-micro-label text-stone">
                     Compatível com portais e repositórios
                   </div>
                 </div>
               </div>
-              <Download className="w-4 h-4 text-zinc-400 group-hover:text-black" />
-            </button>
+              <Download className="w-4 h-4 text-stone" />
+            </Button>
 
             {/* TXT */}
-            <button
+            <Button
               onClick={handleExportTxt}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200 bg-white hover:border-[#FBB040] hover:bg-[#fef7eb] transition-all text-left group shadow-2xs"
+              variant="secondary"
+              size="md"
+              className="w-full justify-between p-3.5 h-auto"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-black text-xs">
+                <div className="w-8 h-8 rounded-tile bg-ink text-amber flex items-center justify-center font-bold text-xs">
                   TXT
                 </div>
                 <div>
-                  <div className="text-xs font-black text-black group-hover:text-black">
+                  <div className="text-body-sm font-semibold text-ink">
                     Texto Puro (.txt)
                   </div>
-                  <div className="text-[11px] text-zinc-500 font-medium">
+                  <div className="text-micro-label text-stone">
                     Sem formatação, universal
                   </div>
                 </div>
               </div>
-              <Download className="w-4 h-4 text-zinc-400 group-hover:text-black" />
-            </button>
+              <Download className="w-4 h-4 text-stone" />
+            </Button>
 
             {/* HTML */}
-            <button
+            <Button
               onClick={handleExportHtml}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-zinc-200 bg-white hover:border-[#FBB040] hover:bg-[#fef7eb] transition-all text-left group shadow-2xs"
+              variant="secondary"
+              size="md"
+              className="w-full justify-between p-3.5 h-auto"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#18181b] text-[#FBB040] flex items-center justify-center font-black text-xs">
+                <div className="w-8 h-8 rounded-tile bg-ink text-amber flex items-center justify-center font-bold text-xs">
                   HTML
                 </div>
                 <div>
-                  <div className="text-xs font-black text-black group-hover:text-black">
+                  <div className="text-body-sm font-semibold text-ink">
                     Página Web (.html)
                   </div>
-                  <div className="text-[11px] text-zinc-500 font-medium">
+                  <div className="text-micro-label text-stone">
                     Arquivo pronto para navegadores
                   </div>
                 </div>
               </div>
-              <Code className="w-4 h-4 text-zinc-400 group-hover:text-black" />
-            </button>
+              <Code className="w-4 h-4 text-stone" />
+            </Button>
           </div>
         </div>
 
         {/* Rodapé do Modal */}
-        <div className="bg-white px-6 py-4 border-t border-zinc-200 text-right">
-          <button
+        <div className="bg-sand/30 px-6 py-4 border-t border-sand text-right">
+          <Button
             onClick={onClose}
-            className="text-xs font-bold text-zinc-600 hover:text-black px-4 py-2 rounded-xl"
+            variant="ghost"
+            size="md"
           >
             Fechar
-          </button>
+          </Button>
         </div>
       </div>
     </div>

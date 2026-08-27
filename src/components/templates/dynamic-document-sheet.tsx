@@ -47,7 +47,7 @@ export function DynamicDocumentSheet({
 
     <div
       id="printable-document-sheet"
-      className="bg-white text-zinc-900 shadow-xl border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-between"
+      className="bg-white text-zinc-900 border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-between"
       style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
       <div className="space-y-6">
@@ -103,7 +103,7 @@ export function DynamicDocumentSheet({
         {isNormative && (
           <div className="space-y-6 pt-2">
             {/* Epígrafe */}
-            <div className="text-center">
+            <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
                 {docType === "portaria" && `PORTARIA ${metadata.unitName?.includes("Reitor") ? "GR" : "DGRH"} Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`}
                 {docType === "resolucao" && `RESOLUÇÃO GR-Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`}
@@ -160,7 +160,7 @@ export function DynamicDocumentSheet({
         {/* ========================================================================= */}
         {isRegimentoOuRegulamento && (
           <div className="space-y-6 pt-2">
-            <div className="text-center space-y-1">
+            <div className="space-y-1">
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
                 {metadata.regimentoTitle || (docType === "regimento" ? "REGIMENTO INTERNO DA UNIDADE" : "REGULAMENTO DO PROGRAMA")}
               </h2>
@@ -259,6 +259,24 @@ export function DynamicDocumentSheet({
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
+            {/* Bloco de Destinatário */}
+            <div className="text-xs text-zinc-900 space-y-0.5 pt-2">
+              {metadata.recipientTitle && <p className="text-zinc-600">{metadata.recipientTitle}</p>}
+              <p className="font-bold text-black">{metadata.recipientName || "Nome do Destinatário"}</p>
+              <p className="font-medium">{metadata.recipientRole || "Cargo / Função"}</p>
+              {metadata.recipientAddress && (
+                <p className="text-zinc-600 text-[11px] leading-tight pt-0.5">{metadata.recipientAddress}</p>
+              )}
+            </div>
+
+            {/* Assunto */}
+            {metadata.subject && (
+              <div className="text-xs text-zinc-900 pt-1">
+                <span className="font-black text-black">Assunto: </span>
+                <span className="font-normal">{metadata.subject}</span>
+              </div>
+            )}
+
             <div className="text-xs font-bold text-black pt-2">
               {metadata.vocativo || "Prezado(a) Professor(a),"}
             </div>
@@ -328,28 +346,70 @@ export function DynamicDocumentSheet({
         {/* ========================================================================= */}
         {isMinutes && (
           <div className="space-y-5 pt-1">
-            <div className="text-center border-b border-zinc-300 pb-3">
+            <div className="border-b border-zinc-300 pb-3">
               <h2 className="text-sm font-black text-black uppercase tracking-wide">
                 ATA DA {metadata.meetingNumber?.toUpperCase() || "15ª REUNIÃO ORDINÁRIA DA COMISSÃO"}
               </h2>
             </div>
 
             {/* Tabela de Dados da Sessão */}
-            <div className="bg-zinc-50 border border-zinc-300 rounded-xl p-3 text-[11px] space-y-1.5 leading-tight">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <p><strong className="text-black">Data/Horário:</strong> {metadata.meetingDate || "27 de agosto de 2026, às 14h00"}</p>
-                <p><strong className="text-black">Local:</strong> {metadata.meetingPlace || "Sala de Reuniões da DGRH / Virtual"}</p>
+            <div className="border border-zinc-300 text-[11px] leading-tight">
+              <div className="grid grid-cols-2 gap-0">
+                <div className="border-r border-b border-zinc-300 p-2">
+                  <strong className="text-black">Data/Horário:</strong>
+                </div>
+                <div className="border-b border-zinc-300 p-2">
+                  {metadata.meetingDate || "27 de agosto de 2026, às 14h00"}
+                </div>
+                <div className="border-r border-b border-zinc-300 p-2">
+                  <strong className="text-black">Local:</strong>
+                </div>
+                <div className="border-b border-zinc-300 p-2">
+                  {metadata.meetingPlace || "Sala de Reuniões da DGRH / Virtual"}
+                </div>
+                <div className="border-r border-b border-zinc-300 p-2">
+                  <strong className="text-black">Presidência:</strong>
+                </div>
+                <div className="border-b border-zinc-300 p-2">
+                  {metadata.meetingPresident || "Profa. Dra. Coordenadora Geral"}
+                </div>
+                <div className="border-r border-b border-zinc-300 p-2">
+                  <strong className="text-black">Secretário(a):</strong>
+                </div>
+                <div className="border-b border-zinc-300 p-2">
+                  {metadata.meetingSecretary || "Secretário(a) da Comissão"}
+                </div>
+                {metadata.membersPresent && (
+                  <>
+                    <div className="border-r border-b border-zinc-300 p-2">
+                      <strong className="text-black">Membros Presentes:</strong>
+                    </div>
+                    <div className="border-b border-zinc-300 p-2">
+                      {metadata.membersPresent}
+                    </div>
+                  </>
+                )}
+                {metadata.membersAbsent && (
+                  <>
+                    <div className="border-r border-zinc-300 p-2">
+                      <strong className="text-black">Ausências Justificadas:</strong>
+                    </div>
+                    <div className="p-2">
+                      {metadata.membersAbsent}
+                    </div>
+                  </>
+                )}
+                {!metadata.membersPresent && !metadata.membersAbsent && (
+                  <>
+                    <div className="border-r border-zinc-300 p-2">
+                      <strong className="text-black">Membros Presentes:</strong>
+                    </div>
+                    <div className="p-2">
+                      {metadata.membersPresent || "12"}
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-zinc-200 pt-1.5">
-                <p><strong className="text-black">Presidência:</strong> {metadata.meetingPresident || "Profa. Dra. Coordenadora Geral"}</p>
-                <p><strong className="text-black">Secretaria:</strong> {metadata.meetingSecretary || "Secretário(a) da Comissão"}</p>
-              </div>
-              {metadata.membersPresent && (
-                <p className="border-t border-zinc-200 pt-1.5"><strong className="text-black">Membros Presentes:</strong> {metadata.membersPresent}</p>
-              )}
-              {metadata.membersAbsent && (
-                <p><strong className="text-black">Ausências Justificadas:</strong> {metadata.membersAbsent}</p>
-              )}
             </div>
 
             {/* Texto da Ata */}
@@ -373,15 +433,27 @@ export function DynamicDocumentSheet({
         {/* ========================================================================= */}
         {isPauta && (
           <div className="space-y-5 pt-1">
-            <div className="text-center border-b border-zinc-300 pb-3">
+            <div className="border-b border-zinc-300 pb-3">
               <h2 className="text-sm font-black text-black uppercase tracking-wide">
                 PAUTA DA {metadata.meetingNumber?.toUpperCase() || "12ª REUNIÃO ORDINÁRIA"}
               </h2>
             </div>
 
-            <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs space-y-1">
-              <p><strong className="text-black">Data/Horário:</strong> {metadata.meetingDate || "02 de setembro de 2026, às 09h30"}</p>
-              <p><strong className="text-black">Local:</strong> {metadata.meetingPlace || "Sala de Reuniões nº 2 - DGRH / Teams"}</p>
+            <div className="border border-zinc-300 text-[11px] leading-tight">
+              <div className="grid grid-cols-2 gap-0">
+                <div className="border-r border-b border-zinc-300 p-2">
+                  <strong className="text-black">Data/Horário:</strong>
+                </div>
+                <div className="border-b border-zinc-300 p-2">
+                  {metadata.meetingDate || "02 de setembro de 2026, às 09h30"}
+                </div>
+                <div className="border-r border-zinc-300 p-2">
+                  <strong className="text-black">Local:</strong>
+                </div>
+                <div className="p-2">
+                  {metadata.meetingPlace || "Sala de Reuniões nº 2 - DGRH / Teams"}
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3.5 pt-1">
@@ -409,7 +481,7 @@ export function DynamicDocumentSheet({
 
             {/* Tabela de Referência Processual */}
             {(metadata.referenceProcess || metadata.interestedParty || metadata.subject) && (
-              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs space-y-1 leading-tight">
+              <div className="text-xs space-y-1 leading-tight pt-1">
                 {metadata.referenceProcess && (
                   <p><strong className="text-black">Processo nº:</strong> {metadata.referenceProcess}</p>
                 )}
@@ -439,7 +511,7 @@ export function DynamicDocumentSheet({
         {isDeclaracao && (
           <div className="space-y-6 pt-4">
             <div className="text-center pt-4 pb-2">
-              <h2 className="text-base font-black text-black tracking-widest uppercase border-b-2 border-black inline-block pb-1">
+              <h2 className="text-base font-black text-black tracking-widest uppercase">
                 DECLARAÇÃO
               </h2>
             </div>
@@ -466,7 +538,7 @@ export function DynamicDocumentSheet({
         {/* 10. CERTIFICADO (Layout Nobre Paisagem/Retrato) */}
         {/* ========================================================================= */}
         {isCertificado && (
-          <div className="border-4 border-double border-[#d98a1a] rounded-2xl p-6 sm:p-8 space-y-6 text-center bg-gradient-to-b from-white to-amber-50/20 shadow-inner">
+          <div className="border-4 border-double border-[#d98a1a] rounded-2xl p-6 sm:p-8 space-y-6 text-center bg-gradient-to-b from-white to-amber-50/20">
             {/* Logo Unicamp Centralizada */}
             <div className="flex justify-center">
               <div className="relative h-16 w-36 flex items-center justify-center">
@@ -507,13 +579,13 @@ export function DynamicDocumentSheet({
         {/* ========================================================================= */}
         {(!isNormative && !isRegimentoOuRegulamento && !isLetter && !isCarta && !isMemo && !isMinutes && !isPauta && !isParecer && !isDecisaoOuDespacho && !isInformacao && !isDeclaracao && !isCertificado) && (
           <div className="space-y-5 pt-1">
-            <div className="border-b border-zinc-950 pb-2">
+            <div className="pb-2">
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
                 {currentTypeInfo.label.toUpperCase()} DGRH Nº {metadata.documentNumber || "01/2026"}
               </h2>
               {metadata.subject && (
-                <p className="text-xs text-zinc-800 font-bold mt-1">
-                  {metadata.subject}
+                <p className="text-xs text-zinc-800 font-bold mt-2">
+                  Assunto: {metadata.subject}
                 </p>
               )}
             </div>
@@ -533,24 +605,45 @@ export function DynamicDocumentSheet({
       {/* RODAPÉ DO DOCUMENTO: LOCAL, DATA E ASSINATURA */}
       {/* ========================================================================= */}
       <footer className="pt-8 space-y-6">
-        {/* Local e Data à esquerda ou direita conforme o padrão */}
-        {!isLetter && !isCarta && (
-          <div className="text-left text-xs text-zinc-700 font-medium">
+        {/* Declaração: Local/Data à esquerda, Nome/Cargo centralizados */}
+        {isDeclaracao && (
+          <div className="space-y-16">
+            <div className="text-left text-xs text-zinc-700 font-medium">
+              {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-64 border-t border-zinc-950 pt-1.5 text-center">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Local e Data à direita (demais documentos, exceto ofício e carta) */}
+        {!isLetter && !isCarta && !isDeclaracao && (
+          <div className="text-right text-xs text-zinc-700 font-medium">
             {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
           </div>
         )}
 
-        {/* Bloco de Assinatura */}
-        <div className="pt-6 flex flex-col items-center justify-center text-center">
-          <div className="w-64 border-t border-zinc-950 pt-1.5">
-            <p className="text-xs font-bold text-black">
-              {metadata.authorName || "Coordenação Geral da DGRH"}
-            </p>
-            <p className="text-[10px] text-zinc-600 font-medium">
-              {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
-            </p>
+        {/* Bloco de Assinatura padrão (demais documentos) */}
+        {!isDeclaracao && (
+          <div className="pt-6 flex flex-col items-end text-right">
+            <div className="w-64 border-t border-zinc-950 pt-1.5">
+              <p className="text-xs font-bold text-black">
+                {metadata.authorName || "Coordenação Geral da DGRH"}
+              </p>
+              <p className="text-[10px] text-zinc-600 font-medium">
+                {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </footer>
     </div>
   );

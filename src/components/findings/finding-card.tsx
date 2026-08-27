@@ -19,6 +19,7 @@ import {
   Info
 } from "lucide-react";
 import { getStoredAiHeaders } from "@/lib/ai";
+import { Button } from "@/components/ui/button";
 
 interface FindingCardProps {
   finding: Finding;
@@ -53,7 +54,6 @@ export function FindingCard({
     detail?: string;
   } | null>(null);
 
-  // Estados de edição inline
   const [isEditing, setIsEditing] = useState(false);
   const [customDraft, setCustomDraft] = useState(finding.suggestedText || "");
   const [isCustomized, setIsCustomized] = useState(false);
@@ -68,19 +68,18 @@ export function FindingCard({
   const isIgnored = finding.status === "ignored";
   const hasSuggestion = Boolean(finding.suggestedText && finding.suggestedText.trim() !== finding.originalText.trim());
 
-  // Configuração visual da categoria
   const getCategoryConfig = (category: string) => {
     switch (category) {
       case "spelling":
       case "grammar":
-        return { label: "Ortografia & Gramática", icon: SpellCheck, badge: "bg-emerald-50 text-emerald-800 border-emerald-200" };
+        return { label: "Ortografia & Gramática", icon: SpellCheck, badge: "bg-success-light text-success-dark border-success/30" };
       case "sentence":
-        return { label: "Frase Longa", icon: AlignLeft, badge: "bg-amber-50 text-amber-900 border-amber-200" };
+        return { label: "Frase Longa", icon: AlignLeft, badge: "bg-amber/10 text-amber-dark border-amber/30" };
       case "inclusion":
       case "nonsexist":
         return { label: "Linguagem Inclusiva", icon: HeartHandshake, badge: "bg-purple-50 text-purple-900 border-purple-200" };
       default:
-        return { label: "Clareza & Simplicidade", icon: FileCheck2, badge: "bg-blue-50 text-blue-900 border-blue-200" };
+        return { label: "Clareza & Simplicidade", icon: FileCheck2, badge: "bg-info-light text-info-dark border-info/30" };
     }
   };
 
@@ -147,19 +146,19 @@ export function FindingCard({
           setRewriteNotice({
             type: "offline",
             message: "Motor Unicamp Offline ativo (sem IA generativa configurada).",
-            detail: "Para reescrever frases longas com inteligência artificial, adicione sua chave de API (Google Gemini ou OpenAI) nas configurações, ou personalize manualmente no botão 'Editar'."
+            detail: "Configure uma chave de API (Google Gemini ou OpenAI) nas configurações, ou personalize manualmente."
           });
         } else if (data.status === "ai_error" || data.error) {
           setRewriteNotice({
             type: "error",
             message: "Falha na comunicação com a API de IA.",
-            detail: data.error || "Verifique se a chave de API nas configurações está ativa e com cota disponível."
+            detail: data.error || "Verifique se a chave de API está ativa."
           });
         } else {
           setRewriteNotice({
             type: "unchanged",
             message: "A IA manteve a frase original inalterada.",
-            detail: "A oração foi avaliada como técnica ou sem margem para divisão segura. Você pode personalizá-la no botão 'Editar'."
+            detail: "Você pode personalizá-la no botão 'Editar'."
           });
         }
       } else {
@@ -167,15 +166,15 @@ export function FindingCard({
         setRewriteNotice({
           type: "error",
           message: "Erro ao processar reescrita com IA.",
-          detail: errData.message || errData.error || "Verifique suas configurações de IA ou tente novamente."
+          detail: errData.message || errData.error || "Verifique suas configurações."
         });
       }
     } catch (e: any) {
-      console.error("Erro ao reescrever trecho com IA:", e);
+      console.error("Erro ao reescrever trecho:", e);
       setRewriteNotice({
         type: "error",
         message: "Erro de conexão com o serviço de IA.",
-        detail: e?.message || "Verifique sua conexão com a internet."
+        detail: e?.message || "Verifique sua conexão."
       });
     } finally {
       setAiRewriting(false);
@@ -210,32 +209,32 @@ export function FindingCard({
   return (
     <div
       onClick={onSelect}
-      className={`rounded-2xl border transition-all duration-200 p-5 ${
+      className={`rounded-card border transition-all duration-200 p-5 ${
         isApplied
-          ? "bg-[#faf9f5]/70 border-[#FBB040]/50"
+          ? "bg-sand/30 border-amber/30"
           : isIgnored
-          ? "bg-zinc-50 border-zinc-200/60 opacity-50"
+          ? "bg-sand/20 border-sand opacity-50"
           : isSelected
-          ? "bg-white border-zinc-900 ring-2 ring-[#FBB040] shadow-sm"
-          : "bg-white border-zinc-200 hover:border-zinc-300 shadow-2xs"
+          ? "bg-paper border-ink ring-2 ring-amber/40"
+          : "bg-paper border-sand hover:border-deep-stone"
       }`}
     >
-      {/* 1. Header do Card (Categoria + Status) */}
+      {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md border flex items-center gap-1.5 ${catConfig.badge}`}>
+          <span className={`text-caption font-sans font-semibold px-2.5 py-0.5 rounded-btn border flex items-center gap-1.5 ${catConfig.badge}`}>
             <CatIcon className="w-3 h-3 opacity-90" />
             <span>{catConfig.label}</span>
           </span>
 
           {finding.severity === "critical" && !isApplied && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200">
+            <span className="text-micro-label font-sans px-2 py-0.5 rounded-btn bg-error-light text-error-dark border border-error/30">
               Prioritário
             </span>
           )}
 
           {isCustomized && !isApplied && (
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="text-micro-label font-sans px-2 py-0.5 rounded-btn bg-amber/10 text-amber-dark border border-amber/30">
               Editada por você
             </span>
           )}
@@ -243,42 +242,40 @@ export function FindingCard({
 
         <div>
           {isApplied ? (
-            <span className="text-xs font-bold text-zinc-900 bg-[#FBB040]/30 border border-[#FBB040] px-2.5 py-0.5 rounded-md flex items-center gap-1">
-              <Check className="w-3 h-3 text-black stroke-[3]" />
+            <span className="text-body-sm font-sans font-semibold text-ink bg-amber/20 border border-amber/40 px-2.5 py-0.5 rounded-btn flex items-center gap-1">
+              <Check className="w-3 h-3 text-ink stroke-[3]" />
               <span>Aplicada</span>
             </span>
           ) : isIgnored ? (
-            <span className="text-xs font-medium text-zinc-500 bg-zinc-100 px-2.5 py-0.5 rounded-md">
+            <span className="text-body-sm font-sans text-stone bg-sand/50 px-2.5 py-0.5 rounded-btn">
               Ignorada
             </span>
           ) : null}
         </div>
       </div>
 
-      {/* 2. Mensagem do problema */}
-      <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed mb-3">
+      {/* Problema */}
+      <p className="text-body-sm text-charcoal leading-relaxed mb-3">
         {finding.explanation}
       </p>
 
-      {/* 3. Bloco Comparativo: Original vs Sugestão */}
-      <div className="space-y-2 rounded-xl bg-zinc-50/80 p-3 border border-zinc-200/70 mb-3">
-        {/* Trecho Original */}
-        <div className="text-xs">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 block mb-1">
-            Texto Original:
+      {/* Bloco Comparativo */}
+      <div className="space-y-2 rounded-tile bg-sand/30 p-3 border border-sand mb-3">
+        <div className="text-body-sm">
+          <span className="text-micro-label font-sans text-stone block mb-1">
+            Texto Original
           </span>
-          <p className="font-mono text-zinc-600 bg-white border border-zinc-200/80 rounded-lg p-2.5 line-through opacity-80 leading-relaxed">
+          <p className="font-mono text-charcoal bg-paper border border-sand rounded-input p-2.5 line-through opacity-80 leading-relaxed">
             {finding.originalText}
           </p>
         </div>
 
-        {/* Sugestão / Modo Edição / Aguardando IA */}
         {isEditing ? (
           <div className="pt-1 space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-medium text-zinc-600">
-              <span className="font-bold text-zinc-900 flex items-center gap-1">
-                <Pencil className="w-3 h-3 text-[#FBB040]" />
-                <span>Edição Manual da Sugestão:</span>
+            <div className="flex items-center justify-between text-caption font-sans text-stone">
+              <span className="font-semibold text-ink flex items-center gap-1">
+                <Pencil className="w-3 h-3 text-amber" />
+                <span>Edição Manual:</span>
               </span>
               <span>{customDraft.trim().split(/\s+/).filter(Boolean).length} palavras</span>
             </div>
@@ -286,126 +283,85 @@ export function FindingCard({
               value={customDraft}
               onChange={(e) => setCustomDraft(e.target.value)}
               rows={2}
-              className="w-full text-xs font-mono font-bold text-zinc-900 bg-white border-2 border-[#FBB040] rounded-lg p-2.5 focus:outline-hidden focus:ring-1 focus:ring-[#FBB040]"
-              placeholder="Digite sua versão personalizada..."
+              className="w-full text-body-sm font-mono font-semibold text-ink bg-paper border-2 border-amber rounded-input p-2.5 focus:outline-hidden focus:ring-1 focus:ring-amber"
+              placeholder="Digite sua versão..."
               autoFocus
             />
             <div className="flex items-center justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="text-xs text-zinc-500 hover:text-black font-medium px-2.5 py-1 rounded-md hover:bg-zinc-200/60"
-              >
+              <Button type="button" onClick={() => setIsEditing(false)} variant="ghost" size="sm">
                 Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveCustomDraft}
-                disabled={!customDraft.trim()}
-                className="text-xs font-bold bg-zinc-900 text-white hover:bg-black px-3 py-1 rounded-md transition-colors disabled:opacity-40"
-              >
-                Salvar Rascunho
-              </button>
+              </Button>
+              <Button type="button" onClick={handleSaveCustomDraft} disabled={!customDraft.trim()} variant="secondary" size="sm">
+                Salvar
+              </Button>
               {onApplySuggestion && (
-                <button
-                  type="button"
-                  onClick={handleSaveAndApply}
-                  disabled={!customDraft.trim()}
-                  className="text-xs font-bold bg-[#FBB040] hover:bg-[#e59b2b] text-black px-3 py-1 rounded-md transition-colors disabled:opacity-40"
-                >
+                <Button type="button" onClick={handleSaveAndApply} disabled={!customDraft.trim()} variant="primary" size="sm">
                   Salvar e Aplicar
-                </button>
+                </Button>
               )}
             </div>
           </div>
         ) : hasSuggestion ? (
-          <div className="text-xs pt-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 block mb-1">
-              Sugestão de Simplificação:
+          <div className="text-body-sm pt-1">
+            <span className="text-micro-label font-sans text-stone block mb-1">
+              Sugestão de Simplificação
             </span>
-            <div className="font-mono text-zinc-900 font-bold bg-[#fffdfa] border border-[#FBB040] rounded-lg p-2.5 leading-relaxed">
+            <div className="font-mono text-ink font-semibold bg-paper-light border border-amber/40 rounded-input p-2.5 leading-relaxed">
               {finding.suggestedText}
             </div>
           </div>
         ) : (
           <div className="pt-1 space-y-2">
-            <div className="bg-amber-50/70 border border-amber-200/80 rounded-lg p-3 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+            <div className="bg-amber/10 border border-amber/30 rounded-input p-3 text-body-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
               <div>
-                <p className="font-bold text-amber-950">Frase longa ({finding.originalText.split(/\s+/).filter(Boolean).length} palavras)</p>
-                <p className="text-amber-800 text-[11px] mt-0.5">{finding.recommendation}</p>
+                <p className="font-semibold text-ink">Frase longa ({finding.originalText.split(/\s+/).filter(Boolean).length} palavras)</p>
+                <p className="text-charcoal text-caption mt-0.5">{finding.recommendation}</p>
               </div>
-              <button
+              <Button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAiRewriteSegment();
-                }}
+                onClick={(e) => { e.stopPropagation(); handleAiRewriteSegment(); }}
                 disabled={aiRewriting}
-                className="shrink-0 text-xs font-black bg-zinc-900 hover:bg-black text-[#FBB040] px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-xs disabled:opacity-60"
+                variant="primary"
+                size="sm"
+                leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber" />}
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#FBB040]" />
-                <span>{aiRewriting ? "Reescrevendo..." : "Reescrever com IA"}</span>
-              </button>
+                {aiRewriting ? "Reescrevendo..." : "Reescrever com IA"}
+              </Button>
             </div>
 
-            {/* Aviso Explicativo e Ação Rápida */}
             {rewriteNotice && (
-              <div
-                className={`p-3 rounded-xl text-xs space-y-2 border animate-in fade-in slide-in-from-top-1 ${
-                  rewriteNotice.type === "offline"
-                    ? "bg-amber-50 border-amber-300 text-amber-950"
-                    : rewriteNotice.type === "error"
-                    ? "bg-rose-50 border-rose-300 text-rose-950"
-                    : "bg-blue-50 border-blue-300 text-blue-950"
-                }`}
-              >
+              <div className={`p-3 rounded-tile text-body-sm space-y-2 border animate-in fade-in slide-in-from-top-1 ${
+                rewriteNotice.type === "offline"
+                  ? "bg-amber/10 border-amber/40 text-ink"
+                  : rewriteNotice.type === "error"
+                  ? "bg-error-light border-error/30 text-error-dark"
+                  : "bg-info-light border-info/30 text-info-dark"
+              }`}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-1">
-                    <div className="font-bold flex items-center gap-1.5">
+                    <div className="font-semibold flex items-center gap-1.5">
                       {rewriteNotice.type === "offline" ? (
-                        <Info className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                        <Info className="w-3.5 h-3.5 text-amber shrink-0" />
                       ) : rewriteNotice.type === "error" ? (
-                        <AlertCircle className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+                        <AlertCircle className="w-3.5 h-3.5 text-error shrink-0" />
                       ) : (
-                        <Info className="w-3.5 h-3.5 text-blue-700 shrink-0" />
+                        <Info className="w-3.5 h-3.5 text-info shrink-0" />
                       )}
                       <span>{rewriteNotice.message}</span>
                     </div>
                     {rewriteNotice.detail && (
-                      <p className="text-[11px] opacity-90 leading-relaxed">
-                        {rewriteNotice.detail}
-                      </p>
+                      <p className="text-caption opacity-90 leading-relaxed">{rewriteNotice.detail}</p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setRewriteNotice(null)}
-                    className="text-zinc-400 hover:text-zinc-700 p-0.5"
-                    title="Fechar aviso"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+                  <Button type="button" onClick={() => setRewriteNotice(null)} variant="ghost" size="xs" className="p-0.5" leftIcon={<X className="w-3.5 h-3.5" />} />
                 </div>
                 <div className="flex items-center gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => window.dispatchEvent(new CustomEvent("open-ai-settings"))}
-                    className="text-[11px] font-bold bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100 px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-2xs"
-                  >
-                    <Settings className="w-3 h-3 text-[#FBB040]" />
-                    <span>Configurar Chave de IA</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCustomDraft(finding.suggestedText || finding.originalText);
-                      setIsEditing(true);
-                      setRewriteNotice(null);
-                    }}
-                    className="text-[11px] font-medium text-zinc-700 hover:text-zinc-900 px-2 py-1 rounded-lg hover:bg-black/5"
-                  >
-                    <span>Editar manualmente</span>
-                  </button>
+                  <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-ai-settings"))} variant="secondary" size="xs" leftIcon={<Settings className="w-3 h-3 text-amber" />}>
+                    Configurar IA
+                  </Button>
+                  <Button type="button" onClick={() => { setCustomDraft(finding.suggestedText || finding.originalText); setIsEditing(true); setRewriteNotice(null); }} variant="ghost" size="xs">
+                    Editar manualmente
+                  </Button>
                 </div>
               </div>
             )}
@@ -413,137 +369,83 @@ export function FindingCard({
         )}
       </div>
 
-
-      {/* 4. Barra Inferior de Ações (Unificada e sem duplicações) */}
+      {/* Ações */}
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
         <div className="flex items-center gap-3">
-          {/* Botão de Dica / Fundamentação */}
-          <button
+          <Button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleLearnMore();
-            }}
-            className="text-xs text-zinc-500 hover:text-zinc-900 font-medium flex items-center gap-1 transition-colors"
+            onClick={(e) => { e.stopPropagation(); handleLearnMore(); }}
+            variant="ghost"
+            size="sm"
+            leftIcon={showExplanation ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           >
-            {showExplanation ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            <span>{showExplanation ? "Ocultar fundamentação" : "Por que isso importa?"}</span>
-          </button>
+            {showExplanation ? "Ocultar fundamentação" : "Por que isso importa?"}
+          </Button>
 
-          {/* Botão de Ignorar */}
           {!isApplied && onIgnoreFinding && (
-            <button
+            <Button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onIgnoreFinding(finding);
-              }}
-              className="text-xs text-zinc-400 hover:text-zinc-700 font-medium flex items-center gap-1 transition-colors"
-              title="Ignorar esta recomendação"
+              onClick={(e) => { e.stopPropagation(); onIgnoreFinding(finding); }}
+              variant="ghost"
+              size="sm"
+              leftIcon={<EyeOff className="w-3.5 h-3.5" />}
             >
-              <EyeOff className="w-3.5 h-3.5" />
-              <span>{isIgnored ? "Reativar" : "Ignorar"}</span>
-            </button>
+              {isIgnored ? "Reativar" : "Ignorar"}
+            </Button>
           )}
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Ações quando já foi aplicada */}
           {isApplied && onRevertSuggestion && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRevertSuggestion(finding);
-              }}
-              className="text-xs font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
-            >
-              <Undo2 className="w-3.5 h-3.5" />
-              <span>Reverter</span>
-            </button>
+            <Button type="button" onClick={(e) => { e.stopPropagation(); onRevertSuggestion(finding); }} variant="secondary" size="sm" leftIcon={<Undo2 className="w-3.5 h-3.5" />}>
+              Reverter
+            </Button>
           )}
 
-          {/* Ações quando NÃO foi aplicada */}
           {!isApplied && !isEditing && (
             <>
-              {/* Botão de Editar */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCustomDraft(finding.suggestedText || finding.originalText);
-                  setIsEditing(true);
-                }}
-                className="text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
-                title="Editar sugestão manualmente"
-              >
-                <Pencil className="w-3 h-3 text-zinc-600" />
-                <span>Editar</span>
-              </button>
+              <Button type="button" onClick={(e) => { e.stopPropagation(); setCustomDraft(finding.suggestedText || finding.originalText); setIsEditing(true); }} variant="secondary" size="sm" leftIcon={<Pencil className="w-3 h-3 text-stone" />}>
+                Editar
+              </Button>
 
-              {/* Botão de IA alternativo (quando já tem sugestão) */}
               {hasSuggestion && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAiRewriteSegment();
-                  }}
-                  disabled={aiRewriting}
-                  className="text-xs font-medium text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors disabled:opacity-50"
-                  title="Gerar nova versão com IA"
-                >
-                  <Sparkles className="w-3 h-3 text-[#d98a1a]" />
-                  <span>{aiRewriting ? "Gerando..." : "Nova IA"}</span>
-                </button>
+                <Button type="button" onClick={(e) => { e.stopPropagation(); handleAiRewriteSegment(); }} disabled={aiRewriting} variant="secondary" size="sm" leftIcon={<Sparkles className="w-3 h-3 text-amber" />}>
+                  {aiRewriting ? "Gerando..." : "Nova IA"}
+                </Button>
               )}
 
-              {/* Botão Principal: Aceitar Sugestão */}
               {hasSuggestion && onApplySuggestion && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onApplySuggestion(finding);
-                  }}
-                  className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-black px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs transition-all border border-[#d98a1a]"
-                >
-                  <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
-                  <span>Aceitar</span>
-                </button>
+                <Button type="button" onClick={(e) => { e.stopPropagation(); onApplySuggestion(finding); }} variant="success" size="sm" leftIcon={<Check className="w-3.5 h-3.5 stroke-[3]" />}>
+                  Aceitar
+                </Button>
               )}
             </>
           )}
         </div>
       </div>
 
-      {/* 5. Fundamentação Pedagógica (Accordion Suave) */}
+      {/* Fundamentação */}
       {showExplanation && (
-        <div className="mt-3 pt-3 border-t border-zinc-200/80 text-xs bg-white p-3.5 rounded-xl space-y-2 text-zinc-600 animate-in fade-in">
+        <div className="mt-3 pt-3 border-t border-sand text-body-sm bg-sand/20 p-3.5 rounded-tile space-y-2 text-charcoal animate-in fade-in">
           {detailedLoading ? (
-            <div className="flex items-center gap-2 text-zinc-500 py-1">
-              <div className="w-3 h-3 border-2 border-zinc-800 border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center gap-2 text-stone py-1">
+              <div className="w-3 h-3 border-2 border-ink border-t-transparent rounded-full animate-spin" />
               <span>Consultando diretrizes da Unicamp...</span>
             </div>
           ) : (
             <>
               <div>
-                <strong className="text-zinc-900 block mb-0.5 font-bold">Por que isso importa na comunicação pública?</strong>
+                <strong className="text-ink block mb-0.5">Por que isso importa na comunicação pública?</strong>
                 <p className="leading-relaxed">{detailedData?.whyItMatters || "Comunicações diretas e acessíveis garantem que o cidadão encontre, compreenda e aja sem dúvidas na primeira leitura."}</p>
               </div>
               <div>
-                <strong className="text-zinc-900 block mb-0.5 font-bold">Dica Prática:</strong>
+                <strong className="text-ink block mb-0.5">Dica Prática:</strong>
                 <p className="leading-relaxed">{detailedData?.pedagogicalTip || finding.recommendation}</p>
               </div>
               {finding.source?.url && (
-                <a
-                  href={finding.source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] text-zinc-900 hover:text-[#d98a1a] hover:underline inline-flex items-center gap-1 font-bold pt-0.5"
-                >
-                  <BookOpen className="w-3 h-3 text-[#FBB040]" />
-                  <span>Consultar guia no portal Linguagem Simples Unicamp</span>
+                <a href={finding.source.url} target="_blank" rel="noopener noreferrer" className="ghost-link text-caption text-ink inline-flex items-center gap-1 pt-0.5">
+                  <BookOpen className="w-3 h-3 text-amber" />
+                  <span>Consultar guia Unicamp</span>
                 </a>
               )}
             </>
@@ -553,4 +455,3 @@ export function FindingCard({
     </div>
   );
 }
-

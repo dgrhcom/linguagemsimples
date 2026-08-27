@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SemanticValidation } from "@/types/analysis";
 import { computeWordDiff, calculateDiffStats } from "@/lib/analysis/diff-utils";
 import { Copy, Check, ShieldCheck, AlertTriangle, GitCompare, Columns, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ComparisonViewProps {
   originalText: string;
@@ -43,23 +44,23 @@ export function ComparisonView({
     <div className="space-y-4">
       {/* Alerta de Validação Semântica */}
       {semanticValidation && (
-        <div className={`p-4 rounded-2xl border flex items-start gap-3 text-xs leading-relaxed ${
+        <div className={`p-4 rounded-tile border flex items-start gap-3 text-xs leading-relaxed ${
           isPreserved
-            ? "bg-zinc-50 border-zinc-200 text-zinc-800"
-            : "bg-amber-50 border-amber-200 text-amber-950"
+            ? "bg-sand/30 border-sand text-charcoal"
+            : "bg-amber/10 border-amber/30 text-ink"
         }`}>
           {isPreserved ? (
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-success shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-4 h-4 text-amber shrink-0 mt-0.5" />
           )}
           <div className="space-y-0.5">
-            <span className="font-bold text-zinc-900 block">
+            <span className="font-bold text-ink block">
               {isPreserved
                 ? "Preservação Semântica e Normativa Verificada"
                 : `Atenção na Preservação de Fatos (${semanticValidation.preservationScore ?? 85}%)`}
             </span>
-            <p className="text-zinc-600">
+            <p className="text-stone">
               {semanticValidation.summary || (isPreserved
                 ? "Datas, valores, regras e obrigações foram preservadas na versão simplificada."
                 : (semanticValidation.warnings || []).join(" "))}
@@ -69,95 +70,81 @@ export function ComparisonView({
       )}
 
       {/* Barra de Controles Unificada */}
-      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-zinc-200 shadow-2xs space-y-3">
+      <div className="bg-paper p-3.5 sm:p-4 rounded-card border border-sand space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Seletor de Versão (Segmented Control) */}
-          <div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 self-start">
-            <button
+          <div className="inline-flex p-1 bg-sand/50 rounded-btn border border-sand self-start">
+            <Button
               onClick={() => setTargetVersion("working")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                targetVersion === "working"
-                  ? "bg-white text-zinc-900 shadow-xs font-bold"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              variant={targetVersion === "working" ? "primary" : "ghost"}
+              size="sm"
             >
               Alterações Aceitas por Você
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setTargetVersion("full_simplified")}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                targetVersion === "full_simplified"
-                  ? "bg-white text-zinc-900 shadow-xs font-bold"
-                  : "text-zinc-500 hover:text-zinc-900"
-              }`}
+              variant={targetVersion === "full_simplified" ? "primary" : "ghost"}
+              size="sm"
             >
               Versão Integral IA
-            </button>
+            </Button>
           </div>
 
           <div className="flex items-center gap-2 self-start md:self-auto">
             {/* Seletor de Modo de Exibição */}
-            <div className="inline-flex p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60">
-              <button
+            <div className="inline-flex p-1 bg-sand/50 rounded-btn border border-sand">
+              <Button
                 onClick={() => setViewMode("inline_wordpress")}
-                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                  viewMode === "inline_wordpress"
-                    ? "bg-white text-zinc-900 shadow-xs font-bold"
-                    : "text-zinc-500 hover:text-zinc-900"
-                }`}
+                variant={viewMode === "inline_wordpress" ? "primary" : "ghost"}
+                size="sm"
+                leftIcon={<GitCompare className="w-3.5 h-3.5" />}
                 title="Modo Diff Unificado"
               >
-                <GitCompare className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Diff Unificado</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setViewMode("split")}
-                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                  viewMode === "split"
-                    ? "bg-white text-zinc-900 shadow-xs font-bold"
-                    : "text-zinc-500 hover:text-zinc-900"
-                }`}
+                variant={viewMode === "split" ? "primary" : "ghost"}
+                size="sm"
+                leftIcon={<Columns className="w-3.5 h-3.5" />}
                 title="Modo Lado a Lado"
               >
-                <Columns className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Lado a Lado</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setViewMode("clean")}
-                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                  viewMode === "clean"
-                    ? "bg-white text-zinc-900 shadow-xs font-bold"
-                    : "text-zinc-500 hover:text-zinc-900"
-                }`}
+                variant={viewMode === "clean" ? "primary" : "ghost"}
+                size="sm"
+                leftIcon={<FileText className="w-3.5 h-3.5" />}
                 title="Texto Final Limpo"
               >
-                <FileText className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Texto Final</span>
-              </button>
+              </Button>
             </div>
 
             {/* Botão Copiar */}
-            <button
+            <Button
               onClick={handleCopy}
-              className="text-xs font-bold bg-[#FBB040] hover:bg-[#e59b2b] text-black px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all border border-[#d98a1a]"
+              variant="primary"
+              size="md"
+              leftIcon={copied ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <Copy className="w-3.5 h-3.5" />}
             >
-              {copied ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? "Copiado!" : "Copiar"}</span>
-            </button>
+              {copied ? "Copiado!" : "Copiar"}
+            </Button>
           </div>
         </div>
 
         {/* Resumo de Alterações */}
-        <div className="flex items-center gap-3 text-[11px] text-zinc-500 pt-2 border-t border-zinc-100 font-medium">
+        <div className="flex items-center gap-3 text-micro-label text-stone pt-2 border-t border-sand">
           <span>Diferenças:</span>
-          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold">
+          <span className="text-success-dark bg-success-light px-2 py-0.5 rounded-btn font-bold">
             +{diffStats.insertions} inserções
           </span>
-          <span className="text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md font-bold">
+          <span className="text-error-dark bg-error-light px-2 py-0.5 rounded-btn font-bold">
             -{diffStats.deletions} remoções
           </span>
           {targetVersion === "working" && workingText === originalText && (
-            <span className="text-zinc-400 italic">
+            <span className="text-stone italic">
               (Nenhuma alteração individual aceita ainda)
             </span>
           )}
@@ -166,8 +153,8 @@ export function ComparisonView({
 
       {/* 1. MODO INLINE DIFF */}
       {viewMode === "inline_wordpress" && (
-        <div className="bg-white rounded-2xl border border-zinc-200 p-6 sm:p-8 shadow-2xs space-y-3">
-          <div className="text-base text-zinc-900 leading-relaxed font-sans whitespace-pre-wrap">
+        <div className="bg-paper rounded-card border border-sand p-6 sm:p-8 space-y-3">
+          <div className="text-body text-ink leading-relaxed font-sans whitespace-pre-wrap">
             {diffParts.map((part, index) => {
               if (part.type === "delete") {
                 return (
@@ -192,16 +179,16 @@ export function ComparisonView({
       {/* 2. MODO LADO A LADO */}
       {viewMode === "split" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+          <div className="bg-paper rounded-card border border-sand p-5 space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-sand">
+              <span className="text-micro-label text-stone">
                 Texto Original
               </span>
-              <span className="text-xs text-zinc-400 font-medium">
+              <span className="text-micro-label text-stone">
                 {originalText.split(/\s+/).filter(Boolean).length} palavras
               </span>
             </div>
-            <div className="text-sm text-zinc-700 leading-relaxed whitespace-pre-wrap font-sans">
+            <div className="text-body-sm text-charcoal leading-relaxed whitespace-pre-wrap font-sans">
               {diffParts.map((part, index) => {
                 if (part.type === "delete") {
                   return (
@@ -216,16 +203,16 @@ export function ComparisonView({
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-2xs space-y-2">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+          <div className="bg-paper rounded-card border border-sand p-5 space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-sand">
+              <span className="text-micro-label text-ink">
                 {targetVersion === "working" ? "Alterações Aceitas" : "Versão Integral IA"}
               </span>
-              <span className="text-xs text-zinc-400 font-medium">
+              <span className="text-micro-label text-stone">
                 {activeTargetText.split(/\s+/).filter(Boolean).length} palavras
               </span>
             </div>
-            <div className="text-sm text-zinc-900 leading-relaxed whitespace-pre-wrap font-sans">
+            <div className="text-body-sm text-ink leading-relaxed whitespace-pre-wrap font-sans">
               {diffParts.map((part, index) => {
                 if (part.type === "insert") {
                   return (
@@ -244,16 +231,16 @@ export function ComparisonView({
 
       {/* 3. MODO LIMPO */}
       {viewMode === "clean" && (
-        <div className="bg-white rounded-2xl border border-zinc-200 p-6 sm:p-8 shadow-2xs max-w-3xl mx-auto space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
-            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+        <div className="bg-paper rounded-card border border-sand p-6 sm:p-8 max-w-3xl mx-auto space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-sand">
+            <span className="text-micro-label text-stone">
               {targetVersion === "working" ? "Texto com Alterações Aceitas" : "Versão Final Simplificada"}
             </span>
-            <span className="text-xs text-zinc-400 font-medium">
+            <span className="text-micro-label text-stone">
               {activeTargetText.split(/\s+/).filter(Boolean).length} palavras
             </span>
           </div>
-          <div className="text-base text-zinc-900 leading-relaxed whitespace-pre-wrap font-sans">
+          <div className="text-body text-ink leading-relaxed whitespace-pre-wrap font-sans">
             {activeTargetText}
           </div>
         </div>
@@ -261,4 +248,3 @@ export function ComparisonView({
     </div>
   );
 }
-

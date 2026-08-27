@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Finding } from "@/types/analysis";
-import { Pencil, Eye, Sparkles, RotateCcw, FileText } from "lucide-react";
+import { Save, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AnnotatedTextProps {
   text: string;
   originalInputText?: string;
   findings: Finding[];
-  selectedFindingId?: string;
   selectedFinding?: Finding | null;
-  onSelectFinding: (finding: Finding | null) => void;
+  onSelectFinding: (finding: Finding) => void;
   onUpdateText?: (newText: string) => void;
-  onReanalyze?: (newText: string) => void;
+  onReanalyze?: (customText?: string) => void;
   isReanalyzing?: boolean;
 }
 
@@ -20,7 +20,6 @@ export function AnnotatedText({
   text,
   originalInputText,
   findings,
-  selectedFindingId,
   selectedFinding,
   onSelectFinding,
   onUpdateText,
@@ -28,268 +27,264 @@ export function AnnotatedText({
   isReanalyzing = false
 }: AnnotatedTextProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [draftText, setDraftText] = useState(text || "");
+  const [editText, setEditText] = useState(text);
+  const [hasChanges, setHasChanges] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!isEditing) {
-      setDraftText(text || "");
+      setEditText(text);
     }
   }, [text, isEditing]);
 
-  const activeSelectedId = selectedFinding?.id || selectedFindingId;
-  if (!text && !draftText) return null;
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditText(e.target.value);
+    setHasChanges(e.target.value !== text);
+  };
 
-  const currentWordCount = (isEditing ? draftText : text).trim().split(/\s+/).filter(Boolean).length;
-  const currentCharCount = (isEditing ? draftText : text).length;
-  const isModifiedFromOriginal = Boolean(originalInputText && originalInputText.trim() !== text.trim());
-
-  const handleSaveTextOnly = () => {
-    if (!draftText.trim()) return;
+  const handleSave = () => {
     if (onUpdateText) {
-      onUpdateText(draftText.trim());
+      onUpdateText(editText);
     }
     setIsEditing(false);
+    setHasChanges(false);
+  };
+
+  const handleCancel = () => {
+    setEditText(text);
+    setIsEditing(false);
+    setHasChanges(false);
   };
 
   const handleSaveAndReanalyze = () => {
-    if (!draftText.trim()) return;
     if (onUpdateText) {
-      onUpdateText(draftText.trim());
+      onUpdateText(editText);
     }
     if (onReanalyze) {
-      onReanalyze(draftText.trim());
+      onReanalyze(editText);
     }
     setIsEditing(false);
+    setHasChanges(false);
   };
 
-  // 1. Renderização dos trechos anotados quando em Modo Leitura
-  const renderAnnotatedContent = () => {
-    const occurrences: { start: number; end: number; text: string; finding: Finding }[] = [];
-
-    for (const f of findings) {
-      if (!f.originalText) continue;
-      let idx = 0;
-      while ((idx = text.indexOf(f.originalText, idx)) !== -1) {
-        occurrences.push({
-          start: idx,
-          end: idx + f.originalText.length,
-          text: f.originalText,
-          finding: f
-        });
-        idx += f.originalText.length;
-      }
-    }
-
-    occurrences.sort((a, b) => a.start - b.start);
-
-    const filteredOccurrences: typeof occurrences = [];
-    let lastEnd = 0;
-    for (const occ of occurrences) {
-      if (occ.start >= lastEnd) {
-        filteredOccurrences.push(occ);
-        lastEnd = occ.end;
-      }
-    }
-
-    const segments: React.ReactNode[] = [];
-    let currentPos = 0;
-
-    filteredOccurrences.forEach((occ, i) => {
-      if (occ.start > currentPos) {
-        segments.push(
-          <span key={`plain-${currentPos}`}>
-            {text.substring(currentPos, occ.start)}
-          </span>
-        );
-      }
-
-      const isSelected = activeSelectedId === occ.finding.id;
-      const severityColor = {
-        critical: "bg-[#fdecd0] text-black border-b-2 border-[#d98a1a] hover:bg-[#fbd38d]",
-        warning: "bg-[#fef7eb] text-zinc-900 border-b-2 border-[#FBB040] hover:bg-[#fdecd0]",
-        suggestion: "bg-zinc-100 text-zinc-900 border-b-2 border-zinc-400 hover:bg-zinc-200",
-        info: "bg-zinc-100 text-zinc-900 border-b-2 border-zinc-300 hover:bg-zinc-200"
-      }[occ.finding.severity];
-
-      segments.push(
-        <mark
-          key={`mark-${occ.start}-${i}`}
-          onClick={() => onSelectFinding(occ.finding)}
-          className={`cursor-pointer px-1.5 py-0.5 rounded-md transition-all font-semibold ${severityColor} ${
-            isSelected ? "!bg-[#FBB040] !text-black ring-2 ring-black font-black shadow-xs" : ""
-          }`}
-          title={`Clique para ver a orientação sobre '${occ.text}'`}
-        >
-          {occ.text}
-        </mark>
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(
+        textareaRef.current.value.length,
+        textareaRef.current.value.length
       );
+    }
+  }, [isEditing]);
 
-      currentPos = occ.end;
+  const renderAnnotatedText = useCallback(() => {
+    if (!text) return <p className="text-stone italic">Nenhum texto para exibir.</p>;
+
+    const pendingFindings = findings.filter(f => f.status === "pending" || !f.status);
+
+    if (pendingFindings.length === 0) {
+      return (
+        <p className="text-body leading-relaxed text-ink">
+          {text}
+        </p>
+      );
+    }
+
+    const getSeverityColor = (severity: string, isApplied: boolean) => {
+      if (isApplied) return "bg-amber/20 border-amber/50 cursor-default";
+      switch (severity) {
+        case "high": return "bg-error-light border-error/40 hover:bg-error/20 cursor-pointer";
+        case "critical": return "bg-error-light border-error/40 hover:bg-error/20 cursor-pointer";
+        case "medium": return "bg-amber/15 border-amber/40 hover:bg-amber/25 cursor-pointer";
+        default: return "bg-sand/50 border-sand hover:bg-sand cursor-pointer";
+      }
+    };
+
+    const sortedFindings = [...pendingFindings].sort((a, b) => {
+      const severityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+      return (severityOrder[a.severity] || 4) - (severityOrder[b.severity] || 4);
     });
 
-    if (currentPos < text.length) {
-      segments.push(
-        <span key={`plain-${currentPos}`}>
-          {text.substring(currentPos)}
-        </span>
-      );
+    let resultText = text;
+
+    interface Segment {
+      text: string;
+      finding?: Finding;
+      isOriginal?: boolean;
+      start: number;
+      end: number;
     }
 
-    return segments;
-  };
+    const segments: Segment[] = [];
+
+    const occupiedRanges: { start: number; end: number }[] = [];
+
+    const findStart = (searchText: string, startIndex: number = 0) => {
+      const normalizedSearch = searchText.toLowerCase().replace(/[.,;:!?\s]+$/, "");
+      let searchFrom = startIndex;
+      while (searchFrom < resultText.length) {
+        const foundAt = resultText.toLowerCase().indexOf(normalizedSearch, searchFrom);
+        if (foundAt === -1) return -1;
+        const isOccupied = occupiedRanges.some(range =>
+          (foundAt >= range.start && foundAt < range.end) ||
+          (foundAt + normalizedSearch.length > range.start && foundAt + normalizedSearch.length <= range.end) ||
+          (foundAt <= range.start && foundAt + normalizedSearch.length >= range.end)
+        );
+        if (!isOccupied) return foundAt;
+        searchFrom = foundAt + 1;
+      }
+      return -1;
+    };
+
+    for (const finding of sortedFindings) {
+      if (!finding.originalText) continue;
+
+      const start = findStart(finding.originalText);
+      if (start === -1) continue;
+
+      const end = start + finding.originalText.length;
+      occupiedRanges.push({ start, end });
+      segments.push({
+        text: resultText.substring(start, end),
+        finding,
+        start,
+        end
+      });
+    }
+
+    segments.sort((a, b) => (a.start || 0) - (b.start || 0));
+
+    const annotatedSegments: { text: string; finding?: Finding; isOriginal?: boolean }[] = [];
+    let lastIndex = 0;
+
+    for (const segment of segments) {
+      if (segment.start > lastIndex) {
+        annotatedSegments.push({
+          text: resultText.substring(lastIndex, segment.start),
+          isOriginal: true
+        });
+      }
+      annotatedSegments.push({
+        text: segment.text,
+        finding: segment.finding
+      });
+      lastIndex = segment.end;
+    }
+
+    if (lastIndex < resultText.length) {
+      annotatedSegments.push({
+        text: resultText.substring(lastIndex),
+        isOriginal: true
+      });
+    }
+
+    return (
+      <p className="text-body leading-relaxed text-ink whitespace-pre-wrap">
+        {annotatedSegments.map((segment, index) => {
+          if (!segment.finding) {
+            return <span key={index}>{segment.text}</span>;
+          }
+
+          const finding = segment.finding;
+          const isSelected = selectedFinding?.id === finding.id;
+          const isApplied = finding.status === "applied";
+
+          return (
+            <span
+              key={index}
+              onClick={() => onSelectFinding(finding)}
+              className={`inline border-b-[2px] transition-colors rounded-[2px] px-0 -mx-[2px] ${
+                getSeverityColor(finding.severity, isApplied)
+              } ${
+                isSelected ? "ring-2 ring-amber/60 ring-offset-1" : ""
+              }`}
+              title={`${finding.category}: ${finding.explanation}`}
+            >
+              {segment.text}
+            </span>
+          );
+        })}
+      </p>
+    );
+  }, [text, findings, selectedFinding, onSelectFinding]);
 
   return (
-    <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col">
-      {/* Barra Superior do Documento com Alternância Visualização / Edição */}
-      <div className="bg-[#faf9f5] border-b border-zinc-200 px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-        <div className="flex items-center gap-2.5">
-          <FileText className="w-4 h-4 text-zinc-600" />
-          <span className="text-xs font-black text-zinc-900">
-            {isEditing ? "Editar Texto do Documento" : "Texto em Análise"}
-          </span>
-          <span className="text-[11px] font-medium text-zinc-500 bg-white border border-zinc-200 px-2 py-0.5 rounded-md">
-            {currentWordCount} palavras
-          </span>
-          {isModifiedFromOriginal && !isEditing && (
-            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-              Alterações aplicadas
-            </span>
-          )}
-        </div>
-
-        {/* Botão de Alternância de Modo */}
+    <div className="bg-paper rounded-card border border-sand overflow-hidden h-full flex flex-col">
+      <div className="bg-sand/40 border-b border-sand px-4 py-3 flex justify-between items-center gap-3">
+        <span className="text-body-sm font-display text-ink">Texto Atual</span>
         <div className="flex items-center gap-2">
           {isEditing ? (
-            <button
-              type="button"
-              onClick={() => {
-                setDraftText(text);
-                setIsEditing(false);
-              }}
-              className="text-xs font-semibold text-zinc-600 hover:text-zinc-900 bg-white border border-zinc-200 hover:bg-zinc-100 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-2xs"
-            >
-              <Eye className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Ver Apontamentos</span>
-            </button>
+            <>
+              {hasChanges && onReanalyze && (
+                <Button
+                  type="button"
+                  onClick={handleSaveAndReanalyze}
+                  disabled={isReanalyzing}
+                  variant="primary"
+                  size="sm"
+                  leftIcon={isReanalyzing ? (
+                    <div className="w-3.5 h-3.5 border-2 border-paper border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  )}
+                >
+                  {isReanalyzing ? "Reanalisando..." : "Salvar e Reanalisar"}
+                </Button>
+              )}
+              {hasChanges && (
+                <Button
+                  type="button"
+                  onClick={handleSave}
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<Save className="w-3.5 h-3.5 text-amber" />}
+                >
+                  Salvar
+                </Button>
+              )}
+              <Button
+                type="button"
+                onClick={handleCancel}
+                variant="ghost"
+                size="sm"
+              >
+                Cancelar
+              </Button>
+            </>
           ) : (
-            <button
+            <Button
               type="button"
-              onClick={() => {
-                setDraftText(text);
-                setIsEditing(true);
-              }}
-              className="text-xs font-bold text-zinc-800 hover:text-black bg-white border border-zinc-300 hover:border-zinc-400 hover:bg-zinc-50 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs"
+              onClick={() => setIsEditing(true)}
+              variant="secondary"
+              size="sm"
             >
-              <Pencil className="w-3.5 h-3.5 text-[#FBB040]" />
-              <span>Editar Texto</span>
-            </button>
+              Editar Texto
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Corpo do Documento */}
-      <div className="p-5 sm:p-6 bg-white min-h-[300px]">
+      <div className="p-4 sm:p-5 flex-grow overflow-y-auto">
         {isEditing ? (
-          <div className="space-y-3">
-            <label htmlFor="document-edit-textarea" className="sr-only">
-              Edição do texto em análise
-            </label>
-            <textarea
-              id="document-edit-textarea"
-              value={draftText}
-              onChange={(e) => setDraftText(e.target.value)}
-              rows={12}
-              className="w-full text-zinc-900 text-base leading-relaxed p-4 bg-[#faf9f5]/50 border-2 border-[#FBB040] rounded-2xl focus:outline-hidden focus:ring-2 focus:ring-[#FBB040] focus:bg-white resize-y font-sans transition-all"
-              placeholder="Edite seu texto livremente aqui para corrigir erros ou reestruturar períodos..."
-              autoFocus
-            />
-            <p className="text-[11px] text-zinc-500">
-              💡 Dica: Você pode reescrever parágrafos inteiros, corrigir pontuações ou dividir frases longas e depois clicar em <strong>&quot;Salvar e Reanalisar&quot;</strong>.
-            </p>
-          </div>
+          <textarea
+            ref={textareaRef}
+            value={editText}
+            onChange={handleTextChange}
+            className="w-full h-full min-h-[200px] text-body text-ink font-mono leading-relaxed bg-transparent border-0 focus:ring-0 focus:outline-hidden resize-none"
+          />
         ) : (
-          <div className="leading-relaxed text-zinc-900 whitespace-pre-wrap font-sans text-base">
-            {renderAnnotatedContent()}
+          <div className="min-h-[100px]">
+            {renderAnnotatedText()}
           </div>
         )}
       </div>
 
-      {/* Rodapé do Documento com Ações Contextuais */}
-      <div className="bg-[#faf9f5] border-t border-zinc-200 px-4 py-3 flex flex-wrap justify-between items-center gap-3">
-        <div className="text-xs text-zinc-500 font-medium">
-          <span>{currentCharCount} caracteres</span>
+      {!isEditing && findings.some(f => f.status === "applied") && (
+        <div className="bg-sand/30 px-4 py-3 border-t border-sand text-caption text-stone flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-amber/40 inline-block"></span>
+          Trechos com fundo âmbar foram simplificados
         </div>
-
-        <div className="flex items-center gap-2">
-          {isEditing ? (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setDraftText(text);
-                  setIsEditing(false);
-                }}
-                className="text-xs text-zinc-600 hover:text-black font-semibold px-3 py-1.5 rounded-xl hover:bg-zinc-200/60 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveTextOnly}
-                disabled={!draftText.trim()}
-                className="text-xs font-bold text-zinc-800 bg-white border border-zinc-300 hover:bg-zinc-100 px-3.5 py-1.5 rounded-xl transition-colors shadow-2xs disabled:opacity-50"
-              >
-                Salvar Texto
-              </button>
-              {onReanalyze && (
-                <button
-                  type="button"
-                  onClick={handleSaveAndReanalyze}
-                  disabled={isReanalyzing || !draftText.trim()}
-                  className="text-xs font-black bg-[#FBB040] hover:bg-[#e59b2b] text-black px-4 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all border border-[#d98a1a] disabled:opacity-50"
-                >
-                  {isReanalyzing ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>Reanalisando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5 text-black" />
-                      <span>Salvar e Reanalisar</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </>
-          ) : (
-            <>
-              {onReanalyze && isModifiedFromOriginal && (
-                <button
-                  type="button"
-                  onClick={() => onReanalyze(text)}
-                  disabled={isReanalyzing}
-                  className="text-xs font-black bg-zinc-900 hover:bg-black text-[#FBB040] px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs transition-all disabled:opacity-50"
-                  title="Executar nova avaliação sobre as alterações que você fez ou aceitou"
-                >
-                  {isReanalyzing ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-[#FBB040] border-t-transparent rounded-full animate-spin" />
-                      <span>Reanalisando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <RotateCcw className="w-3.5 h-3.5 text-[#FBB040]" />
-                      <span>Reanalisar Texto Atualizado</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
-
