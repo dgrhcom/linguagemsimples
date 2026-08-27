@@ -1,33 +1,36 @@
+export type DocumentCategory = "normativo" | "correspondencia" | "administrativo";
+
 export type DocumentType =
-  // Tipos Oficiais Unicamp (Slug direto)
-  | "ata"
-  | "carta"
-  | "certificado"
-  | "comunicado"
+  // Atos Normativos e Decisórios
+  | "portaria"
+  | "resolucao"
+  | "deliberacao"
+  | "instrucao-normativa"
+  | "regimento"
+  | "regulamento"
   | "decisao"
-  | "declaracao"
   | "despacho"
-  | "informacao"
-  | "memorando"
+  | "conceito-atos-normativos"
+  // Correspondência Oficial
   | "oficio"
   | "oficio-circular"
+  | "carta"
+  | "memorando"
+  | "comunicado"
+  | "informacao"
+  // Administrativo / Colegiados / Declarações
+  | "ata"
   | "pauta"
   | "parecer"
   | "relatorio"
-  | "conceito-atos-normativos"
-  | "deliberacao"
-  | "instrucao-normativa"
-  | "portaria"
-  | "regimento"
-  | "regulamento"
-  | "resolucao"
-  // Aliases legados para compatibilidade
+  | "declaracao"
+  | "certificado"
+  // Aliases legados para compatibilidade retroativa
   | "general"
   | "email"
   | "notice"
   | "official-letter"
   | "memo"
-  | "report"
   | "opinion"
   | "declaration"
   | "minutes"
@@ -36,41 +39,77 @@ export type DocumentType =
   | "instruction"
   | "regulation";
 
+export interface DocumentTypeMetadata {
+  type: DocumentType;
+  label: string;
+  category: DocumentCategory;
+  description: string;
+  unicampUrl: string;
+  modelImagePath?: string;
+  modelImagePages?: string[];
+  expectedSections?: string[];
+  competence?: string;
+  defaultMetadata?: Partial<UniversalDocumentMetadata>;
+}
+
 export interface UniversalDocumentMetadata {
+  // Cabeçalho Institucional Geral
   unitName: string;
-  documentNumber?: string;
+  documentNumber: string;
   emailSite: string;
   locationAndDate: string;
   authorName: string;
   authorRole: string;
   customUnitLogo?: string;
   hideUnicampLogo?: boolean;
-  
-  // Campos contextuais adicionais
-  ementa?: string;            // Portaria, Resolução, Deliberação, Instrução Normativa
-  preamble?: string;          // "O Reitor no uso de suas atribuições..."
-  recipientName?: string;     // Ofício, Carta (Nome do destinatário)
-  recipientRole?: string;     // Ofício, Carta (Cargo do destinatário)
-  recipientAddress?: string;  // Ofício, Carta (Endereço / Unidade)
-  subject?: string;           // Assunto (Ofício, Memorando, Despacho, Parecer)
-  vocativo?: string;          // "Senhor Diretor," "Prezado(a),"
-  fecho?: string;             // "Atenciosamente," "Respeitosamente,"
-  meetingNumber?: string;     // Ata, Pauta (ex: "15ª Reunião Ordinária")
-  meetingDate?: string;       // Ata, Pauta
-  meetingPlace?: string;      // Ata, Pauta
-  targetPerson?: string;      // Declaração, Certificado (Nome da pessoa declarada)
-  targetDocument?: string;    // Declaração (CPF / Matrícula / RG)
-}
 
-export interface DocumentTypeMetadata {
-  type: DocumentType;
-  label: string;
-  category: "normativo" | "correspondencia" | "administrativo" | "geral";
-  description: string;
-  expectedSections: string[];
-  mandatoryElements: string[];
-  competenceNote?: string;
-  modelImagePath?: string;
-  unicampUrl?: string;
-  fields?: string[]; // Quais campos específicos devem ser mostrados no Drawer
+  // Atos Normativos & Decisórios (Portaria, Resolução, Deliberação, Instrução Normativa)
+  ementa?: string;
+  preamble?: string;
+  effectiveClause?: string;
+  revocationClause?: string;
+
+  // Correspondência Oficial (Ofício, Ofício Circular, Carta)
+  recipientTitle?: string;
+  recipientName?: string;
+  recipientRole?: string;
+  recipientAddress?: string;
+  subject?: string;
+  vocativo?: string;
+  fecho?: string;
+
+  // Memorando (Tramitação interna)
+  memoPara?: string;
+  memoDe?: string;
+  memoAssunto?: string;
+  memoData?: string;
+
+  // Atos Colegiados & Reuniões (Ata, Pauta)
+  meetingNumber?: string;
+  meetingDate?: string;
+  meetingPlace?: string;
+  meetingPresident?: string;
+  meetingSecretary?: string;
+  membersPresent?: string;
+  membersAbsent?: string;
+  expedienteText?: string;
+  ordemDoDiaText?: string;
+
+  // Processos & Pareceres & Informação (Parecer, Informação, Decisão, Despacho)
+  referenceProcess?: string;
+  interestedParty?: string;
+  relatorioSection?: string;
+  fundamentacaoSection?: string;
+  conclusaoSection?: string;
+
+  // Declaração & Certificado
+  targetPerson?: string;
+  targetDocument?: string;
+  courseName?: string;
+  courseHours?: string;
+  coursePeriod?: string;
+  targetPurpose?: string;
+
+  // Regimento & Regulamento
+  regimentoTitle?: string;
 }

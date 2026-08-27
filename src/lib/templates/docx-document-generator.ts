@@ -12,198 +12,188 @@ import {
   ImageRun
 } from "docx";
 import { DocumentType, UniversalDocumentMetadata } from "@/types/document";
+import documentTypesData from "@/data/document-types/document-types.json";
+import { UNICAMP_LOGO_BASE64 } from "@/data/unicamp-logo-base64";
 
 export type { UniversalDocumentMetadata, UniversalDocumentMetadata as ComunicadoMetadata };
-
 
 /**
  * Converte Data URL (Base64) em Uint8Array para o ImageRun do docx
  */
-export function dataUriToBuffer(dataUri: string): Uint8Array {
-  const base64Str = dataUri.includes(",") ? dataUri.split(",")[1] : dataUri;
-  const binaryStr = typeof window !== "undefined"
-    ? window.atob(base64Str)
-    : Buffer.from(base64Str, "base64").toString("binary");
-  const bytes = new Uint8Array(binaryStr.length);
-  for (let i = 0; i < binaryStr.length; i++) {
-    bytes[i] = binaryStr.charCodeAt(i);
+function dataUrlToUint8Array(dataUrl: string): Uint8Array {
+  const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
   }
   return bytes;
 }
 
 /**
- * Converte qualquer imagem ou SVG em PNG Data URL e calcula suas dimensões proporcionais
+ * Busca o PNG oficial da Unicamp em base64 nativo seguro para client e server
  */
-export async function loadImageAsPngDataUrl(
-  src: string,
-  targetHeight = 56
-): Promise<{ dataUrl: string; width: number; height: number } | null> {
-  if (typeof window === "undefined") {
+function getUnicampLogoBytes(): Uint8Array | null {
+  try {
+    return dataUrlToUint8Array(UNICAMP_LOGO_BASE64);
+  } catch (e) {
     return null;
   }
-  return new Promise((resolve) => {
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      const naturalW = img.naturalWidth || 240;
-      const naturalH = img.naturalHeight || 270;
-      const scale = targetHeight / naturalH;
-      const targetWidth = Math.max(20, Math.round(naturalW * scale));
-
-      const canvas = document.createElement("canvas");
-      canvas.width = targetWidth * 2; // Alta densidade
-      canvas.height = targetHeight * 2;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        return resolve(null);
-      }
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(img, 0, 0, targetWidth * 2, targetHeight * 2);
-      const dataUrl = canvas.toDataURL("image/png");
-      resolve({ dataUrl, width: targetWidth, height: targetHeight });
-    };
-    img.onerror = () => {
-      resolve(null);
-    };
-    img.src = src;
-  });
 }
 
+
 /**
- * Gerador Universal de DOCX para todos os tipos de documentos da Unicamp
+ * Gera documento Word (.DOCX) profissional nos padrões rigorosos da Unicamp
  */
 export async function generateDocumentDocx(
-  docType: DocumentType,
+  docType: DocumentType = "comunicado",
   text: string,
   metadata: UniversalDocumentMetadata
 ): Promise<Blob> {
-  const paragraphs = text
-    .split(/\n\s*\n|\n/)
-    .map(p => p.trim())
-    .filter(Boolean);
+  // Margens Oficiais da Unicamp (em DXA: 1 cm = 567 dxa):
+  // Superior: 1,5 cm (850 dxa), Inferior: 1,5 cm (850 dxa)
+  // Esquerda: 2,5 cm (1417 dxa), Direita: 2,0 cm (1134 dxa)
+  // Largura útil total da folha A4 (11906 - 1417 - 1134 = 9355 dxa)
+  const PAGE_WIDTH_DXA = 11906;
+  const MARGIN_TOP = 850;
+  const MARGIN_BOTTOM = 850;
+  const MARGIN_LEFT = 1417;
+  const MARGIN_RIGHT = 1134;
+  const CONTENT_WIDTH_DXA = PAGE_WIDTH_DXA - MARGIN_LEFT - MARGIN_RIGHT; // 9355 dxa
 
+  const LOGO_COL_WIDTH = 4200;
+  const TEXT_COL_WIDTH = CONTENT_WIDTH_DXA - LOGO_COL_WIDTH; // 5155 dxa
+
+  const isNormative = [
+    "portaria", "resolucao", "deliberacao", "instrucao-normativa",
+    "ordinance", "resolution", "instruction", "regulation", "conceito-atos-normativos"
+  ].includes(docType);
+
+  const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
+  const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);
+  const isCarta = ["carta"].includes(docType);
+  const isMemo = ["memorando", "memo"].includes(docType);
+  const isMinutes = ["ata", "minutes"].includes(docType);
+  const isPauta = ["pauta"].includes(docType);
+  const isParecer = ["parecer", "opinion"].includes(docType);
+  const isDecisaoOuDespacho = ["decisao", "despacho"].includes(docType);
+  const isInformacao = ["informacao"].includes(docType);
+  const isDeclaracao = ["declaracao", "declaration"].includes(docType);
+  const isCertificado = ["certificado"].includes(docType);
+
+  const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
+
+  // 1. Preparação dos Logotipos do Cabeçalho
   const logoRuns: ImageRun[] = [];
 
-  // 1. Logotipo oficial da Unicamp (a menos que o usuário tenha marcado para ocultar)
+
+  // Logotipo Unicamp
   if (!metadata.hideUnicampLogo) {
-    try {
-      const unicampPng = await loadImageAsPngDataUrl("/images/logo-unicamp.svg", 54);
-      if (unicampPng) {
-        const unicampBytes = dataUriToBuffer(unicampPng.dataUrl);
+    const defaultLogoBytes = getUnicampLogoBytes();
+    if (defaultLogoBytes) {
+      try {
         logoRuns.push(
           new ImageRun({
-            data: unicampBytes,
-            transformation: {
-              width: unicampPng.width,
-              height: 54
-            },
+            data: defaultLogoBytes,
+            transformation: { width: 130, height: 50 },
             type: "png"
           })
         );
-      }
-    } catch (e) {
-      console.warn("Erro ao processar logotipo da Unicamp para DOCX:", e);
+      } catch (err) {}
     }
   }
 
-  // 2. Logotipo da Unidade (mesma altura que o da Unicamp, largura proporcional irrestrita)
-  if (metadata.customUnitLogo && metadata.customUnitLogo.startsWith("data:")) {
+  // Logotipo Customizado da Unidade
+  if (metadata.customUnitLogo) {
     try {
-      const unitPng = await loadImageAsPngDataUrl(metadata.customUnitLogo, 54);
-      if (unitPng) {
-        const unitBytes = dataUriToBuffer(unitPng.dataUrl);
-        logoRuns.push(
-          new ImageRun({
-            data: unitBytes,
-            transformation: {
-              width: unitPng.width,
-              height: 54
-            },
-            type: "png"
-          })
-        );
-      }
-    } catch (e) {
-      console.warn("Erro ao processar logotipo da unidade para DOCX:", e);
-    }
+      const customBytes = dataUrlToUint8Array(metadata.customUnitLogo);
+      logoRuns.push(
+        new ImageRun({
+          data: customBytes,
+          transformation: { width: 120, height: 48 },
+          type: "png"
+        })
+      );
+    } catch (err) {}
   }
 
-  const headerLeftChildren = logoRuns.length > 0
-    ? [new Paragraph({ spacing: { before: 0, after: 0 }, children: logoRuns })]
-    : [new Paragraph({ children: [new TextRun({ text: "UNICAMP", bold: true, size: 22, font: "Arial" })] })];
+  // 2. Construção da Tabela de Cabeçalho Institucional Oficial
+  let headerTable: Table | null = null;
 
-  // Larguras exatas em DXA para A4
-  const leftColWidth = 4200; // ~7,4 cm
-  const rightColWidth = 5155; // ~9,1 cm
-  const totalTableWidth = leftColWidth + rightColWidth; // 9355 dxa
-
-  const isNormative = ["portaria", "resolucao", "deliberacao", "instrucao-normativa", "regimento", "regulamento", "ordinance", "resolution", "instruction", "regulation"].includes(docType);
-  const isLetter = ["oficio", "oficio-circular", "carta", "official-letter"].includes(docType);
-  const isMemo = ["memorando", "memo"].includes(docType);
-  const isMinutes = ["ata", "pauta", "minutes"].includes(docType);
-  const isDeclaration = ["declaracao", "certificado", "declaration"].includes(docType);
-
-  const docChildren: (Paragraph | Table)[] = [];
-
-  // 1. Cabeçalho Institucional
-  docChildren.push(
-    new Table({
-      columnWidths: [leftColWidth, rightColWidth],
-      width: {
-        size: totalTableWidth,
-        type: WidthType.DXA
-      },
+  if (!isCertificado) {
+    headerTable = new Table({
+      width: { size: CONTENT_WIDTH_DXA, type: WidthType.DXA },
       borders: {
         top: { style: BorderStyle.NONE },
-        bottom: { style: BorderStyle.SINGLE, size: 6, color: "888888" },
         left: { style: BorderStyle.NONE },
         right: { style: BorderStyle.NONE },
+        bottom: { style: BorderStyle.SINGLE, size: 8, color: "000000" },
         insideHorizontal: { style: BorderStyle.NONE },
         insideVertical: { style: BorderStyle.NONE }
       },
       rows: [
         new TableRow({
           children: [
+            // Coluna Esquerda: Logotipos
             new TableCell({
-              width: { size: leftColWidth, type: WidthType.DXA },
-              children: headerLeftChildren
+              width: { size: LOGO_COL_WIDTH, type: WidthType.DXA },
+              borders: {
+                top: { style: BorderStyle.NONE },
+                left: { style: BorderStyle.NONE },
+                right: { style: BorderStyle.NONE },
+                bottom: { style: BorderStyle.NONE }
+              },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  children: logoRuns.length > 0 ? logoRuns : [new TextRun({ text: "UNICAMP", bold: true, size: 24, font: "Arial" })]
+                })
+              ]
             }),
+            // Coluna Direita: Texto da Unidade
             new TableCell({
-              width: { size: rightColWidth, type: WidthType.DXA },
+              width: { size: TEXT_COL_WIDTH, type: WidthType.DXA },
+              borders: {
+                top: { style: BorderStyle.NONE },
+                left: { style: BorderStyle.NONE },
+                right: { style: BorderStyle.NONE },
+                bottom: { style: BorderStyle.NONE }
+              },
               children: [
                 new Paragraph({
                   alignment: AlignmentType.RIGHT,
-                  spacing: { line: 240, before: 0, after: 30 },
-                  children: [
-                    new TextRun({
-                      text: "Universidade Estadual de Campinas",
-                      bold: true,
-                      size: 20, // 10pt
-                      font: "Arial"
-                    })
-                  ]
-                }),
-                new Paragraph({
-                  alignment: AlignmentType.RIGHT,
-                  spacing: { line: 240, before: 0, after: 30 },
+                  spacing: { line: 220, after: 30 },
                   children: [
                     new TextRun({
                       text: metadata.unitName || "Diretoria Geral de Recursos Humanos",
-                      size: 18, // 9pt
-                      font: "Arial"
+                      bold: true,
+                      size: 20, // 10pt
+                      font: "Arial",
+                      color: "111111"
                     })
                   ]
                 }),
                 new Paragraph({
                   alignment: AlignmentType.RIGHT,
-                  spacing: { line: 240, before: 0, after: 0 },
+                  spacing: { line: 200, after: 20 },
                   children: [
                     new TextRun({
                       text: metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br",
-                      size: 16, // 8pt
-                      color: "555555",
-                      font: "Arial"
+                      size: 17, // 8.5pt
+                      font: "Arial",
+                      color: "555555"
+                    })
+                  ]
+                }),
+                new Paragraph({
+                  alignment: AlignmentType.RIGHT,
+                  spacing: { line: 200 },
+                  children: [
+                    new TextRun({
+                      text: "Universidade Estadual de Campinas",
+                      size: 17,
+                      font: "Arial",
+                      color: "777777"
                     })
                   ]
                 })
@@ -212,51 +202,54 @@ export async function generateDocumentDocx(
           ]
         })
       ]
-    })
-  );
+    });
+  }
 
-  docChildren.push(new Paragraph({ spacing: { before: 360, after: 360 } }));
+  // 3. Montagem dos Filhos do Documento conforme o Tipo
+  const docChildren: (Paragraph | Table)[] = [];
 
-  // 2. Título / Identificação do Documento conforme o Tipo
+  if (headerTable) {
+    docChildren.push(headerTable);
+    docChildren.push(new Paragraph({ spacing: { before: 240 } }));
+  }
+
+  const rawParagraphs = text.split(/\n+/).map(p => p.trim()).filter(Boolean);
+
+  // A. ATOS NORMATIVOS (Portaria, Resolução, Deliberação, Instrução Normativa)
   if (isNormative) {
-    const typeTitle = docType === "portaria" || docType === "ordinance"
-      ? "PORTARIA"
-      : docType === "resolucao" || docType === "resolution"
-      ? "RESOLUÇÃO"
-      : docType === "deliberacao"
-      ? "DELIBERAÇÃO"
-      : docType === "instrucao-normativa" || docType === "instruction"
-      ? "INSTRUÇÃO NORMATIVA"
-      : docType === "regimento"
-      ? "REGIMENTO"
-      : docType === "regulamento" || docType === "regulation"
-      ? "REGULAMENTO"
-      : "ATO NORMATIVO";
+    let epigraph = `PORTARIA ${metadata.unitName?.includes("Reitor") ? "GR" : "DGRH"} Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`;
+    if (docType === "resolucao") {
+      epigraph = `RESOLUÇÃO GR-Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`;
+    } else if (docType === "deliberacao") {
+      epigraph = `DELIBERAÇÃO CONSU-A-Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`;
+    } else if (docType === "instrucao-normativa") {
+      epigraph = `INSTRUÇÃO NORMATIVA DGRH Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`;
+    }
 
+    // Epígrafe Centralizada
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        spacing: { before: 200, after: 200 },
+        spacing: { before: 240, after: 240 },
         children: [
           new TextRun({
-            text: metadata.documentNumber ? `${typeTitle} Nº ${metadata.documentNumber}` : typeTitle,
+            text: epigraph.toUpperCase(),
             bold: true,
-            size: 24,
+            size: 24, // 12pt
             font: "Arial"
           })
         ]
       })
     );
 
-    // Ementa à direita
+    // Ementa Recuada à Direita (Itálico, 10pt)
     if (metadata.ementa) {
       docChildren.push(
         new Paragraph({
           alignment: AlignmentType.BOTH,
-          indent: { left: 4500 }, // ~8 cm à direita
+          indent: { left: 4200 }, // ~7.5 cm de recuo à esquerda
           spacing: { line: 240, before: 180, after: 360 },
           children: [
-
             new TextRun({
               text: metadata.ementa,
               italics: true,
@@ -273,7 +266,7 @@ export async function generateDocumentDocx(
       docChildren.push(
         new Paragraph({
           alignment: AlignmentType.BOTH,
-          indent: { firstLine: 708 },
+          indent: { firstLine: 708 }, // 1,25 cm
           spacing: { line: 360, before: 180, after: 240 },
           children: [
             new TextRun({
@@ -285,69 +278,121 @@ export async function generateDocumentDocx(
         })
       );
     }
-  } else if (isLetter) {
-    // Ofício / Carta
-    const letterTitle = docType === "oficio-circular"
-      ? "OFÍCIO CIRCULAR"
-      : docType === "carta"
-      ? "CARTA"
-      : "OFÍCIO";
 
-    docChildren.push(
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        spacing: { before: 100, after: 200 },
-        children: [
-          new TextRun({
-            text: metadata.documentNumber ? `${letterTitle} Nº ${metadata.documentNumber}` : letterTitle,
-            bold: true,
-            size: 24,
-            font: "Arial"
-          })
-        ]
-      })
-    );
-
-    // Destinatário
-    if (metadata.recipientName) {
+    // Artigos
+    for (const p of rawParagraphs) {
       docChildren.push(
         new Paragraph({
-          alignment: AlignmentType.LEFT,
-          spacing: { line: 240, before: 100, after: 40 },
+          alignment: AlignmentType.BOTH,
+          indent: { firstLine: 708 },
+          spacing: { line: 360, after: 180 },
           children: [
-            new TextRun({ text: "A Sua Senhoria o(a) Senhor(a)", size: 22, font: "Arial" })
-          ]
-        }),
-        new Paragraph({
-          alignment: AlignmentType.LEFT,
-          spacing: { line: 240, before: 0, after: 40 },
-          children: [
-            new TextRun({ text: metadata.recipientName, bold: true, size: 22, font: "Arial" })
-          ]
-        }),
-        new Paragraph({
-          alignment: AlignmentType.LEFT,
-          spacing: { line: 240, before: 0, after: 40 },
-          children: [
-            new TextRun({ text: metadata.recipientRole || "", size: 20, font: "Arial" })
-          ]
-        }),
-        new Paragraph({
-          alignment: AlignmentType.LEFT,
-          spacing: { line: 240, before: 0, after: 200 },
-          children: [
-            new TextRun({ text: metadata.recipientAddress || "", size: 20, color: "444444", font: "Arial" })
+            new TextRun({
+              text: p,
+              size: 24,
+              font: "Arial"
+            })
           ]
         })
       );
     }
 
-    // Assunto
+    // Cláusula de Vigência
+    if (metadata.effectiveClause) {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.BOTH,
+          indent: { firstLine: 708 },
+          spacing: { line: 360, before: 240, after: 360 },
+          children: [
+            new TextRun({
+              text: metadata.effectiveClause,
+              size: 24,
+              font: "Arial"
+            })
+          ]
+        })
+      );
+    }
+  }
+
+  // B. OFÍCIO E OFÍCIO CIRCULAR
+  else if (isLetter) {
+    // Linha 1: Identificação à esquerda e Local/Data à direita (Tabela invisível de 2 colunas)
+    docChildren.push(
+      new Table({
+        width: { size: CONTENT_WIDTH_DXA, type: WidthType.DXA },
+        borders: {
+          top: { style: BorderStyle.NONE },
+          left: { style: BorderStyle.NONE },
+          right: { style: BorderStyle.NONE },
+          bottom: { style: BorderStyle.NONE },
+          insideHorizontal: { style: BorderStyle.NONE },
+          insideVertical: { style: BorderStyle.NONE }
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: 5000, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    alignment: AlignmentType.LEFT,
+                    children: [
+                      new TextRun({
+                        text: `${docType === "oficio-circular" ? "Ofício Circular" : "Ofício"} nº ${metadata.documentNumber || "105/2026"}/DGRH`,
+                        bold: true,
+                        size: 24,
+                        font: "Arial"
+                      })
+                    ]
+                  })
+                ]
+              }),
+              new TableCell({
+                width: { size: CONTENT_WIDTH_DXA - 5000, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    alignment: AlignmentType.RIGHT,
+                    children: [
+                      new TextRun({
+                        text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
+                        size: 24,
+                        font: "Arial"
+                      })
+                    ]
+                  })
+                ]
+              })
+            ]
+          })
+        ]
+      })
+    );
+
+    // Bloco de Destinatário
+    const recipientChildren: TextRun[] = [];
+    if (metadata.recipientTitle) {
+      recipientChildren.push(new TextRun({ text: metadata.recipientTitle + "\n", size: 24, font: "Arial" }));
+    }
+    recipientChildren.push(new TextRun({ text: (metadata.recipientName || "Nome do Destinatário") + "\n", bold: true, size: 24, font: "Arial" }));
+    recipientChildren.push(new TextRun({ text: (metadata.recipientRole || "Cargo / Função") + "\n", size: 24, font: "Arial" }));
+    if (metadata.recipientAddress) {
+      recipientChildren.push(new TextRun({ text: metadata.recipientAddress, size: 22, font: "Arial", color: "555555" }));
+    }
+
+    docChildren.push(
+      new Paragraph({
+        spacing: { before: 240, after: 240 },
+        children: recipientChildren
+      })
+    );
+
+    // Assunto em Destaque
     if (metadata.subject) {
       docChildren.push(
         new Paragraph({
-          alignment: AlignmentType.LEFT,
-          spacing: { before: 100, after: 200 },
+          spacing: { before: 120, after: 240 },
           children: [
             new TextRun({ text: "Assunto: ", bold: true, size: 24, font: "Arial" }),
             new TextRun({ text: metadata.subject, size: 24, font: "Arial" })
@@ -357,102 +402,329 @@ export async function generateDocumentDocx(
     }
 
     // Vocativo
-    const voc = metadata.vocativo || "Senhor(a) Diretor(a),";
     docChildren.push(
       new Paragraph({
-        alignment: AlignmentType.LEFT,
+        spacing: { before: 180, after: 240 },
+        children: [
+          new TextRun({
+            text: metadata.vocativo || "Senhor(a) Diretor(a),",
+            bold: true,
+            size: 24,
+            font: "Arial"
+          })
+        ]
+      })
+    );
+
+    // Corpo
+    for (const p of rawParagraphs) {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.BOTH,
+          indent: { firstLine: 708 },
+          spacing: { line: 360, after: 200 },
+          children: [new TextRun({ text: p, size: 24, font: "Arial" })]
+        })
+      );
+    }
+
+    // Fecho
+    docChildren.push(
+      new Paragraph({
         indent: { firstLine: 708 },
-        spacing: { before: 150, after: 250 },
+        spacing: { before: 240, after: 360 },
+        children: [new TextRun({ text: metadata.fecho || "Atenciosamente,", size: 24, font: "Arial" })]
+      })
+    );
+  }
+
+  // C. MEMORANDO (Com tabela interna formatada)
+  else if (isMemo) {
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 180, after: 240 },
         children: [
-          new TextRun({ text: voc, size: 24, font: "Arial" })
+          new TextRun({
+            text: `MEMORANDO Nº ${metadata.documentNumber || "42/2026"} - DGRH`,
+            bold: true,
+            size: 26,
+            font: "Arial"
+          })
         ]
       })
     );
-  } else if (isMemo) {
-    // Memorando
+
+    // Tabela de Tramitação
+    docChildren.push(
+      new Table({
+        width: { size: CONTENT_WIDTH_DXA, type: WidthType.DXA },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          left: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          right: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          bottom: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: "E5E5E5" },
+          insideVertical: { style: BorderStyle.SINGLE, size: 4, color: "E5E5E5" }
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: 4677, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: "PARA: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: metadata.memoPara || "Diretoria de Administração", size: 20, font: "Arial" })
+                    ]
+                  })
+                ]
+              }),
+              new TableCell({
+                width: { size: 4678, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: "DE: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: metadata.memoDe || "Divisão de Desenvolvimento de Pessoas", size: 20, font: "Arial" })
+                    ]
+                  })
+                ]
+              })
+            ]
+          }),
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: 6000, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: "ASSUNTO: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: metadata.memoAssunto || metadata.subject || "Encaminhamento de relatório", size: 20, font: "Arial" })
+                    ]
+                  })
+                ]
+              }),
+              new TableCell({
+                width: { size: 3355, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: "DATA: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: metadata.memoData || "27 de agosto de 2026", size: 20, font: "Arial" })
+                    ]
+                  })
+                ]
+              })
+            ]
+          })
+        ]
+      })
+    );
+
+    docChildren.push(new Paragraph({ spacing: { before: 240 } }));
+
+    // Corpo do Memorando
+    for (const p of rawParagraphs) {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.BOTH,
+          indent: { firstLine: 708 },
+          spacing: { line: 360, after: 200 },
+          children: [new TextRun({ text: p, size: 24, font: "Arial" })]
+        })
+      );
+    }
+  }
+
+  // D. ATA DE REUNIÃO
+  else if (isMinutes) {
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        spacing: { before: 100, after: 200 },
+        spacing: { before: 180, after: 240 },
         children: [
           new TextRun({
-            text: metadata.documentNumber ? `MEMORANDO Nº ${metadata.documentNumber}` : "MEMORANDO",
+            text: `ATA DA ${metadata.meetingNumber?.toUpperCase() || "15ª REUNIÃO ORDINÁRIA DA COMISSÃO"}`,
             bold: true,
             size: 24,
             font: "Arial"
           })
         ]
-      }),
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        spacing: { line: 240, before: 50, after: 50 },
-        children: [
-          new TextRun({ text: "PARA: ", bold: true, size: 22, font: "Arial" }),
-          new TextRun({ text: metadata.recipientName || "Setor de Destino", size: 22, font: "Arial" })
-        ]
-      }),
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        spacing: { line: 240, before: 50, after: 50 },
-        children: [
-          new TextRun({ text: "DE: ", bold: true, size: 22, font: "Arial" }),
-          new TextRun({ text: metadata.authorName || "Coordenação", size: 22, font: "Arial" })
-        ]
-      }),
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        spacing: { line: 240, before: 50, after: 200 },
-        children: [
-          new TextRun({ text: "ASSUNTO: ", bold: true, size: 22, font: "Arial" }),
-          new TextRun({ text: metadata.subject || "Comunicação Interna", size: 22, font: "Arial" })
+      })
+    );
+
+    // Bloco de Dados da Sessão
+    docChildren.push(
+      new Table({
+        width: { size: CONTENT_WIDTH_DXA, type: WidthType.DXA },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          left: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          right: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          bottom: { style: BorderStyle.SINGLE, size: 6, color: "CCCCCC" },
+          insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: "EEEEEE" },
+          insideVertical: { style: BorderStyle.NONE }
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: CONTENT_WIDTH_DXA, type: WidthType.DXA },
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: "Data/Horário: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: (metadata.meetingDate || "27 de agosto de 2026, às 14h00") + "  |  ", size: 20, font: "Arial" }),
+                      new TextRun({ text: "Local: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: metadata.meetingPlace || "Sala de Reuniões da DGRH / Virtual", size: 20, font: "Arial" })
+                    ]
+                  }),
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: "Presidência: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: (metadata.meetingPresident || "Profa. Dra. Coordenadora Geral") + "  |  ", size: 20, font: "Arial" }),
+                      new TextRun({ text: "Secretaria: ", bold: true, size: 20, font: "Arial" }),
+                      new TextRun({ text: metadata.meetingSecretary || "Secretário(a) da Comissão", size: 20, font: "Arial" })
+                    ]
+                  }),
+                  ...(metadata.membersPresent ? [
+                    new Paragraph({
+                      children: [
+                        new TextRun({ text: "Membros Presentes: ", bold: true, size: 20, font: "Arial" }),
+                        new TextRun({ text: metadata.membersPresent, size: 20, font: "Arial" })
+                      ]
+                    })
+                  ] : [])
+                ]
+              })
+            ]
+          })
         ]
       })
     );
-  } else if (isMinutes) {
-    // Ata / Pauta
-    const minTitle = docType === "pauta" ? "PAUTA" : "ATA";
+
+    docChildren.push(new Paragraph({ spacing: { before: 240 } }));
+
+    // Corpo da Ata
+    for (const p of rawParagraphs) {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.BOTH,
+          indent: { firstLine: 708 },
+          spacing: { line: 360, after: 200 },
+          children: [new TextRun({ text: p, size: 24, font: "Arial" })]
+        })
+      );
+    }
+  }
+
+  // E. CERTIFICADO
+  else if (isCertificado) {
+    if (logoRuns.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 400, after: 240 },
+          children: logoRuns
+        })
+      );
+    }
+
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        spacing: { before: 100, after: 200 },
+        spacing: { before: 120, after: 120 },
         children: [
           new TextRun({
-            text: metadata.meetingNumber ? `${minTitle} - ${metadata.meetingNumber}` : minTitle,
+            text: "UNIVERSIDADE ESTADUAL DE CAMPINAS",
             bold: true,
-            size: 24,
+            size: 26,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 240, after: 360 },
+        children: [
+          new TextRun({
+            text: "CERTIFICADO",
+            bold: true,
+            size: 44, // 22pt
+            font: "Arial",
+            color: "B36B00"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { line: 360, before: 240, after: 240 },
+        children: [
+          new TextRun({ text: "Certificamos que ", size: 28, font: "Arial" }),
+          new TextRun({ text: metadata.targetPerson || "Nome Completo do(a) Participante", bold: true, size: 30, font: "Arial" }),
+          new TextRun({ text: `, portador(a) do documento ${metadata.targetDocument || "CPF nº 000.000.000-00"}, concluiu com êxito as atividades de `, size: 28, font: "Arial" }),
+          new TextRun({ text: metadata.courseName || "Capacitação em Redação Oficial e Linguagem Simples", bold: true, size: 28, font: "Arial" }),
+          new TextRun({ text: `, realizado no período de ${metadata.coursePeriod || "10 a 25 de agosto de 2026"}, com carga horária total de `, size: 28, font: "Arial" }),
+          new TextRun({ text: metadata.courseHours || "20 horas", bold: true, size: 28, font: "Arial" }),
+          new TextRun({ text: ".", size: 28, font: "Arial" })
+        ]
+      })
+    );
+  }
+
+  // F. DEMAIS MODELOS (Comunicado, Parecer, Relatório, Declaração, etc.)
+  else {
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 180, after: 180 },
+        children: [
+          new TextRun({
+            text: `${currentTypeInfo.label.toUpperCase()} DGRH Nº ${metadata.documentNumber || "01/2026"}`,
+            bold: true,
+            size: 26,
             font: "Arial"
           })
         ]
       })
     );
-  } else if (isDeclaration) {
-    const decTitle = docType === "certificado" ? "CERTIFICADO" : "DECLARAÇÃO";
+
+    if (metadata.subject) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 60, after: 240 },
+          children: [
+            new TextRun({ text: "Assunto: ", bold: true, size: 24, font: "Arial" }),
+            new TextRun({ text: metadata.subject, size: 24, font: "Arial" })
+          ]
+        })
+      );
+    }
+
+    for (const p of rawParagraphs) {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.BOTH,
+          indent: { firstLine: 708 },
+          spacing: { line: 360, after: 200 },
+          children: [new TextRun({ text: p, size: 24, font: "Arial" })]
+        })
+      );
+    }
+  }
+
+  // 4. Assinatura e Rodapé
+  if (!isLetter && !isCarta && !isCertificado) {
     docChildren.push(
       new Paragraph({
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 200, after: 400 },
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 360, after: 400 },
         children: [
           new TextRun({
-            text: decTitle,
-            bold: true,
-            size: 28, // 14pt
-            font: "Arial"
-          })
-        ]
-      })
-    );
-  } else {
-    // Comunicado / Geral
-    docChildren.push(
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        spacing: { before: 200, after: 400 },
-        children: [
-          new TextRun({
-            text: metadata.documentNumber
-              ? `COMUNICADO Nº ${metadata.documentNumber}`
-              : "COMUNICADO",
-            bold: true,
+            text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
             size: 24,
             font: "Arial"
           })
@@ -461,77 +733,25 @@ export async function generateDocumentDocx(
     );
   }
 
-  // 3. Corpo do Texto (Parágrafos com recuo de 1,25 cm e entrelinha 1,5)
-  paragraphs.forEach(p => {
-    const isBullet = p.startsWith("-") || p.startsWith("•") || p.startsWith("*") || /^\d+[\.\)]/.test(p);
-    docChildren.push(
-      new Paragraph({
-        alignment: AlignmentType.BOTH,
-        indent: isBullet ? { left: 708 } : { firstLine: 708 },
-        spacing: { line: 360, before: 120, after: 120 },
-        children: [
-          new TextRun({
-            text: p,
-            size: 24, // 12pt
-            font: "Arial"
-          })
-        ]
-      })
-    );
-  });
-
-  // 4. Fecho de Correspondência (para Ofício / Carta)
-  if (isLetter) {
-    docChildren.push(
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        indent: { firstLine: 708 },
-        spacing: { before: 240, after: 180 },
-        children: [
-          new TextRun({
-            text: metadata.fecho || "Atenciosamente,",
-            size: 24,
-            font: "Arial"
-          })
-        ]
-      })
-    );
-  }
-
-  // Espaçamento antes da data
-  docChildren.push(new Paragraph({ spacing: { before: 240, after: 120 } }));
-
-  // 5. Local e Data
-  if (metadata.locationAndDate) {
-    docChildren.push(
-      new Paragraph({
-        alignment: AlignmentType.LEFT,
-        indent: { firstLine: 708 },
-        spacing: { line: 240, before: 120, after: 360 },
-        children: [
-          new TextRun({
-            text: metadata.locationAndDate.endsWith(".")
-              ? metadata.locationAndDate
-              : `${metadata.locationAndDate}.`,
-            size: 24,
-            font: "Arial"
-          })
-        ]
-      })
-    );
-  }
-
-  // 4 linhas em branco antes da assinatura
-  docChildren.push(new Paragraph({ spacing: { line: 240, before: 480, after: 480 } }));
-
-  // 6. Assinatura Centralizada
+  // Bloco de Assinatura Centralizado
   docChildren.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
-      spacing: { line: 240, before: 0, after: 40 },
+      spacing: { before: 400, after: 60 },
       children: [
         new TextRun({
-          text: metadata.authorName || "Nome da Autora ou Autor",
+          text: "____________________________________________",
+          color: "666666",
+          size: 20
+        })
+      ]
+    }),
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      spacing: { line: 240, after: 40 },
+      children: [
+        new TextRun({
+          text: metadata.authorName || "Coordenação Geral da DGRH",
           bold: true,
           size: 24,
           font: "Arial"
@@ -540,44 +760,29 @@ export async function generateDocumentDocx(
     }),
     new Paragraph({
       alignment: AlignmentType.CENTER,
-      spacing: { line: 240, before: 0, after: 0 },
+      spacing: { line: 220 },
       children: [
         new TextRun({
-          text: metadata.authorRole || "Cargo ou Função",
-          size: 24,
-          color: "333333",
-          font: "Arial"
+          text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",
+          size: 20,
+          font: "Arial",
+          color: "555555"
         })
       ]
     })
   );
 
+  // 5. Instanciação e Empacotamento do Documento DOCX
   const doc = new Document({
-    styles: {
-      default: {
-        document: {
-          run: {
-            font: "Arial",
-            size: 24,
-            color: "000000"
-          },
-          paragraph: {
-            spacing: {
-              line: 360
-            }
-          }
-        }
-      }
-    },
     sections: [
       {
         properties: {
           page: {
             margin: {
-              top: 850, // ~1,5 cm
-              bottom: 850, // ~1,5 cm
-              left: 1417, // ~2,5 cm
-              right: 1134 // ~2,0 cm
+              top: MARGIN_TOP,
+              bottom: MARGIN_BOTTOM,
+              left: MARGIN_LEFT,
+              right: MARGIN_RIGHT
             }
           }
         },
@@ -587,14 +792,4 @@ export async function generateDocumentDocx(
   });
 
   return await Packer.toBlob(doc);
-}
-
-/**
- * Backward compatibility alias para generateComunicadoDocx
- */
-export async function generateComunicadoDocx(
-  text: string,
-  metadata: UniversalDocumentMetadata
-): Promise<Blob> {
-  return generateDocumentDocx("comunicado", text, metadata);
 }

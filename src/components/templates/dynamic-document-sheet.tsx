@@ -1,406 +1,561 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { DocumentType, UniversalDocumentMetadata } from "@/types/document";
+import documentTypesData from "@/data/document-types/document-types.json";
 
 interface DynamicDocumentSheetProps {
-  docType: DocumentType;
   text: string;
   metadata: UniversalDocumentMetadata;
-  scale?: number;
-  className?: string;
+  docType?: DocumentType;
 }
 
 export function DynamicDocumentSheet({
-  docType,
   text,
   metadata,
-  scale = 1,
-  className = ""
+  docType = "comunicado"
 }: DynamicDocumentSheetProps) {
+  const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
+
+  // Helper para dividir o texto em parágrafos limpos
   const paragraphs = text
-    .split(/\n\s*\n|\n/)
+    .split(/\n+/)
     .map(p => p.trim())
     .filter(Boolean);
 
-  const formattedDate = metadata.locationAndDate.endsWith(".")
-    ? metadata.locationAndDate
-    : `${metadata.locationAndDate}.`;
-
+  // Categorização do tipo de documento
   const isNormative = [
-    "portaria",
-    "resolucao",
-    "deliberacao",
-    "instrucao-normativa",
-    "regimento",
-    "regulamento",
-    "ordinance",
-    "resolution",
-    "instruction",
-    "regulation"
+    "portaria", "resolucao", "deliberacao", "instrucao-normativa",
+    "ordinance", "resolution", "instruction", "regulation"
   ].includes(docType);
 
-  const isLetter = ["oficio", "oficio-circular", "carta", "official-letter"].includes(docType);
+  const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
+  const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);
+  const isCarta = ["carta"].includes(docType);
   const isMemo = ["memorando", "memo"].includes(docType);
-  const isMinutes = ["ata", "pauta", "minutes"].includes(docType);
-  const isDeclaration = ["declaracao", "certificado", "declaration"].includes(docType);
-
-  // Helper para obter o título principal do documento
-  const getDocumentHeading = () => {
-    switch (docType) {
-      case "portaria":
-      case "ordinance":
-        return metadata.documentNumber ? `PORTARIA GR Nº ${metadata.documentNumber}` : "PORTARIA";
-      case "resolucao":
-      case "resolution":
-        return metadata.documentNumber ? `RESOLUÇÃO GR Nº ${metadata.documentNumber}` : "RESOLUÇÃO";
-      case "deliberacao":
-        return metadata.documentNumber ? `DELIBERAÇÃO Nº ${metadata.documentNumber}` : "DELIBERAÇÃO";
-      case "instrucao-normativa":
-      case "instruction":
-        return metadata.documentNumber ? `INSTRUÇÃO NORMATIVA Nº ${metadata.documentNumber}` : "INSTRUÇÃO NORMATIVA";
-      case "regimento":
-        return metadata.documentNumber ? `REGIMENTO INTERNO Nº ${metadata.documentNumber}` : "REGIMENTO INTERNO";
-      case "regulamento":
-      case "regulation":
-        return metadata.documentNumber ? `REGULAMENTO Nº ${metadata.documentNumber}` : "REGULAMENTO";
-      case "decisao":
-        return metadata.documentNumber ? `DECISÃO Nº ${metadata.documentNumber}` : "DECISÃO";
-      case "despacho":
-        return metadata.documentNumber ? `DESPACHO Nº ${metadata.documentNumber}` : "DESPACHO";
-      case "oficio":
-      case "official-letter":
-        return metadata.documentNumber ? `Ofício nº ${metadata.documentNumber}` : "Ofício";
-      case "oficio-circular":
-        return metadata.documentNumber ? `Ofício Circular nº ${metadata.documentNumber}` : "Ofício Circular";
-      case "carta":
-        return metadata.documentNumber ? `Carta nº ${metadata.documentNumber}` : "Carta";
-      case "memorando":
-      case "memo":
-        return metadata.documentNumber ? `MEMORANDO Nº ${metadata.documentNumber}` : "MEMORANDO";
-      case "pauta":
-        return metadata.meetingNumber ? `PAUTA - ${metadata.meetingNumber}` : "PAUTA DA REUNIÃO";
-      case "ata":
-      case "minutes":
-        return metadata.meetingNumber ? `ATA - ${metadata.meetingNumber}` : "ATA DA REUNIÃO";
-      case "declaracao":
-      case "declaration":
-        return "DECLARAÇÃO";
-      case "certificado":
-        return "CERTIFICADO";
-      case "parecer":
-      case "opinion":
-        return metadata.documentNumber ? `PARECER TÉCNICO Nº ${metadata.documentNumber}` : "PARECER TÉCNICO";
-      case "relatorio":
-      case "report":
-        return "RELATÓRIO DE ATIVIDADES";
-      case "informacao":
-        return metadata.documentNumber ? `INFORMAÇÃO Nº ${metadata.documentNumber}` : "INFORMAÇÃO";
-      case "comunicado":
-      case "notice":
-      default:
-        return metadata.documentNumber ? `COMUNICADO Nº ${metadata.documentNumber}` : "COMUNICADO";
-    }
-  };
+  const isMinutes = ["ata", "minutes"].includes(docType);
+  const isPauta = ["pauta"].includes(docType);
+  const isParecer = ["parecer", "opinion"].includes(docType);
+  const isDecisaoOuDespacho = ["decisao", "despacho"].includes(docType);
+  const isInformacao = ["informacao"].includes(docType);
+  const isRelatorio = ["relatorio", "report"].includes(docType);
+  const isDeclaracao = ["declaracao", "declaration"].includes(docType);
+  const isCertificado = ["certificado"].includes(docType);
+  const isConceitos = ["conceito-atos-normativos"].includes(docType);
 
   return (
     <div
-      id="printable-comunicado"
-      className={`bg-white text-black shadow-2xl border border-zinc-300 rounded-sm select-text printable-document ${className}`}
-      style={{
-        width: "100%",
-        maxWidth: "210mm",
-        minHeight: "297mm",
-        paddingTop: "15mm",
-        paddingBottom: "15mm",
-        paddingLeft: "25mm",
-        paddingRight: "20mm",
-        boxSizing: "border-box",
-        fontFamily: "Arial, Helvetica, sans-serif",
-        fontSize: "12pt",
-        lineHeight: "1.5",
-        color: "#000000",
-        transform: scale !== 1 ? `scale(${scale})` : undefined,
-        transformOrigin: "top center"
-      }}
+      id="printable-document-sheet"
+      className="bg-white text-zinc-900 shadow-xl border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-between"
+      style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
-      {/* 1. Cabeçalho Institucional Oficial da Unicamp */}
-      <div className="border-b border-zinc-400 pb-3 mb-6 block">
-        <div className="flex items-center justify-between gap-4">
-          {/* Logotipos à Esquerda */}
-          <div className="flex items-center gap-3">
-            {!metadata.hideUnicampLogo && (
-              <img
-                src="/images/logo-unicamp.svg"
-                alt="Logotipo da Unicamp"
-                style={{
-                  height: "56px",
-                  width: "auto",
-                  display: "inline-block",
-                  objectFit: "contain"
-                }}
-                className="print:inline-block"
-              />
+      <div className="space-y-6">
+        {/* ========================================================================= */}
+        {/* CABEÇALHO INSTITUCIONAL OFICIAL (Apenas se não for Certificado) */}
+        {/* ========================================================================= */}
+        {!isCertificado && (
+          <header className="border-b border-zinc-950 pb-4">
+            <div className="flex justify-between items-center gap-4">
+              {/* Logotipos Institucionais à Esquerda */}
+              <div className="flex items-center gap-3 shrink-0">
+                {!metadata.hideUnicampLogo && (
+                  <div className="relative h-14 w-32 shrink-0">
+                    <Image
+                      src="/images/logo-unicamp.png"
+                      alt="Logo Unicamp"
+                      fill
+                      className="object-contain object-left"
+                      priority
+                      unoptimized
+                    />
+                  </div>
+                )}
+
+                {metadata.customUnitLogo && (
+                  <div className="relative h-14 w-32 shrink-0 border-l border-zinc-200 pl-3">
+                    <img
+                      src={metadata.customUnitLogo}
+                      alt="Logo da Unidade"
+                      className="h-full w-auto object-contain object-left"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Informações da Unidade e Contato à Direita */}
+              <div className="text-right space-y-0.5">
+                <h1 className="text-xs font-bold text-zinc-900 tracking-tight">
+                  {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
+                </h1>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
+                </p>
+                <p className="text-[10px] text-zinc-500 font-medium">
+                  Universidade Estadual de Campinas
+                </p>
+              </div>
+            </div>
+          </header>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 1. ATOS NORMATIVOS (Portaria, Resolução, Deliberação, Instrução Normativa) */}
+        {/* ========================================================================= */}
+        {isNormative && (
+          <div className="space-y-6 pt-2">
+            {/* Epígrafe */}
+            <div className="text-center">
+              <h2 className="text-sm font-black text-black tracking-wide uppercase">
+                {docType === "portaria" && `PORTARIA ${metadata.unitName?.includes("Reitor") ? "GR" : "DGRH"} Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`}
+                {docType === "resolucao" && `RESOLUÇÃO GR-Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`}
+                {docType === "deliberacao" && `DELIBERAÇÃO CONSU-A-Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`}
+                {docType === "instrucao-normativa" && `INSTRUÇÃO NORMATIVA DGRH Nº ${metadata.documentNumber || "01/2026"}, DE ${metadata.locationAndDate?.replace(/^Campinas,\s*/i, "") || "27 DE AGOSTO DE 2026"}`}
+                {!["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType) && `${currentTypeInfo.label.toUpperCase()} Nº ${metadata.documentNumber || "01/2026"}`}
+              </h2>
+            </div>
+
+            {/* Ementa Recuada à Direita */}
+            {metadata.ementa && (
+              <div className="flex justify-end">
+                <div className="w-[58%] text-xs text-zinc-800 italic leading-relaxed text-justify bg-zinc-50/50 p-2.5 rounded-lg border-l-2 border-zinc-400">
+                  {metadata.ementa}
+                </div>
+              </div>
             )}
 
-            {metadata.customUnitLogo && (
-              <div className={!metadata.hideUnicampLogo ? "border-l border-zinc-300 pl-3" : ""}>
-                <img
-                  src={metadata.customUnitLogo}
-                  alt="Logotipo da Unidade"
-                  style={{
-                    height: "56px",
-                    width: "auto",
-                    display: "inline-block",
-                    objectFit: "contain"
-                  }}
-                  className="print:inline-block"
+            {/* Preâmbulo / Competência */}
+            {metadata.preamble && (
+              <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8">
+                {metadata.preamble}
+              </p>
+            )}
+
+            {/* Artigos e Parágrafos */}
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => {
+                const isArtigo = /^(Art\.|Artigo|§|Parágrafo|Capítulo|Seção|TÍTULO|[0-9]+\.)/i.test(p);
+                return (
+                  <p
+                    key={idx}
+                    className={`text-xs text-zinc-900 leading-[1.6] text-justify ${
+                      isArtigo ? "indent-8 font-normal" : "indent-8 font-normal"
+                    }`}
+                  >
+                    {p}
+                  </p>
+                );
+              })}
+            </div>
+
+            {/* Cláusula de Vigência */}
+            {metadata.effectiveClause && (
+              <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8 pt-2">
+                {metadata.effectiveClause}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 2. REGIMENTO E REGULAMENTO */}
+        {/* ========================================================================= */}
+        {isRegimentoOuRegulamento && (
+          <div className="space-y-6 pt-2">
+            <div className="text-center space-y-1">
+              <h2 className="text-sm font-black text-black tracking-wide uppercase">
+                {metadata.regimentoTitle || (docType === "regimento" ? "REGIMENTO INTERNO DA UNIDADE" : "REGULAMENTO DO PROGRAMA")}
+              </h2>
+              <p className="text-xs text-zinc-600 font-bold uppercase">
+                {metadata.unitName || "Universidade Estadual de Campinas"}
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              {paragraphs.map((p, idx) => {
+                const isTitle = /^(TÍTULO|CAPÍTULO|SEÇÃO)/i.test(p);
+                return (
+                  <div key={idx}>
+                    {isTitle ? (
+                      <h3 className="text-xs font-black text-black uppercase tracking-wider text-center pt-3 pb-1 border-b border-zinc-200">
+                        {p}
+                      </h3>
+                    ) : (
+                      <p className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                        {p}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {metadata.effectiveClause && (
+              <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8 pt-2">
+                {metadata.effectiveClause}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 3. OFÍCIO E OFÍCIO CIRCULAR */}
+        {/* ========================================================================= */}
+        {isLetter && (
+          <div className="space-y-5 pt-1">
+            {/* Linha Superior: Identificação à esquerda e Local/Data à direita */}
+            <div className="flex justify-between items-baseline gap-4">
+              <span className="text-xs font-bold text-black uppercase">
+                {docType === "oficio-circular" ? "Ofício Circular" : "Ofício"} nº {metadata.documentNumber || "105/2026"}/DGRH
+              </span>
+              <span className="text-xs text-zinc-700 font-medium">
+                {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+              </span>
+            </div>
+
+            {/* Bloco de Destinatário */}
+            <div className="text-xs text-zinc-900 space-y-0.5 pt-2">
+              {metadata.recipientTitle && <p className="text-zinc-600">{metadata.recipientTitle}</p>}
+              <p className="font-bold text-black">{metadata.recipientName || "Nome do Destinatário"}</p>
+              <p className="font-medium">{metadata.recipientRole || "Cargo / Função"}</p>
+              {metadata.recipientAddress && (
+                <p className="text-zinc-600 text-[11px] leading-tight pt-0.5">{metadata.recipientAddress}</p>
+              )}
+            </div>
+
+            {/* Assunto em Destaque */}
+            {metadata.subject && (
+              <div className="text-xs text-zinc-900 pt-1">
+                <span className="font-black text-black">Assunto: </span>
+                <span className="font-normal">{metadata.subject}</span>
+              </div>
+            )}
+
+            {/* Vocativo Formal */}
+            <div className="text-xs font-bold text-black pt-1">
+              {metadata.vocativo || "Senhor(a) Diretor(a),"}
+            </div>
+
+            {/* Corpo do Ofício */}
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+
+            {/* Fecho Padrão */}
+            <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
+              {metadata.fecho || "Atenciosamente,"}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 4. CARTA */}
+        {/* ========================================================================= */}
+        {isCarta && (
+          <div className="space-y-5 pt-1">
+            <div className="text-right text-xs text-zinc-700 font-medium">
+              {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
+
+            <div className="text-xs font-bold text-black pt-2">
+              {metadata.vocativo || "Prezado(a) Professor(a),"}
+            </div>
+
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+
+            <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
+              {metadata.fecho || "Cordialmente,"}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 5. MEMORANDO */}
+        {/* ========================================================================= */}
+        {isMemo && (
+          <div className="space-y-5 pt-1">
+            <div className="border-b-2 border-zinc-900 pb-2 flex justify-between items-baseline">
+              <h2 className="text-sm font-black text-black tracking-wide uppercase">
+                MEMORANDO Nº {metadata.documentNumber || "42/2026"} - DGRH
+              </h2>
+            </div>
+
+            {/* Grade de Tramitação Interna do Memorando */}
+            <div className="bg-zinc-50 border border-zinc-300 rounded-xl p-3.5 text-xs space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <span className="font-bold text-black uppercase tracking-wider text-[10px] block">PARA:</span>
+                  <span className="text-zinc-900 font-medium">{metadata.memoPara || "Diretoria de Administração"}</span>
+                </div>
+                <div>
+                  <span className="font-bold text-black uppercase tracking-wider text-[10px] block">DE:</span>
+                  <span className="text-zinc-900 font-medium">{metadata.memoDe || "Divisão de Desenvolvimento de Pessoas"}</span>
+                </div>
+              </div>
+              <div className="border-t border-zinc-200 pt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="sm:col-span-2">
+                  <span className="font-bold text-black uppercase tracking-wider text-[10px] block">ASSUNTO:</span>
+                  <span className="text-zinc-900 font-medium">{metadata.memoAssunto || metadata.subject || "Encaminhamento de relatório de treinamento"}</span>
+                </div>
+                <div>
+                  <span className="font-bold text-black uppercase tracking-wider text-[10px] block">DATA:</span>
+                  <span className="text-zinc-900 font-medium">{metadata.memoData || "27 de agosto de 2026"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Corpo do Memorando */}
+            <div className="space-y-3.5 pt-2">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 6. ATA DE REUNIÃO */}
+        {/* ========================================================================= */}
+        {isMinutes && (
+          <div className="space-y-5 pt-1">
+            <div className="text-center border-b border-zinc-300 pb-3">
+              <h2 className="text-sm font-black text-black uppercase tracking-wide">
+                ATA DA {metadata.meetingNumber?.toUpperCase() || "15ª REUNIÃO ORDINÁRIA DA COMISSÃO"}
+              </h2>
+            </div>
+
+            {/* Tabela de Dados da Sessão */}
+            <div className="bg-zinc-50 border border-zinc-300 rounded-xl p-3 text-[11px] space-y-1.5 leading-tight">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <p><strong className="text-black">Data/Horário:</strong> {metadata.meetingDate || "27 de agosto de 2026, às 14h00"}</p>
+                <p><strong className="text-black">Local:</strong> {metadata.meetingPlace || "Sala de Reuniões da DGRH / Virtual"}</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-zinc-200 pt-1.5">
+                <p><strong className="text-black">Presidência:</strong> {metadata.meetingPresident || "Profa. Dra. Coordenadora Geral"}</p>
+                <p><strong className="text-black">Secretaria:</strong> {metadata.meetingSecretary || "Secretário(a) da Comissão"}</p>
+              </div>
+              {metadata.membersPresent && (
+                <p className="border-t border-zinc-200 pt-1.5"><strong className="text-black">Membros Presentes:</strong> {metadata.membersPresent}</p>
+              )}
+              {metadata.membersAbsent && (
+                <p><strong className="text-black">Ausências Justificadas:</strong> {metadata.membersAbsent}</p>
+              )}
+            </div>
+
+            {/* Texto da Ata */}
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+
+            {/* Encerramento */}
+            <p className="text-xs text-zinc-800 leading-relaxed text-justify indent-8 italic">
+              Nada mais havendo a tratar, a Presidência deu por encerrada a reunião, da qual eu, Secretário(a), lavrei a presente ata que, após lida e aprovada, vai assinada por todos os presentes.
+            </p>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 7. PAUTA DE REUNIÃO */}
+        {/* ========================================================================= */}
+        {isPauta && (
+          <div className="space-y-5 pt-1">
+            <div className="text-center border-b border-zinc-300 pb-3">
+              <h2 className="text-sm font-black text-black uppercase tracking-wide">
+                PAUTA DA {metadata.meetingNumber?.toUpperCase() || "12ª REUNIÃO ORDINÁRIA"}
+              </h2>
+            </div>
+
+            <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs space-y-1">
+              <p><strong className="text-black">Data/Horário:</strong> {metadata.meetingDate || "02 de setembro de 2026, às 09h30"}</p>
+              <p><strong className="text-black">Local:</strong> {metadata.meetingPlace || "Sala de Reuniões nº 2 - DGRH / Teams"}</p>
+            </div>
+
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 8. PARECER, INFORMAÇÃO, DECISÃO E DESPACHO */}
+        {/* ========================================================================= */}
+        {(isParecer || isDecisaoOuDespacho || isInformacao) && (
+          <div className="space-y-5 pt-1">
+            <div className="border-b border-zinc-300 pb-2">
+              <h2 className="text-sm font-black text-black tracking-wide uppercase">
+                {isParecer && `PARECER Nº ${metadata.documentNumber || "23/2026"} - DGRH`}
+                {isInformacao && `INFORMAÇÃO Nº ${metadata.documentNumber || "18/2026"} - DGRH`}
+                {isDecisaoOuDespacho && (docType === "decisao" ? `DECISÃO Nº ${metadata.documentNumber || "08/2026"}` : "DESPACHO DO COORDENADOR GERAL")}
+              </h2>
+            </div>
+
+            {/* Tabela de Referência Processual */}
+            {(metadata.referenceProcess || metadata.interestedParty || metadata.subject) && (
+              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs space-y-1 leading-tight">
+                {metadata.referenceProcess && (
+                  <p><strong className="text-black">Processo nº:</strong> {metadata.referenceProcess}</p>
+                )}
+                {metadata.interestedParty && (
+                  <p><strong className="text-black">Interessado(a):</strong> {metadata.interestedParty}</p>
+                )}
+                {metadata.subject && (
+                  <p><strong className="text-black">Assunto:</strong> {metadata.subject}</p>
+                )}
+              </div>
+            )}
+
+            {/* Corpo Técnico */}
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 9. DECLARAÇÃO */}
+        {/* ========================================================================= */}
+        {isDeclaracao && (
+          <div className="space-y-6 pt-4">
+            <div className="text-center pt-4 pb-2">
+              <h2 className="text-base font-black text-black tracking-widest uppercase border-b-2 border-black inline-block pb-1">
+                DECLARAÇÃO
+              </h2>
+            </div>
+
+            <div className="space-y-4 pt-4">
+              {paragraphs.length > 0 ? (
+                paragraphs.map((p, idx) => (
+                  <p key={idx} className="text-xs text-zinc-900 leading-[1.8] text-justify indent-8">
+                    {p}
+                  </p>
+                ))
+              ) : (
+                <p className="text-xs text-zinc-900 leading-[1.8] text-justify indent-8">
+                  Declaramos, para os devidos fins a pedido da pessoa interessada, que{" "}
+                  <strong>{metadata.targetPerson || "Nome Completo do Servidor"}</strong>, portador(a) do{" "}
+                  <strong>{metadata.targetDocument || "RG nº 00.000.000-X / CPF nº 000.000.000-00"}</strong>, integra o quadro funcional da Universidade Estadual de Campinas.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 10. CERTIFICADO (Layout Nobre Paisagem/Retrato) */}
+        {/* ========================================================================= */}
+        {isCertificado && (
+          <div className="border-4 border-double border-[#d98a1a] rounded-2xl p-6 sm:p-8 space-y-6 text-center bg-gradient-to-b from-white to-amber-50/20 shadow-inner">
+            {/* Logo Unicamp Centralizada */}
+            <div className="flex justify-center">
+              <div className="relative h-16 w-36">
+                <Image
+                  src="/images/logo-unicamp.png"
+                  alt="Logo Unicamp"
+                  fill
+                  className="object-contain"
+                  priority
+                  unoptimized
                 />
               </div>
-            )}
-          </div>
-
-          {/* Textos Institucionais à Direita */}
-          <div className="text-right leading-tight space-y-1" style={{ fontSize: "10pt" }}>
-            <p className="font-bold text-black">
-              Universidade Estadual de Campinas
-            </p>
-            <p className="font-normal text-zinc-800">
-              {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
-            </p>
-            <p className="text-zinc-600 font-normal" style={{ fontSize: "8.5pt" }}>
-              {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 1 linha em branco após o cabeçalho */}
-      <div className="h-4" />
-
-      {/* 2. Seções Contextuais de Acordo com o Tipo */}
-      {isNormative ? (
-        // Layout de Ato Normativo (Portaria, Resolução, Deliberação, etc.)
-        <div className="space-y-4 mb-6">
-          <div className="text-center my-4">
-            <h2 className="font-bold tracking-wide uppercase text-black" style={{ fontSize: "12pt" }}>
-              {getDocumentHeading()}
-            </h2>
-          </div>
-
-          {/* Ementa alinhada à direita */}
-          {metadata.ementa && (
-            <div className="flex justify-end my-4">
-              <div
-                className="w-1/2 text-justify italic text-zinc-900 border-l-2 border-zinc-300 pl-3 py-1"
-                style={{ fontSize: "10pt", lineHeight: "1.3" }}
-              >
-                {metadata.ementa}
-              </div>
             </div>
-          )}
 
-          {/* Preâmbulo / Atribuições */}
-          {metadata.preamble && (
-            <div style={{ textIndent: "1.25cm", fontSize: "12pt", lineHeight: "1.5" }} className="text-justify my-3 font-normal">
-              {metadata.preamble}
+            <div className="space-y-1">
+              <h1 className="text-xs font-bold text-zinc-700 uppercase tracking-widest">
+                UNIVERSIDADE ESTADUAL DE CAMPINAS
+              </h1>
+              <h2 className="text-xl font-black text-black tracking-widest uppercase text-[#b36b00]">
+                CERTIFICADO
+              </h2>
             </div>
-          )}
-        </div>
-      ) : isLetter ? (
-        // Layout de Ofício / Carta
-        <div className="space-y-4 mb-6">
-          <div className="flex justify-between items-start my-3">
-            <h2 className="font-bold text-black" style={{ fontSize: "12pt" }}>
-              {getDocumentHeading()}
-            </h2>
-            <p style={{ fontSize: "11pt" }} className="text-zinc-700">
-              {formattedDate}
-            </p>
-          </div>
 
-          {/* Destinatário */}
-          {metadata.recipientName && (
-            <div className="my-4 leading-snug space-y-0.5" style={{ fontSize: "11pt" }}>
-              <p className="text-zinc-700">A Sua Senhoria o(a) Senhor(a)</p>
-              <p className="font-bold text-black">{metadata.recipientName}</p>
-              {metadata.recipientRole && <p className="text-zinc-800">{metadata.recipientRole}</p>}
-              {metadata.recipientAddress && <p className="text-zinc-600 text-xs">{metadata.recipientAddress}</p>}
-            </div>
-          )}
-
-          {/* Assunto */}
-          {metadata.subject && (
-            <div className="my-3 font-bold text-black" style={{ fontSize: "12pt" }}>
-              Assunto: <span className="font-normal text-zinc-900">{metadata.subject}</span>
-            </div>
-          )}
-
-          {/* Vocativo */}
-          <div style={{ textIndent: "1.25cm", fontSize: "12pt" }} className="my-3 font-normal text-black">
-            {metadata.vocativo || "Senhor(a) Diretor(a),"}
-          </div>
-        </div>
-      ) : isMemo ? (
-        // Layout de Memorando
-        <div className="space-y-3 mb-6 border border-zinc-300 rounded-lg p-4 bg-zinc-50/50">
-          <div className="text-center font-bold text-black uppercase" style={{ fontSize: "12pt" }}>
-            {getDocumentHeading()}
-          </div>
-          <div className="grid grid-cols-1 gap-1 text-xs sm:text-sm">
-            <p><strong>PARA:</strong> {metadata.recipientName || "Setor de Destino"}</p>
-            <p><strong>DE:</strong> {metadata.authorName || "Coordenação"}</p>
-            <p><strong>ASSUNTO:</strong> {metadata.subject || "Comunicação Interna"}</p>
-            <p><strong>DATA:</strong> {formattedDate}</p>
-          </div>
-        </div>
-      ) : isMinutes ? (
-        // Layout de Ata / Pauta
-        <div className="space-y-3 mb-6 text-center">
-          <h2 className="font-bold uppercase tracking-wide text-black" style={{ fontSize: "13pt" }}>
-            {getDocumentHeading()}
-          </h2>
-          {(metadata.meetingDate || metadata.meetingPlace) && (
-            <p className="text-xs text-zinc-600 italic">
-              {[metadata.meetingDate, metadata.meetingPlace].filter(Boolean).join(" - ")}
-            </p>
-          )}
-        </div>
-      ) : isDeclaration ? (
-        // Layout de Declaração / Certificado
-        <div className="text-center my-6">
-          <h2 className="font-bold tracking-widest uppercase text-black text-xl" style={{ fontSize: "14pt" }}>
-            {getDocumentHeading()}
-          </h2>
-        </div>
-      ) : (
-        // Layout Padrão (Comunicado, Informação, Parecer, Relatório)
-        <div className="space-y-3 mb-6">
-          <div className="text-center my-4">
-            <h2 className="font-bold tracking-wide uppercase text-black" style={{ fontSize: "12pt" }}>
-              {getDocumentHeading()}
-            </h2>
-          </div>
-          {metadata.subject && (
-            <div className="my-2 font-bold text-black" style={{ fontSize: "12pt" }}>
-              Assunto: <span className="font-normal text-zinc-900">{metadata.subject}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 3. Corpo do Texto com Recuo de 1,25 cm e Entrelinha 1,5 */}
-      <div
-        className="space-y-4 text-justify"
-        style={{
-          fontSize: "12pt",
-          lineHeight: "1.5"
-        }}
-      >
-        {paragraphs.length > 0 ? (
-          paragraphs.map((p, idx) => {
-            const isBullet =
-              p.startsWith("-") ||
-              p.startsWith("•") ||
-              p.startsWith("*") ||
-              /^\d+[\.\)]/.test(p);
-
-            if (isBullet) {
-              return (
-                <div
-                  key={idx}
-                  style={{ paddingLeft: "1.25cm", textIndent: "0" }}
-                  className="text-left my-2"
-                >
-                  {p}
-                </div>
-              );
-            }
-
-            return (
-              <p
-                key={idx}
-                style={{ textIndent: "1.25cm" }}
-                className="my-3"
-              >
-                {p}
+            <div className="space-y-3 max-w-xl mx-auto py-2">
+              <p className="text-xs text-zinc-700 leading-relaxed">
+                Certificamos que
               </p>
-            );
-          })
-        ) : (
-          <p style={{ textIndent: "1.25cm" }} className="text-zinc-400 italic">
-            [O texto simplificado do documento será renderizado aqui em tempo real...]
-          </p>
+              <h3 className="text-sm font-black text-black border-b border-zinc-400 pb-1 inline-block px-4">
+                {metadata.targetPerson || "Nome Completo do(a) Participante"}
+              </h3>
+              <p className="text-xs text-zinc-700 leading-relaxed text-justify sm:text-center pt-2">
+                concluiu com êxito as atividades de <strong>{metadata.courseName || "Capacitação em Redação Oficial e Linguagem Simples"}</strong> promovido pela {metadata.unitName || "Diretoria Geral de Recursos Humanos"}, realizado no período de {metadata.coursePeriod || "10 a 25 de agosto de 2026"}, com carga horária total de <strong>{metadata.courseHours || "20 horas"}</strong>.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 11. COMUNICADO, RELATÓRIO E OUTROS DOCUMENTOS */}
+        {/* ========================================================================= */}
+        {(!isNormative && !isRegimentoOuRegulamento && !isLetter && !isCarta && !isMemo && !isMinutes && !isPauta && !isParecer && !isDecisaoOuDespacho && !isInformacao && !isDeclaracao && !isCertificado) && (
+          <div className="space-y-5 pt-1">
+            <div className="border-b border-zinc-950 pb-2">
+              <h2 className="text-sm font-black text-black tracking-wide uppercase">
+                {currentTypeInfo.label.toUpperCase()} DGRH Nº {metadata.documentNumber || "01/2026"}
+              </h2>
+              {metadata.subject && (
+                <p className="text-xs text-zinc-800 font-bold mt-1">
+                  {metadata.subject}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-3.5 pt-1">
+              {paragraphs.map((p, idx) => (
+                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
-      {/* 4. Fecho de Correspondência (para Ofício / Carta) */}
-      {isLetter && (
-        <div
-          className="mt-6 mb-4"
-          style={{ textIndent: "1.25cm", fontSize: "12pt", lineHeight: "1.5" }}
-        >
-          <p>{metadata.fecho || "Atenciosamente,"}</p>
+      {/* ========================================================================= */}
+      {/* RODAPÉ DO DOCUMENTO: LOCAL, DATA E ASSINATURA */}
+      {/* ========================================================================= */}
+      <footer className="pt-8 space-y-6">
+        {/* Local e Data à esquerda ou direita conforme o padrão */}
+        {!isLetter && !isCarta && (
+          <div className="text-left text-xs text-zinc-700 font-medium">
+            {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+          </div>
+        )}
+
+        {/* Bloco de Assinatura */}
+        <div className="pt-6 flex flex-col items-center justify-center text-center">
+          <div className="w-64 border-t border-zinc-950 pt-1.5">
+            <p className="text-xs font-bold text-black">
+              {metadata.authorName || "Coordenação Geral da DGRH"}
+            </p>
+            <p className="text-[10px] text-zinc-600 font-medium">
+              {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+            </p>
+          </div>
         </div>
-      )}
-
-      {/* 5. Local e Data (para documentos que levam data no rodapé) */}
-      {!isLetter && !isMemo && metadata.locationAndDate && (
-        <div
-          className="mt-8 mb-6"
-          style={{
-            textIndent: "1.25cm",
-            fontSize: "12pt",
-            lineHeight: "1.5"
-          }}
-        >
-          <p>{formattedDate}</p>
-        </div>
-      )}
-
-      {/* 4 linhas em branco antes da assinatura */}
-      <div className="h-16" />
-
-      {/* 6. Identificação da Autora ou Autor / Signatário */}
-      <div
-        className="text-center space-y-1"
-        style={{
-          fontSize: "12pt",
-          lineHeight: "1.2"
-        }}
-      >
-        <p className="font-bold text-black">
-          {metadata.authorName || "Nome da Autora ou Autor"}
-        </p>
-        <p className="text-zinc-800">
-          {metadata.authorRole || "Cargo ou Função"}
-        </p>
-      </div>
+      </footer>
     </div>
-  );
-}
-
-/**
- * Backward compatibility alias para ComunicadoSheet
- */
-export function ComunicadoSheet({
-  text,
-  metadata,
-  scale = 1,
-  className = ""
-}: {
-  text: string;
-  metadata: UniversalDocumentMetadata;
-  scale?: number;
-  className?: string;
-}) {
-  return (
-    <DynamicDocumentSheet
-      docType="comunicado"
-      text={text}
-      metadata={metadata}
-      scale={scale}
-      className={className}
-    />
   );
 }

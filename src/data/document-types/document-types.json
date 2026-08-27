@@ -1,596 +1,637 @@
 [
   {
-    "type": "portaria",
-    "label": "Portaria",
-    "category": "normativo",
-    "description": "Ato que expede determinações, designa servidores ou institui comissões e grupos de trabalho.",
-    "expectedSections": [
-      "Epígrafe e Ementa",
-      "Preâmbulo / Atribuições",
-      "Texto Articulado (Artigos e Parágrafos)",
-      "Cláusula de Vigência",
-      "Data e Assinatura"
+    "type": "ata",
+    "label": "Ata",
+    "category": "administrativo",
+    "description": "Registro formal e sucinto dos fatos, ocorrências, discussões e decisões tomadas em reunião de colegiado ou comissão.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/ata/",
+    "modelImagePath": "/images/models/modelo-ata1.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-ata1.jpg",
+      "/images/models/modelo-ata2.jpg"
     ],
-    "mandatoryElements": [
-      "Ementa à direita",
-      "Artigos numerados",
-      "Cláusula de vigência"
-    ],
-    "competenceNote": "Reitoria, Pró-Reitorias e Diretorias de Unidades.",
-    "modelImagePath": "/images/models/modelo-portaria.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/portaria/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "preamble",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "resolucao",
-    "label": "Resolução",
-    "category": "normativo",
-    "description": "Ato normativo de competência privativa da Reitoria para disciplinar matérias regimentais.",
-    "expectedSections": [
-      "Epígrafe e Ementa",
-      "Preâmbulo Estatutário",
-      "Disposições Normativas Articuladas",
-      "Cláusula de Vigência",
-      "Data e Assinatura"
-    ],
-    "mandatoryElements": [
-      "Ementa concisa",
-      "Articulação legal clara"
-    ],
-    "competenceNote": "Competência privativa de Reitora ou Reitor.",
-    "modelImagePath": "/images/models/modelo-resolucao.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/resolucao/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "preamble",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "deliberacao",
-    "label": "Deliberação",
-    "category": "normativo",
-    "description": "Ato normativo colegiado aprovado por órgãos deliberativos superiores (CONSU, CAD, CEPE ou Congregações).",
-    "expectedSections": [
-      "Epígrafe e Ementa",
-      "Preâmbulo do Colegiado",
-      "Dispositivo Articulado",
-      "Cláusula de Vigência",
-      "Assinatura da Presidência"
-    ],
-    "mandatoryElements": [
-      "Indicação do órgão colegiado",
-      "Aprovação em sessão"
-    ],
-    "competenceNote": "Órgãos colegiados superiores e Congregações.",
-    "modelImagePath": "/images/models/modelo-deliberacao.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/deliberacao/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "preamble",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "instrucao-normativa",
-    "label": "Instrução Normativa",
-    "category": "normativo",
-    "description": "Normatização técnica e operacional sobre procedimentos e execução de serviços públicos.",
-    "expectedSections": [
-      "Epígrafe e Ementa",
-      "Fundamentação",
-      "Procedimentos Passo a Passo",
-      "Disposições Finais",
-      "Data e Assinatura"
-    ],
-    "mandatoryElements": [
-      "Linguagem instrucional direta",
-      "Passos claros e acionáveis"
-    ],
-    "competenceNote": "Pró-Reitorias, Diretoria Geral e Coordenadorias.",
-    "modelImagePath": "/images/models/modelo-instrucao-normativa.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/instrucao-normativa/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "preamble",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "regimento",
-    "label": "Regimento",
-    "category": "normativo",
-    "description": "Ato normativo que rege a estrutura, organização e funcionamento interno de um órgão ou colegiado.",
-    "expectedSections": [
-      "Título e Ementa",
-      "Finalidades e Competências",
-      "Estrutura Organizacional",
-      "Atribuições de Cargos",
-      "Disposições Transitórias e Finais"
-    ],
-    "mandatoryElements": [
-      "Capítulos e Seções bem delimitados"
-    ],
-    "competenceNote": "Aprovado por órgão colegiado superior competente.",
-    "modelImagePath": "/images/models/modelo-regimento.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/regimento/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "regulamento",
-    "label": "Regulamento",
-    "category": "normativo",
-    "description": "Conjunto de normas detalhadas para a execução e operacionalização de uma deliberação, programa ou serviço.",
-    "expectedSections": [
-      "Título e Objeto",
-      "Regras de Acesso e Funcionamento",
-      "Direitos e Deveres",
-      "Sanções ou Recursos",
-      "Vigência"
-    ],
-    "mandatoryElements": [
-      "Ordem lógica dos procedimentos"
-    ],
-    "competenceNote": "Órgãos executivos e colegiados.",
-    "modelImagePath": "/images/models/modelo-regulamento.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/regulamento/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "decisao",
-    "label": "Decisão",
-    "category": "normativo",
-    "description": "Manifestação conclusiva de autoridade ou câmara sobre processo administrativo submetido a julgamento.",
-    "expectedSections": [
-      "Ementa",
-      "Relatório Sucinto",
-      "Fundamentação Legal",
-      "Dispositivo / Conclusão Decisória",
-      "Data e Assinatura"
-    ],
-    "mandatoryElements": [
-      "Clareza no deferimento ou indeferimento"
-    ],
-    "competenceNote": "Autoridades e comissões com poder de julgamento.",
-    "modelImagePath": "/images/models/modelo-decisao.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/decisao/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "ementa",
-      "subject",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "despacho",
-    "label": "Despacho",
-    "category": "normativo",
-    "description": "Manifestação de autoridade administrativa em processo ou requerimento (encaminhamento, solicitação de parecer ou decisão).",
-    "expectedSections": [
-      "Identificação do Processo / Assunto",
-      "Teor do Despacho",
-      "Data e Assinatura da Autoridade"
-    ],
-    "mandatoryElements": [
-      "Objetividade e clareza no encaminhamento"
-    ],
-    "competenceNote": "Chefias, Diretores e autoridades administrativas.",
-    "modelImagePath": "/images/models/modelo-despacho.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/despacho/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "subject",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "oficio",
-    "label": "Ofício",
-    "category": "correspondencia",
-    "description": "Comunicação formal externa ou entre autoridades de órgãos autônomos para tratar de matérias administrativas.",
-    "expectedSections": [
-      "Cabeçalho e Numeração",
-      "Local e Data",
-      "Endereçamento com Destinatário",
-      "Assunto Resumido",
-      "Vocativo Formal",
-      "Texto em Ordem Direta",
-      "Fecho Oficial (Atenciosamente)",
-      "Assinatura"
-    ],
-    "mandatoryElements": [
-      "Vocativo adequado",
-      "Assunto destacado",
-      "Fecho padronizado"
-    ],
-    "competenceNote": "Dirigentes, Diretores e Coordenadores.",
-    "modelImagePath": "/images/models/modelo-oficio.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/oficio/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "recipientName",
-      "recipientRole",
-      "recipientAddress",
-      "subject",
-      "vocativo",
-      "fecho",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "oficio-circular",
-    "label": "Ofício Circular",
-    "category": "correspondencia",
-    "description": "Ofício com teor idêntico expedido simultaneamente para múltiplos destinatários ou unidades.",
-    "expectedSections": [
-      "Cabeçalho e Numeração Circular",
-      "Local e Data",
-      "Destinatários Gerais",
-      "Assunto",
-      "Vocativo",
-      "Texto",
-      "Fecho",
-      "Assinatura"
-    ],
-    "mandatoryElements": [
-      "Destinação coletiva explícita"
-    ],
-    "competenceNote": "Órgãos centrais e diretorias.",
-    "modelImagePath": "/images/models/modelo-oficio-circular.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/oficio-circular/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "recipientName",
-      "subject",
-      "vocativo",
-      "fecho",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "comunicado",
-    "label": "Comunicado",
-    "category": "correspondencia",
-    "description": "Comunicação de ordem geral emitida para prestar esclarecimentos, informes ou orientações a uma comunidade.",
+    "competence": "Secretarias e Colegiados da Unicamp",
     "expectedSections": [
       "Cabeçalho Institucional",
-      "Identificação (COMUNICADO Nº)",
-      "Corpo com Informações Claras",
-      "Local e Data",
-      "Assinatura do Emissor"
+      "Título com Nº da Reunião",
+      "Data, Horário e Local",
+      "Presidência e Secretaria",
+      "Membros Presentes e Justificativas",
+      "Expediente",
+      "Ordem do Dia (Deliberações)",
+      "Encerramento e Assinaturas"
     ],
-    "mandatoryElements": [
-      "Mensagem central logo no início",
-      "Prazos em destaque"
-    ],
-    "competenceNote": "Diretorias, Coordenadorias e Órgãos da Instituição.",
-    "modelImagePath": "/images/models/modelo-comunicado.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/comunicado/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "memorando",
-    "label": "Memorando",
-    "category": "correspondencia",
-    "description": "Comunicação exclusivamente interna entre unidades administrativas de uma mesma instituição.",
-    "expectedSections": [
-      "Cabeçalho com Identificação",
-      "Para, De, Assunto e Data",
-      "Texto Sucinto e Objetivo",
-      "Assinatura da Chefia"
-    ],
-    "mandatoryElements": [
-      "Agilidade e concisão",
-      "Campos Para e De explícitos"
-    ],
-    "competenceNote": "Chefias e servidores no fluxo interno.",
-    "modelImagePath": "/images/models/modelo-memorando.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/memorando/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "recipientName",
-      "subject",
-      "authorName",
-      "authorRole"
-    ]
+    "defaultMetadata": {
+      "meetingNumber": "15ª Reunião Ordinária da Comissão de Linguagem Simples",
+      "meetingDate": "27 de agosto de 2026, às 14h00",
+      "meetingPlace": "Sala de Reuniões da DGRH / Videoconferência",
+      "meetingPresident": "Profa. Dra. Coordenadora Geral",
+      "meetingSecretary": "Secretário(a) da Comissão",
+      "membersPresent": "Membro 1, Membro 2, Membro 3, Membro 4",
+      "membersAbsent": "Membro 5 (justificada por licença médica)",
+      "authorName": "Secretaria dos Colegiados",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
   },
   {
     "type": "carta",
     "label": "Carta",
     "category": "correspondencia",
-    "description": "Comunicação formal personalizada de caráter institucional para convites, agradecimentos ou homenagens.",
-    "expectedSections": [
-      "Local e Data",
-      "Destinatário",
-      "Vocativo Afetuoso ou Respeitoso",
-      "Corpo da Mensagem",
-      "Fecho Cordial",
-      "Assinatura"
-    ],
-    "mandatoryElements": [
-      "Tom cortês e objetivo"
-    ],
-    "competenceNote": "Dirigentes e autoridades.",
-    "modelImagePath": "/images/models/modelo-carta.jpg",
+    "description": "Comunicação formal dirigida a pessoas ou entidades para convites, manifestações de apreço, agradecimentos ou contatos especiais.",
     "unicampUrl": "https://linguagemsimples.unicamp.br/carta/",
-    "fields": [
-      "unitName",
-      "locationAndDate",
-      "recipientName",
-      "recipientRole",
-      "vocativo",
-      "fecho",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "informacao",
-    "label": "Informação",
-    "category": "correspondencia",
-    "description": "Nota técnica ou pronunciamento de setor competente prestando esclarecimentos em um processo.",
+    "modelImagePath": "/images/models/modelo-carta.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-carta.jpg"
+    ],
+    "competence": "Reitoria, Diretorias e Chefias",
     "expectedSections": [
-      "Identificação do Processo / Interessado",
-      "Assunto",
-      "Exposição Informativa",
-      "Conclusão",
-      "Local, Data e Assinatura"
+      "Cabeçalho Unicamp",
+      "Local e Data (à direita)",
+      "Vocativo e Tratamento",
+      "Texto da Mensagem",
+      "Fecho de Cortesia",
+      "Assinatura e Cargo"
     ],
-    "mandatoryElements": [
-      "Rigor técnico e clareza informativa"
-    ],
-    "competenceNote": "Áreas técnicas e administrativas.",
-    "modelImagePath": "/images/models/modelo-informacao.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/informacao/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "subject",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "pauta",
-    "label": "Pauta",
-    "category": "correspondencia",
-    "description": "Documento que lista os assuntos e a ordem do dia que serão deliberados em sessão colegiada ou reunião.",
-    "expectedSections": [
-      "Identificação do Colegiado e Número da Sessão",
-      "Data, Horário e Local",
-      "Expediente e Informes",
-      "Ordem do Dia (Itens Numerados)",
-      "Assinatura da Presidência/Secretaria"
-    ],
-    "mandatoryElements": [
-      "Itens claros e ordenados"
-    ],
-    "competenceNote": "Secretarias de colegiados e comissões.",
-    "modelImagePath": "/images/models/modelo-pauta.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/pauta/",
-    "fields": [
-      "unitName",
-      "meetingNumber",
-      "meetingDate",
-      "meetingPlace",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "ata",
-    "label": "Ata",
-    "category": "correspondencia",
-    "description": "Registro formal e resumido de tudo o que ocorreu e foi deliberado em uma reunião ou sessão de colegiado.",
-    "expectedSections": [
-      "Abertura (Data, Horário, Local e Presidência)",
-      "Presenças e Ausências Justificadas",
-      "Discussões e Votações por Item",
-      "Encerramento e Assinaturas"
-    ],
-    "mandatoryElements": [
-      "Fidelidade às decisões",
-      "Sem rasuras ou ambiguidades"
-    ],
-    "competenceNote": "Secretários e membros de comissões/colegiados.",
-    "modelImagePath": "/images/models/modelo-ata1.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/ata/",
-    "fields": [
-      "unitName",
-      "meetingNumber",
-      "meetingDate",
-      "meetingPlace",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "parecer",
-    "label": "Parecer",
-    "category": "administrativo",
-    "description": "Manifestação técnica, científica ou jurídica fundamentada sobre matéria submetida à apreciação.",
-    "expectedSections": [
-      "Ementa / Assunto",
-      "Relatório dos Fatos",
-      "Fundamentação Técnica / Jurídica",
-      "Conclusão ou Voto do Relator",
-      "Local, Data e Assinatura"
-    ],
-    "mandatoryElements": [
-      "Separação clara entre fatos, fundamentação e conclusão"
-    ],
-    "competenceNote": "Pareceristas, relatores e assessores técnicos.",
-    "modelImagePath": "/images/models/modelo-parecer.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/parecer/",
-    "fields": [
-      "unitName",
-      "documentNumber",
-      "locationAndDate",
-      "subject",
-      "ementa",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "relatorio",
-    "label": "Relatório",
-    "category": "administrativo",
-    "description": "Documento circunstanciado sobre o desenvolvimento de atividades, projetos, inspeções ou gestão anual.",
-    "expectedSections": [
-      "Capa e Título",
-      "Objetivo / Introdução",
-      "Metodologia e Ações Executadas",
-      "Resultados e Indicadores",
-      "Conclusões e Recomendações",
-      "Assinatura da Comissão/Autor"
-    ],
-    "mandatoryElements": [
-      "Uso de tópicos, tabelas e sínteses visuais"
-    ],
-    "competenceNote": "Grupos de trabalho, comissões e gestores.",
-    "modelImagePath": "/images/models/modelo-relatorio.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/relatorio/",
-    "fields": [
-      "unitName",
-      "locationAndDate",
-      "subject",
-      "authorName",
-      "authorRole"
-    ]
-  },
-  {
-    "type": "declaracao",
-    "label": "Declaração",
-    "category": "administrativo",
-    "description": "Documento oficial no qual a autoridade atesta a existência de um fato, situação ou vínculo funcional.",
-    "expectedSections": [
-      "Cabeçalho Institucional",
-      "Título DECLARAÇÃO",
-      "Texto Atestatório com Dados do Interessado",
-      "Finalidade",
-      "Local e Data",
-      "Assinatura"
-    ],
-    "mandatoryElements": [
-      "Dados precisos da pessoa interessada",
-      "Texto em parágrafo único ou direto"
-    ],
-    "competenceNote": "Secretarias acadêmicas, RH e diretorias.",
-    "modelImagePath": "/images/models/modelo-declaracao.jpg",
-    "unicampUrl": "https://linguagemsimples.unicamp.br/declaracao/",
-    "fields": [
-      "unitName",
-      "locationAndDate",
-      "targetPerson",
-      "targetDocument",
-      "authorName",
-      "authorRole"
-    ]
+    "defaultMetadata": {
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "vocativo": "Prezado(a) Professor(a),",
+      "fecho": "Cordialmente,",
+      "authorName": "Prof. Dr. Diretor Geral",
+      "authorRole": "Diretoria da Unidade - Unicamp"
+    }
   },
   {
     "type": "certificado",
     "label": "Certificado",
     "category": "administrativo",
-    "description": "Documento comprobatório de participação, conclusão de curso, treinamento ou evento acadêmico.",
-    "expectedSections": [
-      "Logotipos Oficiais",
-      "Título CERTIFICADO",
-      "Texto de Certificação com Carga Horária e Data",
-      "Assinaturas dos Responsáveis"
-    ],
-    "mandatoryElements": [
-      "Nome completo e carga horária explícita"
-    ],
-    "competenceNote": "Coordenações de cursos, eventos e extensão.",
-    "modelImagePath": "/images/models/modelo-certificado.jpg",
+    "description": "Documento solene que atesta a participação em cursos, eventos, comissões, palestras ou atividades acadêmicas e funcionais.",
     "unicampUrl": "https://linguagemsimples.unicamp.br/certificado/",
-    "fields": [
-      "unitName",
-      "locationAndDate",
-      "targetPerson",
-      "targetDocument",
-      "authorName",
-      "authorRole"
-    ]
+    "modelImagePath": "/images/models/modelo-certificado.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-certificado.jpg"
+    ],
+    "competence": "Unidades de Ensino, Pesquisa, Extensão e Órgãos Administrativos",
+    "expectedSections": [
+      "Brasão / Identificação Institucional",
+      "Título 'CERTIFICADO' em Destaque",
+      "Texto de Concessão / Dados da Pessoa",
+      "Carga Horária e Período",
+      "Local e Data",
+      "Assinaturas e Chancelas"
+    ],
+    "defaultMetadata": {
+      "targetPerson": "Nome Completo do(a) Participante",
+      "targetDocument": "CPF nº 000.000.000-00",
+      "courseName": "Capacitação em Redação Oficial e Linguagem Simples",
+      "courseHours": "20 horas",
+      "coursePeriod": "10 a 25 de agosto de 2026",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Coordenação de Capacitação",
+      "authorRole": "Diretoria Geral de Recursos Humanos - Unicamp"
+    }
+  },
+  {
+    "type": "comunicado",
+    "label": "Comunicado",
+    "category": "correspondencia",
+    "description": "Aviso oficial transmitido à comunidade universitária com orientações práticas, procedimentos operacionais ou avisos de serviço.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/comunicado/",
+    "modelImagePath": "/images/models/modelo-comunicado.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-comunicado.jpg"
+    ],
+    "competence": "Órgãos da Administração Central e Unidades",
+    "expectedSections": [
+      "Cabeçalho Oficial com Logos",
+      "Identificação (COMUNICADO DGRH nº XX/ANO)",
+      "Assunto",
+      "Texto em Linguagem Clara",
+      "Local e Data",
+      "Assinatura do Emissor"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "01/2026",
+      "subject": "Prorrogação de prazos e novas diretrizes operacionais",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Coordenação Geral da DGRH",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "decisao",
+    "label": "Decisão",
+    "category": "normativo",
+    "description": "Ato administrativo decisório pelo qual autoridade competente ou colegiado julga e resolve requerimentos ou recursos em processos.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/decisao/",
+    "modelImagePath": "/images/models/modelo-decisao.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-decisao.jpg"
+    ],
+    "competence": "Autoridades e Colegiados com competência decisória",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Título 'DECISÃO Nº XX/ANO'",
+      "Processo, Interessado e Assunto",
+      "1. Relatório",
+      "2. Fundamentação Legal/Técnica",
+      "3. Decisão (Dispositivo)",
+      "Local, Data e Assinatura"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "08/2026",
+      "referenceProcess": "Processo nº 01-P-12345/2026",
+      "interestedParty": "Servidor(a) / Interessado(a) Requerente",
+      "subject": "Solicitação de enquadramento funcional",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Diretor(a) Geral",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "declaracao",
+    "label": "Declaração",
+    "category": "administrativo",
+    "description": "Documento oficial que atesta a existência de um fato, vínculo funcional ou situação jurídica a pedido da pessoa interessada.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/declaracao/",
+    "modelImagePath": "/images/models/modelo-declaracao.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-declaracao.jpg"
+    ],
+    "competence": "Órgãos de Gestão de Pessoas, Secretarias e Chefias",
+    "expectedSections": [
+      "Cabeçalho Institucional Unicamp",
+      "Título 'DECLARAÇÃO' Centralizado",
+      "Texto Formal de Atestação",
+      "Finalidade Declarada",
+      "Local e Data",
+      "Assinatura e Cargo"
+    ],
+    "defaultMetadata": {
+      "targetPerson": "Nome Completo da Pessoa Interessada",
+      "targetDocument": "RG nº 00.000.000-X / CPF nº 000.000.000-00",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Responsável pelo Atendimento Funcional",
+      "authorRole": "Divisão de Atendimento e Benefícios - DGRH"
+    }
+  },
+  {
+    "type": "despacho",
+    "label": "Despacho",
+    "category": "normativo",
+    "description": "Ato de expediente que dá andamento a processo administrativo, determina providências ou manifesta parecer conclusivo.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/despacho/",
+    "modelImagePath": "/images/models/modelo-despacho.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-despacho.jpg"
+    ],
+    "competence": "Chefias, Diretorias e Autoridades Administrativas",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Identificação do Processo / Expediente",
+      "Título 'DESPACHO DO(A) [CARGO]'",
+      "Texto da Determinação / Encaminhamento",
+      "Local, Data e Assinatura"
+    ],
+    "defaultMetadata": {
+      "referenceProcess": "Processo nº 01-P-98765/2026",
+      "interestedParty": "Divisão de Planejamento e Desenvolvimento",
+      "subject": "Aprovação de cronograma de capacitação",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Coordenador(a) Geral",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "informacao",
+    "label": "Informação",
+    "category": "correspondencia",
+    "description": "Manifestação técnica e fundamentada prestada por servidor ou unidade sobre assunto submetido à sua apreciação em processo.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/informacao/",
+    "modelImagePath": "/images/models/modelo-informacao.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-informacao.jpg"
+    ],
+    "competence": "Áreas Técnicas, Jurídicas e Administrativas",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Identificação (INFORMAÇÃO Nº XX/ANO/SIGLA)",
+      "Processo e Interessado",
+      "1. Histórico",
+      "2. Análise Técnica",
+      "3. Conclusão",
+      "Local, Data e Assinatura"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "18/2026",
+      "referenceProcess": "Processo nº 01-P-44556/2026",
+      "interestedParty": "Instituto de Artes",
+      "subject": "Análise sobre aplicação de jornada especial",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Analista Técnico de Recursos Humanos",
+      "authorRole": "Divisão de Legislação Funcional - DGRH"
+    }
+  },
+  {
+    "type": "memorando",
+    "label": "Memorando",
+    "category": "correspondencia",
+    "description": "Comunicação eminentemente interna entre unidades ou órgãos da Universidade para tratar de rotinas administrativas.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/memorando/",
+    "modelImagePath": "/images/models/modelo-memorando.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-memorando.jpg"
+    ],
+    "competence": "Todas as Unidades, Órgãos e Setores da Unicamp",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Identificação (MEMORANDO Nº XX/ANO/SIGLA)",
+      "Tabela Institucional (PARA, DE, ASSUNTO, DATA)",
+      "Texto Sucinto e Objetivo",
+      "Assinatura do Responsável"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "42/2026",
+      "memoPara": "Diretoria de Administração / DGRH",
+      "memoDe": "Divisão de Desenvolvimento de Pessoas",
+      "memoAssunto": "Encaminhamento de relatório de necessidades de treinamento",
+      "memoData": "27 de agosto de 2026",
+      "authorName": "Chefia de Divisão",
+      "authorRole": "Divisão de Desenvolvimento de Pessoas"
+    }
+  },
+  {
+    "type": "oficio",
+    "label": "Ofício",
+    "category": "correspondencia",
+    "description": "Comunicação formal expedida para autoridades, órgãos externos ou entre dirigentes de Unidades e Órgãos da Universidade.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/oficio/",
+    "modelImagePath": "/images/models/modelo-oficio.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-oficio.jpg"
+    ],
+    "competence": "Reitoria, Pró-Reitorias, Diretorias de Faculdades e Órgãos",
+    "expectedSections": [
+      "Cabeçalho Oficial Unicamp",
+      "Identificação (Ofício nº XX/ANO/SIGLA)",
+      "Local e Data (à direita)",
+      "Destinatário Completo com Cargo e Endereço",
+      "Assunto em Destaque",
+      "Vocativo Formal",
+      "Corpo em Parágrafos (Recuo 1,25cm)",
+      "Fecho Padrão",
+      "Assinatura e Cargo"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "105/2026",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "recipientTitle": "A Sua Senhoria o Senhor",
+      "recipientName": "Prof. Dr. Fulano de Tal",
+      "recipientRole": "Diretor do Instituto de Computação",
+      "recipientAddress": "Av. Albert Einstein, 1251 - Cidade Universitária - CEP 13083-852 - Campinas/SP",
+      "subject": "Solicitação de indicação de representantes docentes para comissão técnica.",
+      "vocativo": "Senhor Diretor,",
+      "fecho": "Atenciosamente,",
+      "authorName": "Prof. Dr. Diretor Geral",
+      "authorRole": "Diretoria Geral de Recursos Humanos - Unicamp"
+    }
+  },
+  {
+    "type": "oficio-circular",
+    "label": "Ofício Circular",
+    "category": "correspondencia",
+    "description": "Ofício com o mesmo teor e idêntica redação endereçado a múltiplos destinatários ou coletividades de dirigentes.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/oficio-circular/",
+    "modelImagePath": "/images/models/modelo-oficio-circular.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-oficio-circular.jpg"
+    ],
+    "competence": "Reitoria, Pró-Reitorias e Diretorias Centrais",
+    "expectedSections": [
+      "Cabeçalho Unicamp",
+      "Identificação (Ofício Circular nº XX/ANO/SIGLA)",
+      "Local e Data",
+      "Destinatário Coletivo",
+      "Assunto em Negrito",
+      "Vocativo Coletivo",
+      "Corpo do Texto",
+      "Fecho",
+      "Assinatura"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "05/2026",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "recipientName": "Aos Dirigentes de Unidades e Órgãos da Unicamp",
+      "recipientRole": "Diretoria Geral / Chefias Executivas",
+      "subject": "Divulgação do novo cronograma institucional de avaliação de desempenho.",
+      "vocativo": "Senhores(as) Dirigentes,",
+      "fecho": "Atenciosamente,",
+      "authorName": "Coordenação Geral da DGRH",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "pauta",
+    "label": "Pauta",
+    "category": "administrativo",
+    "description": "Instrumento de convocação que relaciona a ordem dos assuntos a serem tratados em sessão de colegiado ou reunião técnica.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/pauta/",
+    "modelImagePath": "/images/models/modelo-pauta1.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-pauta1.jpg",
+      "/images/models/modelo-pauta2.jpg"
+    ],
+    "competence": "Presidência de Órgãos Colegiados e Comissões",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Título 'PAUTA DA XXª REUNIÃO'",
+      "Dados da Sessão (Data, Horário, Local)",
+      "1. Expediente (Aprovação de Ata e Informes)",
+      "2. Ordem do Dia (Itens Numerados)",
+      "3. Assuntos Gerais",
+      "Assinatura do Convocante"
+    ],
+    "defaultMetadata": {
+      "meetingNumber": "12ª Reunião Ordinária do Comitê Gestor",
+      "meetingDate": "02 de setembro de 2026, às 09h30",
+      "meetingPlace": "Sala de Reuniões nº 2 - DGRH / Microsoft Teams",
+      "authorName": "Presidência do Comitê Gestor",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "parecer",
+    "label": "Parecer",
+    "category": "administrativo",
+    "description": "Opinião técnica, jurídica ou especializada fundamentada, emitida por relator ou comissão para subsidiar decisão superior.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/parecer/",
+    "modelImagePath": "/images/models/modelo-parecer.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-parecer.jpg"
+    ],
+    "competence": "Relatoras(es), Comissões Técnicas, Assessorias e Colegiados",
+    "expectedSections": [
+      "Cabeçalho Unicamp",
+      "Título 'PARECER Nº XX/ANO/SIGLA'",
+      "Processo, Interessado e Assunto",
+      "I - Relatório",
+      "II - Fundamentação",
+      "III - Voto / Conclusão",
+      "Local, Data e Assinatura do Relator"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "23/2026",
+      "referenceProcess": "Processo nº 01-P-33221/2026",
+      "interestedParty": "Faculdade de Engenharia Mecânica",
+      "subject": "Proposta de criação de curso de especialização",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Prof(a). Dr(a). Relator(a) Designado(a)",
+      "authorRole": "Comissão Especial de Ensino - Unicamp"
+    }
+  },
+  {
+    "type": "relatorio",
+    "label": "Relatório",
+    "category": "administrativo",
+    "description": "Exposição minuciosa e estruturada das atividades, pesquisas, auditorias ou resultados de gestão em determinado período.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/relatorio/",
+    "modelImagePath": "/images/models/modelo-relatorio.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-relatorio.jpg"
+    ],
+    "competence": "Comissões de Trabalho, Gestores de Projetos e Chefias",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Título 'RELATÓRIO DE [TEMA/GESTÃO]'",
+      "Período / Objeto",
+      "1. Introdução e Objetivos",
+      "2. Atividades Realizadas",
+      "3. Resultados e Análises",
+      "4. Conclusões e Recomendações",
+      "Local, Data e Assinaturas"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "02/2026",
+      "subject": "Relatório Anual de Ações do Programa de Linguagem Simples",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Grupo de Trabalho de Linguagem Simples",
+      "authorRole": "Unicamp"
+    }
   },
   {
     "type": "conceito-atos-normativos",
-    "label": "Conceitos e Tópicos de Atos Normativos",
+    "label": "Conceitos e Tópicos (Atos Normativos)",
     "category": "normativo",
-    "description": "Guia de referência da Unicamp com a hierarquia, conceitos e regras de redação para atos oficiais.",
-    "expectedSections": [
-      "Hierarquia dos Atos",
-      "Estrutura Articulada",
-      "Linguagem e Técnica Legislativa",
-      "Padronização Institucional"
-    ],
-    "mandatoryElements": [
-      "Conformidade com o Manual de Redação da Unicamp"
-    ],
-    "competenceNote": "Referência transversal para todos os órgãos.",
-    "modelImagePath": "/images/models/modelo-portaria.jpg",
+    "description": "Guia de técnica legislativa da Unicamp com a divisão em 9 tópicos fundamentais da redação normativa.",
     "unicampUrl": "https://linguagemsimples.unicamp.br/conceito-atos-normativos/",
-    "fields": [
-      "unitName",
-      "locationAndDate",
-      "authorName",
-      "authorRole"
-    ]
+    "modelImagePath": "/images/models/modelo-conceito-atos-normativos.svg",
+    "modelImagePages": [
+      "/images/models/modelo-conceito-atos-normativos.svg"
+    ],
+    "competence": "Órgãos Normativos e Redatores Oficiais",
+    "expectedSections": [
+      "Epígrafe",
+      "Ementa",
+      "Preâmbulo / Fundamentação Legal",
+      "Artigos e Desdobramentos",
+      "Parágrafos (§)",
+      "Incisos e Alíneas",
+      "Cláusula de Vigência",
+      "Cláusula de Revogação",
+      "Assinatura"
+    ],
+    "defaultMetadata": {
+      "ementa": "Estabelece diretrizes de redação oficial e técnica legislativa para atos normativos na Unicamp.",
+      "preamble": "O Reitor da Universidade Estadual de Campinas resolve:",
+      "effectiveClause": "Este ato normativo entra em vigor na data de sua publicação.",
+      "authorName": "Reitoria da Unicamp",
+      "authorRole": "Reitor"
+    }
+  },
+  {
+    "type": "deliberacao",
+    "label": "Deliberação",
+    "category": "normativo",
+    "description": "Ato administrativo normativo e decisório expedido por Órgãos Colegiados (CONSU, CAD, CEPE, Congregações).",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/deliberacao/",
+    "modelImagePath": "/images/models/modelo-deliberacao.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-deliberacao.jpg"
+    ],
+    "competence": "Órgãos Colegiados formalmente instituídos na Unicamp",
+    "expectedSections": [
+      "Cabeçalho do Colegiado",
+      "Epígrafe (DELIBERAÇÃO CONSU-A-nº XX/ANO)",
+      "Ementa (Recuo à direita, itálico)",
+      "Preâmbulo do Colegiado",
+      "Corpo Articulado (Art. 1º, Art. 2º...)",
+      "Cláusula de Vigência",
+      "Data e Assinatura do Presidente"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "25/2026",
+      "unitName": "Conselho Universitário - CONSU",
+      "ementa": "Aprova as diretrizes gerais para simplificação de documentos e atendimento ao cidadão.",
+      "preamble": "O Conselho Universitário da Universidade Estadual de Campinas, em sua 180ª Sessão Ordinária, resolve:",
+      "effectiveClause": "Esta Deliberação entra em vigor na data de sua publicação, revogadas as disposições em contrário.",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Prof. Dr. Reitor",
+      "authorRole": "Presidente do Conselho Universitário"
+    }
+  },
+  {
+    "type": "instrucao-normativa",
+    "label": "Instrução Normativa",
+    "category": "normativo",
+    "description": "Ordem escrita e geral para orientar a execução de serviços públicos e padronizar rotinas administrativas internas.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/instrucao-normativa/",
+    "modelImagePath": "/images/models/modelo-instrucao-normativa.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-instrucao-normativa.jpg"
+    ],
+    "competence": "Reitoria, Coordenadoria Geral, Pró-Reitorias e Dirigentes de Órgãos",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Epígrafe (INSTRUÇÃO NORMATIVA DGRH Nº XX/ANO)",
+      "Ementa Recuada à Direita",
+      "Preâmbulo com Competência",
+      "Disposições Articuladas (Artigos e Parágrafos)",
+      "Vigência",
+      "Assinatura"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "03/2026",
+      "unitName": "Diretoria Geral de Recursos Humanos",
+      "ementa": "Regulamenta os procedimentos de protocolo e atendimento presencial e virtual.",
+      "preamble": "A Diretora Geral de Recursos Humanos da Universidade Estadual de Campinas, no uso de suas atribuições, baixa a seguinte Instrução Normativa:",
+      "effectiveClause": "Esta Instrução Normativa entra em vigor na data de sua publicação.",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Coordenação Geral da DGRH",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "portaria",
+    "label": "Portaria",
+    "category": "normativo",
+    "description": "Ato administrativo interno pelo qual chefias expedem determinações, designam servidores para funções ou instituem comissões.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/portaria/",
+    "modelImagePath": "/images/models/modelo-portaria1.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-portaria1.jpg",
+      "/images/models/modelo-portaria2.jpg"
+    ],
+    "competence": "Reitoria, Coordenadoria Geral, Pró-Reitores, Diretores de Institutos e Dirigentes",
+    "expectedSections": [
+      "Cabeçalho Oficial",
+      "Epígrafe (PORTARIA GR ou DGRH Nº XX/ANO)",
+      "Ementa Recuada à Direita (10pt, itálico)",
+      "Preâmbulo Legal ('resolve:')",
+      "Artigos Numerados",
+      "Cláusula de Vigência",
+      "Assinatura da Autoridade"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "50/2026",
+      "unitName": "Gabinete do Reitor",
+      "ementa": "Designa os membros da Comissão Permanente de Modernização Administrativa.",
+      "preamble": "O Reitor da Universidade Estadual de Campinas, no uso de suas atribuições legais e estatutárias, resolve:",
+      "effectiveClause": "Esta Portaria entra em vigor na data de sua publicação.",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Prof. Dr. Reitor da Unicamp",
+      "authorRole": "Reitoria da Universidade Estadual de Campinas"
+    }
+  },
+  {
+    "type": "regimento",
+    "label": "Regimento",
+    "category": "normativo",
+    "description": "Conjunto de princípios e regras que estabelecem atribuições, direção e funcionamento interno de um setor, colegiado ou comissão.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/regimento/",
+    "modelImagePath": "/images/models/modelo-regimento1.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-regimento1.jpg",
+      "/images/models/modelo-regimento2.jpg"
+    ],
+    "competence": "Unidades e Órgãos da Unicamp",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Título 'REGIMENTO INTERNO DO(A) [ÓRGÃO]'",
+      "TÍTULO I - Da Natureza e Finalidades",
+      "TÍTULO II - Da Estrutura Organizacional",
+      "TÍTULO III - Das Competências",
+      "TÍTULO IV - Do Funcionamento",
+      "TÍTULO V - Das Disposições Finais",
+      "Artigos e Vigência"
+    ],
+    "defaultMetadata": {
+      "regimentoTitle": "REGIMENTO INTERNO DO COMITÊ DE LINGUAGEM SIMPLES",
+      "unitName": "Diretoria Geral de Recursos Humanos",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "effectiveClause": "Este Regimento entra em vigor após aprovação pelo Órgão Colegiado competente.",
+      "authorName": "Presidência da Comissão",
+      "authorRole": "Diretoria Geral de Recursos Humanos"
+    }
+  },
+  {
+    "type": "regulamento",
+    "label": "Regulamento",
+    "category": "normativo",
+    "description": "Ato administrativo que explica e detalha o modo e a forma de execução e cumprimento de norma superior (Deliberação ou Resolução).",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/regulamento/",
+    "modelImagePath": "/images/models/modelo-regulamento1.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-regulamento1.jpg",
+      "/images/models/modelo-regulamento2.jpg"
+    ],
+    "competence": "Diretoras(es) e Coordenadoras(es) de Programas e Órgãos",
+    "expectedSections": [
+      "Cabeçalho Institucional",
+      "Título 'REGULAMENTO DO [PROGRAMA/CONCURSO]'",
+      "Capítulo I - Do Objeto",
+      "Capítulo II - Dos Requisitos e Inscrições",
+      "Capítulo III - Da Avaliação",
+      "Capítulo IV - Dos Recursos e Vigência",
+      "Artigos e Assinatura"
+    ],
+    "defaultMetadata": {
+      "regimentoTitle": "REGULAMENTO DO PROGRAMA DE INOVAÇÃO EM GESTÃO PÚBLICA",
+      "unitName": "Diretoria Geral de Recursos Humanos",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "effectiveClause": "Este Regulamento entra em vigor na data de sua divulgação oficial.",
+      "authorName": "Diretoria Geral",
+      "authorRole": "DGRH - Unicamp"
+    }
+  },
+  {
+    "type": "resolucao",
+    "label": "Resolução",
+    "category": "normativo",
+    "description": "Ato administrativo normativo privativo da Reitora ou do Reitor para disciplinar matérias de sua competência executiva.",
+    "unicampUrl": "https://linguagemsimples.unicamp.br/resolucao/",
+    "modelImagePath": "/images/models/modelo-resolucao1.jpg",
+    "modelImagePages": [
+      "/images/models/modelo-resolucao1.jpg",
+      "/images/models/modelo-resolucao2.jpg"
+    ],
+    "competence": "Privativa de Reitora e Reitor",
+    "expectedSections": [
+      "Cabeçalho Unicamp / Reitoria",
+      "Epígrafe (RESOLUÇÃO GR-nº XX/ANO)",
+      "Ementa Recuada à Direita (Itálico, 10pt)",
+      "Preâmbulo Legal do Reitor",
+      "Artigos Numerados",
+      "Cláusula de Vigência",
+      "Assinatura do Reitor"
+    ],
+    "defaultMetadata": {
+      "documentNumber": "14/2026",
+      "unitName": "Gabinete do Reitor",
+      "ementa": "Institui a Política Institucional de Linguagem Simples no âmbito da Universidade Estadual de Campinas.",
+      "preamble": "O Reitor da Universidade Estadual de Campinas, no uso de suas atribuições legais e estatutárias, resolve:",
+      "effectiveClause": "Esta Resolução entra em vigor na data de sua publicação.",
+      "locationAndDate": "Campinas, 27 de agosto de 2026.",
+      "authorName": "Prof. Dr. Antonio José de Almeida Meirelles",
+      "authorRole": "Reitor da Universidade Estadual de Campinas"
+    }
   }
 ]
