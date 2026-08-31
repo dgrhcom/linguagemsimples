@@ -161,6 +161,27 @@ export function DynamicDocumentDrawer({
       return;
     }
 
+    // Clone the element and inline all computed styles
+    const clonedElement = sheetElement.cloneNode(true) as HTMLElement;
+    const allElements = clonedElement.querySelectorAll("*");
+    allElements.forEach((el) => {
+      const computedStyle = window.getComputedStyle(el as Element);
+      let styleText = "";
+      for (let i = 0; i < computedStyle.length; i++) {
+        const prop = computedStyle[i];
+        styleText += `${prop}: ${computedStyle.getPropertyValue(prop)}; `;
+      }
+      (el as HTMLElement).setAttribute("style", styleText);
+    });
+    // Also inline the root element style
+    const rootStyle = window.getComputedStyle(sheetElement);
+    let rootStyleText = "";
+    for (let i = 0; i < rootStyle.length; i++) {
+      const prop = rootStyle[i];
+      rootStyleText += `${prop}: ${rootStyle.getPropertyValue(prop)}; `;
+    }
+    clonedElement.setAttribute("style", rootStyleText);
+
     const htmlContent = `
       <!DOCTYPE html>
       <html lang="pt-BR">
@@ -170,7 +191,10 @@ export function DynamicDocumentDrawer({
         <style>
           @page {
             size: A4 portrait;
-            margin: 15mm 20mm 15mm 25mm;
+            margin: 20mm 20mm 20mm 25mm;
+          }
+          * {
+            box-sizing: border-box;
           }
           body {
             font-family: Arial, Helvetica, sans-serif;
@@ -179,6 +203,8 @@ export function DynamicDocumentDrawer({
             color: #000;
             margin: 0;
             padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           img {
             max-width: 100%;
@@ -194,7 +220,7 @@ export function DynamicDocumentDrawer({
         </style>
       </head>
       <body>
-        ${sheetElement.innerHTML}
+        ${clonedElement.outerHTML}
       </body>
       </html>
     `;
