@@ -67,34 +67,36 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-paper rounded-card border border-slate max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(20, 20, 19, 0.6)", backdropFilter: "blur(4px)" }}>
+      <div className="rounded-[24px] max-w-lg w-full overflow-hidden" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
         {/* Topo */}
-        <div className="px-6 py-4 bg-ink flex items-center justify-between border-b border-slate">
+        <div className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: "#141413", borderBottom: "1px solid #3d3d3a" }}>
           <div className="flex items-center gap-2.5">
-            <Cpu className="w-5 h-5 text-amber" />
-            <h3 className="text-body font-display text-paper">Configurações de IA</h3>
+            <Cpu className="w-5 h-5" style={{ color: "#d97757" }} />
+            <h3 className="text-[20px]" style={{ fontFamily: "var(--font-anthropic-sans)", color: "#faf9f5" }}>Configurações de IA</h3>
           </div>
-          <Button
+          <button
             onClick={onClose}
-            variant="ghost"
-            size="sm"
-            className="text-stone hover:text-paper p-1"
-            leftIcon={<X className="w-5 h-5" />}
-          />
+            className="p-1 rounded-[8px] transition-colors"
+            style={{ color: "#b0aea5" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#faf9f5"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Corpo */}
-        <div className="p-6 space-y-5 text-body-sm text-charcoal">
-          <div className="bg-sand/50 border border-sand rounded-tile p-4 space-y-2">
-            <p className="text-body-sm leading-relaxed text-charcoal">
+        <div className="p-6 space-y-5 text-[14px]" style={{ color: "#141413" }}>
+          <div className="p-4 rounded-[12px] space-y-2" style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", border: "1px solid #cccbc8" }}>
+            <p className="text-[14px] leading-relaxed" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
               A ferramenta funciona <strong>100% offline</strong> utilizando o motor determinístico da Unicamp. Para reescritas contextuais, configure uma chave de API gratuita do <strong>Google Gemini</strong> ou da <strong>OpenAI</strong>.
             </p>
           </div>
 
           {/* Seleção de Modo */}
           <div className="space-y-2">
-            <label className="font-display text-body-sm text-ink block">Motor de IA:</label>
+            <label className="text-[14px] block" style={{ fontFamily: "var(--font-anthropic-sans)", color: "#141413" }}>Motor de IA:</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { id: "gemini" as const, label: "Google Gemini", sub: "Recomendado (Grátis)" },
@@ -105,14 +107,15 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                   key={opt.id}
                   type="button"
                   onClick={() => setProvider(opt.id)}
-                  className={`p-3 rounded-tile text-left border transition-colors ${
-                    provider === opt.id
-                      ? "bg-ink text-paper border-slate"
-                      : "bg-paper text-charcoal border-sand hover:border-deep-stone"
-                  }`}
+                  className="p-3 rounded-[12px] text-left transition-colors"
+                  style={{
+                    backgroundColor: provider === opt.id ? "#141413" : "#faf9f5",
+                    color: provider === opt.id ? "#faf9f5" : "#141413",
+                    border: `1px solid ${provider === opt.id ? "#3d3d3a" : "#cccbc8"}`
+                  }}
                 >
-                  <div className="text-body-sm font-display">{opt.label}</div>
-                  <div className="text-micro-label text-stone mt-0.5">{opt.sub}</div>
+                  <div className="text-[14px]" style={{ fontFamily: "var(--font-anthropic-sans)" }}>{opt.label}</div>
+                  <div className="text-[10px] mt-0.5" style={{ color: provider === opt.id ? "#b0aea5" : "#b0aea5" }}>{opt.sub}</div>
                 </button>
               ))}
             </div>
@@ -120,17 +123,18 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
 
           {/* Campo de Chave Gemini */}
           {provider === "gemini" && (
-            <div className="space-y-2 bg-sand/30 p-4 rounded-tile border border-sand">
+            <div className="space-y-2 p-4 rounded-[12px]" style={{ backgroundColor: "rgba(227, 218, 204, 0.3)", border: "1px solid #cccbc8" }}>
               <div className="flex justify-between items-center">
-                <label className="font-display text-body-sm text-ink">Chave de API do Google Gemini:</label>
+                <label className="text-[14px]" style={{ fontFamily: "var(--font-anthropic-sans)", color: "#141413" }}>Chave de API do Google Gemini:</label>
                 <a
                   href="https://aistudio.google.com/app/apikey"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ghost-link text-caption text-charcoal flex items-center gap-1"
+                  className="ghost-link text-[12px] flex items-center gap-1"
+                  style={{ color: "#141413" }}
                 >
                   <span>Obter chave</span>
-                  <ExternalLink className="w-3 h-3 text-amber" />
+                  <ExternalLink className="w-3 h-3" style={{ color: "#d97757" }} />
                 </a>
               </div>
               <input
@@ -138,9 +142,10 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                 value={geminiKey}
                 onChange={(e) => setGeminiKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full bg-paper-light border border-sand rounded-input px-3 py-2 text-body-sm font-mono focus:border-deep-stone focus:ring-1 focus:ring-deep-stone outline-hidden"
+                className="w-full rounded-[8px] px-3 py-2 text-[14px] font-mono focus:ring-1 outline-hidden"
+                style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", color: "#141413" }}
               />
-              <span className="text-micro-label text-stone block">
+              <span className="text-[10px] block" style={{ color: "#b0aea5" }}>
                 Sua chave fica salva apenas no navegador (localStorage).
               </span>
             </div>
@@ -148,17 +153,18 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
 
           {/* Campo de Chave OpenAI */}
           {provider === "openai" && (
-            <div className="space-y-2 bg-sand/30 p-4 rounded-tile border border-sand">
+            <div className="space-y-2 p-4 rounded-[12px]" style={{ backgroundColor: "rgba(227, 218, 204, 0.3)", border: "1px solid #cccbc8" }}>
               <div className="flex justify-between items-center">
-                <label className="font-display text-body-sm text-ink">Chave de API da OpenAI:</label>
+                <label className="text-[14px]" style={{ fontFamily: "var(--font-anthropic-sans)", color: "#141413" }}>Chave de API da OpenAI:</label>
                 <a
                   href="https://platform.openai.com/api-keys"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ghost-link text-caption text-charcoal flex items-center gap-1"
+                  className="ghost-link text-[12px] flex items-center gap-1"
+                  style={{ color: "#141413" }}
                 >
                   <span>Obter na OpenAI</span>
-                  <ExternalLink className="w-3 h-3 text-amber" />
+                  <ExternalLink className="w-3 h-3" style={{ color: "#d97757" }} />
                 </a>
               </div>
               <input
@@ -166,22 +172,23 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
                 placeholder="sk-proj-..."
-                className="w-full bg-paper-light border border-sand rounded-input px-3 py-2 text-body-sm font-mono focus:border-deep-stone focus:ring-1 focus:ring-deep-stone outline-hidden"
+                className="w-full rounded-[8px] px-3 py-2 text-[14px] font-mono focus:ring-1 outline-hidden"
+                style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", color: "#141413" }}
               />
             </div>
           )}
 
           {/* Modo Offline */}
           {provider === "offline" && (
-            <div className="bg-sand/30 p-4 rounded-tile border border-sand text-charcoal text-body-sm leading-relaxed">
+            <div className="p-4 rounded-[12px] text-[14px] leading-relaxed" style={{ backgroundColor: "rgba(227, 218, 204, 0.3)", border: "1px solid #cccbc8", color: "#141413", fontFamily: "var(--font-anthropic-serif)" }}>
               O modo offline utiliza o motor baseado nos 4 dicionários estruturados da Unicamp, sem necessidade de internet.
             </div>
           )}
         </div>
 
         {/* Rodapé */}
-        <div className="bg-sand/30 px-6 py-4 border-t border-sand flex items-center justify-between">
-          <span className="text-caption text-stone">
+        <div className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: "rgba(227, 218, 204, 0.3)", borderTop: "1px solid #cccbc8" }}>
+          <span className="text-[12px]" style={{ color: "#b0aea5" }}>
             {savedSuccess ? "Configurações salvas!" : "As alterações têm efeito imediato."}
           </span>
           <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@ import verbosidadeList from "../../data/terminology/verbosidade.json" with { typ
 import chavoesList from "../../data/terminology/chavoes.json" with { type: "json" };
 import linguagemNaoSexistaList from "../../data/terminology/linguagem-nao-sexista.json" with { type: "json" };
 import termosNaoOfensivosList from "../../data/terminology/termos-nao-ofensivos.json" with { type: "json" };
+import termosEstrangeirosList from "../../data/terminology/termos-estrangeiros.json" with { type: "json" };
 
 /**
  * Inverte construções passivas comuns para ordem direta e voz ativa.
@@ -155,6 +156,14 @@ function rewriteSingleParagraph(paragraph: string): string {
     const escaped = item.termoInadequado.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(`\\b${escaped}\\b`, "gi");
     result = result.replace(regex, item.alternativas[0]);
+  }
+
+  // 6b. Dicionário de Termos Estrangeiros
+  for (const item of termosEstrangeirosList) {
+    if (!item.termoEstrangeiro || !item.alternativa) continue;
+    const escaped = item.termoEstrangeiro.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`\\b${escaped}\\b`, "gi");
+    result = result.replace(regex, item.alternativa);
   }
 
   // 7. Expressões Burocráticas, Fórmulas e Nominalizações

@@ -10,47 +10,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /* Strut Design System — Paper Canvas palette */
-        paper: {
-          DEFAULT: "#ead7b8",
-          light: "#f2e8d5",
-          dark: "#dfc9a5",
-        },
-        sand: {
-          DEFAULT: "#e5dfd5",
-          light: "#ede9e2",
-          dark: "#d9d1c4",
-        },
-        ink: {
-          DEFAULT: "#2e2d2b",
-          light: "#3a3836",
-          dark: "#1e1d1c",
-        },
-        charcoal: {
-          DEFAULT: "#333333",
-          light: "#444444",
-          dark: "#222222",
-        },
-        stone: {
-          DEFAULT: "#73706b",
-          light: "#8a8782",
-          dark: "#5c5955",
-        },
-        slate: {
-          DEFAULT: "#676460",
-          light: "#7d7a76",
-          dark: "#504d4a",
-        },
-        "deep-stone": {
-          DEFAULT: "#5c5955",
-          light: "#73706b",
-          dark: "#45433f",
-        },
-        amber: {
-          DEFAULT: "#ffb546",
-          light: "#ffc970",
-          dark: "#e59b2b",
-        },
+        /* Anthropic Design System — Warm Parchment palette */
+        "slate-dark": "#141413",
+        "ivory-medium": "#f0eee6",
+        "ivory-light": "#faf9f5",
+        "cloud-medium": "#b0aea5",
+        "cloud-dark": "#87867f",
+        "stone": "#cccbc8",
+        "slate-medium": "#3d3d3a",
+        "oat-warm": "#e3dacc",
+        "manilla": "#f5e3c7",
+        "clay": "#d97757",
+        "clay-deep": "#c6613f",
         /* Semantic colors — kept for status/feedback */
         error: {
           DEFAULT: "#ef4444",
@@ -100,40 +71,37 @@ const config: Config = {
         ring: "hsl(var(--ring))",
       },
       fontFamily: {
-        display: ["'GT Pressura Standard'", "'Space Grotesk'", "ui-sans-serif", "system-ui", "sans-serif"],
-        sans: ["'Inter'", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["var(--font-anthropic-serif)", "ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
+        sans: ["var(--font-anthropic-sans)", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        mono: ["var(--font-anthropic-mono)", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
       },
       borderRadius: {
-        "card": "28px",
-        "tile": "24px",
-        "input": "12px",
+        "card": "24px",
+        "tile": "12px",
+        "input": "8px",
         "btn": "8px",
-        "tag": "9999px",
+        "tag": "0px",
       },
       spacing: {
         "section": "80px",
         "section-lg": "120px",
       },
       letterSpacing: {
-        "micro": "0.25em",
-        "editorial": "0.071em",
-        "subhead": "0.1em",
+        "caption": "-0.24px",
+        "body-sm": "-0.08px",
+        "subheading": "-0.05px",
+        "heading": "-0.12px",
       },
       fontSize: {
-        "micro-label": ["10px", { lineHeight: "1.6", letterSpacing: "0.25em" }],
-        "caption": ["12px", { lineHeight: "1.43" }],
-        "body-sm": ["14px", { lineHeight: "1.43", letterSpacing: "0.03em" }],
-        "body": ["16px", { lineHeight: "1.5" }],
-        "subheading": ["20px", { lineHeight: "1.4", letterSpacing: "0.1em" }],
-        "heading-sm": ["32px", { lineHeight: "1.25" }],
-        "heading": ["48px", { lineHeight: "1.17" }],
-        "heading-lg": ["68px", { lineHeight: "1" }],
-        "display": ["104px", { lineHeight: "0.92", letterSpacing: "0.071em" }],
-        "display-xl": ["136px", { lineHeight: "0.92", letterSpacing: "0.071em" }],
+        "caption": ["12px", { lineHeight: "1.4", letterSpacing: "-0.24px" }],
+        "body-sm": ["16px", { lineHeight: "1", letterSpacing: "-0.08px" }],
+        "body": ["20px", { lineHeight: "1.4" }],
+        "subheading": ["24px", { lineHeight: "1.3", letterSpacing: "-0.05px" }],
+        "heading": ["61px", { lineHeight: "1.1", letterSpacing: "-0.12px" }],
+        "display": ["68px", { lineHeight: "1.1" }],
       },
       boxShadow: {
         "none": "none",
-        "subtle": "rgba(0, 0, 0, 0.5) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.5) 0px 1px 0px 0px",
       },
     },
   },

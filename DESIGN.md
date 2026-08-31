@@ -1,61 +1,67 @@
-# Strut — Style Reference
-> editorial broadsheet on warm canvas — oversized serif-adjacent display type sitting on a cream paper field, marked only by a single amber highlighter and hairline rules.
+# Anthropic — Style Reference
+> scientific field journal on warm parchment — quiet ivory surfaces, editorial serif headlines, and a single clay accent that only appears when you must act
 
 **Theme:** light
 
-Strut treats its interface as a sheet of warm paper rather than a software screen: a continuous cream canvas carries oversized editorial type, hairline-bordered flat cards, and a single amber accent that punctuates like a highlighter stroke. GT Pressura anchors the voice — its geometric, slightly utilitarian forms at 100–136px turn every headline into a broadsheet masthead, while Inter quietly handles body and UI at 14–16px. Components are deliberately weightless: 1px borders do the work of shadows, 28px corners soften without rounding into pill territory, and vertical rhythm opens up to 80–120px between sections so the page reads like a printed spread. Color is rationed — the amber appears as decorative micro-touches (active icon strokes, brand mark, tag dots) while text and structure stay in warm neutrals from #2e2d2b ink to #ead7b8 paper.
+Anthropic's interface reads like a curated research publication on warm parchment paper. Ivory and oat neutrals replace the typical cool-gray tech palette, giving every surface a paper-like quality that pairs with a custom serif used at unprecedented scale for both body and display text. A single clay-toned accent surfaces only at moments of action; everything else stays quiet and editorial. Components are flat — hairline borders and selective bottom-corner radii replace shadows as the elevation language, sans-serif handles UI chrome, and the serif carries voice.
 
 ## Tokens — Colors
 
 | Name | Value | Token | Role |
 |------|-------|-------|------|
-| Paper Cream | `#ead7b8` | `--color-paper-cream` | Page canvas, the continuous warm background behind every section — the paper the whole product sits on |
-| Sand Border | `#e5dfd5` | `--color-sand-border` | Hairline borders, soft card surfaces that float just barely above the cream canvas, subtle dividers |
-| Ink Black | `#2e2d2b` | `--color-ink-black` | Primary text, masthead headlines, and the near-black ink that gives the editorial type its printed authority |
-| Charcoal | `#333333` | `--color-charcoal` | Body copy, secondary text, and any UI text that needs to stay just slightly softer than pure ink |
-| Stone | `#73706b` | `--color-stone` | Muted helper text, inactive icons, and the soft gray that recedes behind primary content |
-| Slate Border | `#676460` | `--color-slate-border` | Dark borders and separators for elevated surfaces and inverted UI. Do not promote it to the primary CTA color |
-| Deep Stone | `#5c5955` | `--color-deep-stone` | Pressed/hover states for borders and link underlines — a half-step darker than Slate Border |
-| Amber Honey | `#ffb546` | `--color-amber-honey` | Decorative brand accent — brand mark, active workspace icon stroke, highlight tag dots. Rationed: never fills a button, never carries body text |
+| Slate Dark | `#141413` | `--color-slate-dark` | Primary text, headings, footer background, hairline borders — near-black with a hint of warmth, never pure black |
+| Ivory Medium | `#f0eee6` | `--color-ivory-medium` | Page canvas and large surface fills — the parchment background that sets the entire warm tone |
+| Ivory Light | `#faf9f5` | `--color-ivory-light` | Card surfaces, elevated panels, skip-link buttons — one step brighter than canvas for subtle layering without shadows |
+| Cloud Medium | `#b0aea5` | `--color-cloud-medium` | Muted helper text, inactive nav items, secondary labels — the neutral that recedes without disappearing |
+| Cloud Dark | `#87867f` | `--color-cloud-dark` | Outlined button borders, mid-contrast dividers |
+| Stone | `#cccbc8` | `--color-stone` | Hairline borders and dividers between sections — visible but never assertive |
+| Slate Medium | `#3d3d3a` | `--color-slate-medium` | Dark-on-dark borders inside the footer |
+| Oat Warm | `#e3dacc` | `--color-oat-warm` | Secondary warm surface for grouped panels and feature containers — a deeper paper tone for variety |
+| Manilla | `#f5e3c7` | `--color-manilla` | Featured hero card background — vintage paper tone that signals editorial importance without color shouting |
+| Clay | `#d97757` | `--color-clay` | Filled CTA buttons (e.g. cookie consent accept) — the single chromatic accent in the system, a terracotta warmth that belongs to the earth-tone family rather than typical UI blue |
+| Clay Deep | `#c6613f` | `--color-clay-deep` | Hover/pressed state for Clay CTAs and the canonical accent token — deeper version of the primary accent |
 
 ## Tokens — Typography
 
-### GT Pressura Standard — Display and headline voice — masthead, section titles, oversized declarations. Its geometric, slightly industrial forms at 104–136px are the brand's signature, replacing the typical bold sans headline with something that reads more like editorial typography set by hand. · `--font-gt-pressura-standard`
-- **Substitute:** Space Grotesk or Söhne Breit (for the geometric editorial feel); or IBM Plex Sans at high weight as a stand-in.
-- **Weights:** 400, 500
-- **Sizes:** 12, 14, 48, 68, 104, 136
-- **Line height:** 0.92–1.67 (tighter at display, 1.43–1.67 at smaller sizes)
-- **Letter spacing:** 0.0710em at display; 0.2500em at micro/uppercase labels
-- **Role:** Display and headline voice — masthead, section titles, oversized declarations. Its geometric, slightly industrial forms at 104–136px are the brand's signature, replacing the typical bold sans headline with something that reads more like editorial typography set by hand.
-
-### Inter — Body, UI, navigation, badges, and supporting headlines. Quiet, high-legibility workhorse that stays out of GT Pressura's way; the 0.214em tracking on 10–14px uppercase labels is the second signature — small editorial micro-labels that read as typeset marginalia. · `--font-inter`
-- **Substitute:** Inter (native) — no substitute needed.
+### Anthropic Serif — Editorial voice — used for the display heading at 68px, all body copy at 20px, card titles, and supporting paragraphs. The serif carries personality; its presence in body text (unusual for tech sites) signals research-publication DNA. Weight 400 is default, 600 for emphasis. · `--font-anthropic-serif`
+- **Substitute:** Georgia, Source Serif Pro, Charter
 - **Weights:** 400, 600
-- **Sizes:** 10, 14, 16, 20, 32, 48
-- **Line height:** 1.17–1.60
-- **Letter spacing:** 0.1000em at subheadings; 0.2140em at uppercase body labels
-- **Role:** Body, UI, navigation, badges, and supporting headlines. Quiet, high-legibility workhorse that stays out of GT Pressura's way; the 0.214em tracking on 10–14px uppercase labels is the second signature — small editorial micro-labels that read as typeset marginalia.
+- **Sizes:** 14px, 18px, 20px, 24px, 68px
+- **Line height:** 1.10, 1.40, 1.43
+- **Letter spacing:** normal
+- **Role:** Editorial voice — used for the display heading at 68px, all body copy at 20px, card titles, and supporting paragraphs. The serif carries personality; its presence in body text (unusual for tech sites) signals research-publication DNA. Weight 400 is default, 600 for emphasis.
+
+### Anthropic Sans — UI chrome and display sans — nav links, buttons, footers, badges, and the bold sans display heading at 61px weight 700. The 61px sans display sits beside the 68px serif display as a deliberate dual-system: sans shouts declarative statements, serif reads as editorial essay. · `--font-anthropic-sans`
+- **Substitute:** Inter, system-ui, Arial
+- **Weights:** 400, 500, 600, 700
+- **Sizes:** 12px, 15px, 16px, 20px, 24px, 61px
+- **Line height:** 1.00, 1.10, 1.25, 1.30, 1.40
+- **Letter spacing:** -0.0200em at 12px (tight nav/caption tracking), -0.0050em at 15-16px (subtle UI tightening), -0.0020em at larger sizes
+- **Role:** UI chrome and display sans — nav links, buttons, footers, badges, and the bold sans display heading at 61px weight 700. The 61px sans display sits beside the 68px serif display as a deliberate dual-system: sans shouts declarative statements, serif reads as editorial essay.
+
+### Anthropic Mono — Reserved for code or technical snippets — appears sparingly · `--font-anthropic-mono`
+- **Substitute:** JetBrains Mono, SF Mono, Menlo
+- **Weights:** 400
+- **Sizes:** 16px
+- **Line height:** 1.40
+- **Role:** Reserved for code or technical snippets — appears sparingly
 
 ### Type Scale
 
 | Role | Size | Line Height | Letter Spacing | Token |
 |------|------|-------------|----------------|-------|
-| micro-label | 10px | 1.6 | 2.5px | `--text-micro-label` |
-| caption | 12px | 1.43 | — | `--text-caption` |
-| body-sm | 14px | 1.43 | 3px | `--text-body-sm` |
-| body | 16px | 1.5 | — | `--text-body` |
-| subheading | 20px | 1.4 | 2px | `--text-subheading` |
-| heading-sm | 32px | 1.25 | — | `--text-heading-sm` |
-| heading | 48px | 1.17 | — | `--text-heading` |
-| heading-lg | 68px | 1 | — | `--text-heading-lg` |
-| display | 104px | 0.92 | 7.4px | `--text-display` |
-| display-xl | 136px | 0.92 | 9.7px | `--text-display-xl` |
+| caption | 12px | 1.4 | -0.24px | `--text-caption` |
+| body-sm | 16px | 1 | -0.08px | `--text-body-sm` |
+| body | 20px | 1.4 | — | `--text-body` |
+| subheading | 24px | 1.3 | -0.05px | `--text-subheading` |
+| heading | 61px | 1.1 | -0.12px | `--text-heading` |
+| display | 68px | 1.1 | — | `--text-display` |
 
 ## Tokens — Spacing & Shapes
 
 **Base unit:** 4px
 
-**Density:** comfortable
+**Density:** compact
 
 ### Spacing Scale
 
@@ -66,174 +72,162 @@ Strut treats its interface as a sheet of warm paper rather than a software scree
 | 12 | 12px | `--spacing-12` |
 | 16 | 16px | `--spacing-16` |
 | 24 | 24px | `--spacing-24` |
-| 40 | 40px | `--spacing-40` |
-| 80 | 80px | `--spacing-80` |
-| 96 | 96px | `--spacing-96` |
-| 108 | 108px | `--spacing-108` |
-| 120 | 120px | `--spacing-120` |
+| 32 | 32px | `--spacing-32` |
+| 76 | 76px | `--spacing-76` |
+| 100 | 100px | `--spacing-100` |
 
 ### Border Radius
 
 | Element | Value |
 |---------|-------|
-| tags | 9999px |
-| cards | 28px |
-| inputs | 12px |
-| buttons | 8px |
-| appScreenshots | 24px |
-
-### Shadows
-
-| Name | Value | Token |
-|------|-------|-------|
-| subtle | `rgba(0, 0, 0, 0.5) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0...` | `--shadow-subtle` |
+| nav | 0px |
+| cards | 24px |
+| links | 0px |
+| badges | 0px |
+| buttons | 8px (bottom-only on filled variants), 12px (outlined) |
 
 ### Layout
 
-- **Page max-width:** 1200px
+- **Page max-width:** 1280px
 - **Section gap:** 80-120px
-- **Card padding:** 24-40px
-- **Element gap:** 16px
+- **Card padding:** 24-32px
+- **Element gap:** 8px
 
 ## Components
 
-### Editorial Micro-Label
-**Role:** Section label and small caps marginalia
+### Text Link Button
+**Role:** Primary inline link styled as a button — used for navigation and inline actions
 
-10–12px Inter 400, uppercase, letter-spacing 0.25em, color Stone (#73706b). Sits above section headings as a typographic breath — never bold, never colored. Always preceded by a full hairline rule above it.
+Transparent background, #141413 text color, no border, 0px radius, padding 22px 12px. Underline appears on hover. No background fill at any state — this is text that happens to be clickable, not a container.
 
-### Masthead Display Heading
-**Role:** Hero and section-level declarations
+### Filled Ivory Button
+**Role:** Primary action button on light surfaces
 
-GT Pressura 500 at 68–136px, line-height 0.92, letter-spacing ~0.071em, color Ink Black (#2e2d2b). Wraps onto 2–3 lines, never breaks after the first word. No gradient, no decoration.
+Background #faf9f5, text #141413, bottom-only border-radius 8px (top corners sharp), padding 12px 31px. The bottom-only radius is a signature choice — the button reads like a tab or card pulled from a stack, not a generic pill. No border, no shadow.
 
-### Workspace Card
-**Role:** Container for grouped document tiles, used in app and in product preview
+### Outlined Dark Button
+**Role:** Secondary action on dark backgrounds (cookie consent, modal footer)
 
-Background Paper Cream (#ead7b8), 1px Slate Border (#676460), 28px radius, 24–40px internal padding. No shadow. Title is GT Pressura 500 at 14–16px, body is Inter 400 at 12–14px in Stone.
+Transparent background, #ffffff text, 1px border in #87867f, 12px radius, padding 8px 16px. Compact size, ghost treatment that lets the dark background show through.
 
-### Document Tile
-**Role:** Individual document card inside a workspace
+### Clay Filled Button
+**Role:** The single chromatic CTA — used sparingly for the most consequential actions
 
-Background Paper Cream, 1px Sand Border (#e5dfd5), 24px radius, 24px padding. Active state adds Amber Honey (#ffb546) left border at 4px width and a small amber dot. Title in GT Pressura 500, 14px.
+Background #d97757, white text, 8px radius, padding matching Filled Ivory Button proportions. Reserved for moments where acceptance must be visually distinct from the rest of the editorial interface. Deepens to #c6613f on hover.
 
-### App Window Frame
-**Role:** Container for product screenshots in marketing pages
+### Featured Hero Card
+**Role:** Large editorial card for announcements and story highlights
 
-24px radius, 1px Slate Border, no shadow, sits on the cream canvas. Inner chrome bar is ~32px tall, light, with three small traffic-light dots left-aligned. App UI inside uses the same Paper Cream and Ink palette.
+Background #f5e3c7 (manilla), 24px border-radius, no shadow, no border. Generous internal padding (~48-64px) to accommodate large serif display text and editorial illustration. The warm paper tone separates it from ivory cards without using color.
 
-### Detail Accordion Row
-**Role:** Expandable feature description in a vertical list
+### Release Card
+**Role:** Compact card for latest releases grid
 
-Full-width row, flush-left content, +/- toggle flush-right. Title in Inter 600 at 16–20px in Ink Black. Hairline Sand Border above each row. Expanded state reveals body copy in Inter 400, 14–16px, Charcoal, with 16px row-gap between paragraphs. No background change between collapsed and expanded.
+Background #faf9f5, 24px radius, 1px border in #cccbc8 or no border, padding ~24px. Title in Anthropic Sans 24px weight 600 or Anthropic Serif 20px, body in serif 20px. Three-column grid layout.
 
-### Sidebar Nav Item
-**Role:** Workspace/folder navigation in the app
+### Top Navigation Bar
+**Role:** Sticky site navigation
 
-No background fill by default. Active state uses a 1px Amber Honey (#ffb546) left border at 3px and a 2px rounded indicator. Text in Inter 400, 14px. Hover state adds Paper Cream background.
+Transparent or #f0eee6 background, logo left in Anthropic Sans 12px weight 700 all-caps letter-spaced, nav links right-aligned at 12px sans with #b0aea5 hover-to-#141413 transition. Dropdown indicators as chevrons. The 'Try Claude' button on the right uses Filled Ivory Button styling. No background blur, no shadow.
 
-### Input Field
-**Role:** Text inputs, textareas, and search fields across the app
+### Footer
+**Role:** Dark closing section with link columns
 
-Background Paper Light (#f2e8d5) — a warm, lighter cream that sits above the Paper Cream canvas, giving inputs clear visual depth while staying within the warm palette. 1px Sand Border edge, 12px radius, Inter 400 at 14px in Ink Black. Focus state: Deep Stone (#5c5955) 1px ring, background transitions to white (#ffffff). Inputs must always be visually lighter than the surrounding Paper Cream canvas to signal editability — never match or darken relative to the background.
+Full-bleed #141413 background, #faf9f5 text, multi-column link grid with 8px link gaps. Section headings in sans 12px weight 600, link items in sans 12px at #b0aea5. The dark footer is the only inversion in the system — a final grounded anchor after all the parchment above.
 
-### Ghost Text Link
-**Role:** Inline link and supporting action link
+### Hero Heading Block
+**Role:** Asymmetric first-screen composition
 
-Underlined 1px Deep Stone (#5c5955) rule beneath Charcoal text. No color change on hover — the underline thickens to 2px. No arrow, no background, no fill.
+Two-column layout: left holds Anthropic Sans 61px weight 700 heading with inline underlined links mid-phrase; right holds supporting serif paragraph at 20px. Generous whitespace around the block. Headings use #141413, supporting text #141413 at reduced visual weight.
 
-### App Icon Mark
-**Role:** Brand mark in the top-left of the site
+### Inline Underlined Link
+**Role:** Text link embedded in paragraphs and headings
 
-A small geometric glyph in Amber Honey (#ffb546) — the only place amber sits at this size. Followed by the wordmark 'strut' in GT Pressura 500 at 18–20px, Ink Black, lowercase, no tracking.
+No background, text inherits parent color (#141413), 1px underline always visible (not just on hover) in #141413. The persistent underline is editorial — it matches print convention where links are typeset with underlines, not the UI convention of reveal-on-hover.
 
-### Section Divider
-**Role:** Horizontal separator between content blocks
+### Badge / Inline Label
+**Role:** Small tag for categories and metadata
 
-1px solid Sand Border (#e5dfd5), full content width, no padding above or below — sections breathe into the gap.
+Transparent background, #141413 text, 0px radius, no padding above/below the text baseline. Effectively just bold or weighted text in flow — not a container. Used sparingly.
 
-### Feature List Bullet
-**Role:** Small list item within a prose block
+### Cookie Consent Bar
+**Role:** Bottom-pinned consent prompt
 
-No bullet glyphs. Items are preceded by a small uppercase micro-label (10–12px Inter, 0.25em tracking, Stone) instead of a dot. Body copy below in Inter 400, 14–16px.
+Dark band (#141413 background) or dark overlay containing body text and three action buttons: Filled Ivory Button (Accept), Outlined Dark Button (Customize, Reject). The contrast inversion makes consent legible against the parchment above.
 
-### Footer Link
-**Role:** Supporting links in the bottom strip
+### Skip Link
+**Role:** Accessibility utility for keyboard navigation
 
-Inter 400, 12–14px, Stone (#73706b). Hover darkens to Charcoal. No underline unless the link is inline within a sentence.
+Background #faf9f5, text #141413, small padding, visible only on focus. Positioned absolutely at the top edge.
 
 ## Do's and Don'ts
 
 ### Do
-- Use Paper Cream (#ead7b8) as the canvas on every marketing page section; never fall back to white.
-- Set display headings in GT Pressura 500 at 68–136px with 0.92 line-height and ~0.071em letter-spacing.
-- Mark section starts with an uppercase 10–12px Inter micro-label at 0.25em letter-spacing in Stone (#73706b).
-- Use 1px Slate Border (#676460) or Sand Border (#e5dfd5) for all card and container edges — never use drop shadows for elevation.
-- Apply 28px radius to all workspace and feature cards; 24px to app screenshot frames; 8px to small interactive surfaces.
-- Open vertical breathing room to 80–120px between sections to maintain the printed-spread rhythm.
-- Reserve Amber Honey (#ffb546) for the brand mark, active icon strokes, and the sidebar active indicator — never fill a button or large surface with it.
-- Use Paper Light (#f2e8d5) as the background for all input fields — inputs must be lighter than the Paper Cream canvas to clearly signal editability.
+- Use Anthropic Serif at 20px for all body copy and Anthropic Sans at 12-16px for UI chrome — the serif/sans split defines the system's voice.
+- Use #f0eee6 as the page canvas and #faf9f5 for cards; reach for #f5e3c7 only when a card needs to feel like a featured editorial spread.
+- Use the bottom-only 8px radius on filled buttons (Filled Ivory Button); this signature corner treatment replaces the generic pill.
+- Use #d97757 Clay exclusively for the most consequential single CTA on any given page; never apply it to multiple actions or decorative elements.
+- Keep underlines persistent on inline links — editorial print convention, not reveal-on-hover.
+- Reach for 24px radius on all card-level surfaces to maintain the paper-stacked feel.
+- Use the 61px sans weight 700 paired with the 68px serif weight 400 as the dual display system — sans for declarative statements, serif for editorial reflection.
 
 ### Don't
-- Do not use a filled colored CTA button — actions live as ghost text links or outlined controls with Deep Stone (#5c5955) borders.
-- Do not set body copy in a display weight or size; Inter 400 at 14–16px in Charcoal (#333333) is the only body treatment.
-- Do not introduce drop shadows, glows, or blur effects to lift cards — the system is intentionally flat.
-- Do not use pure white (#ffffff) as a page background; Paper Cream is the system canvas.
-- Do not use Amber Honey (#ffb546) for text, button fills, or large background areas — it is a 1–4px accent only.
-- Do not tighten letter-spacing on uppercase micro-labels below 0.2em — the wide tracking is what makes them read as editorial marginalia.
-- Do not center-align long body paragraphs; body copy sits flush-left in a max-width column of 640–720px.
+- Don't introduce cool grays, blues, or any color outside the warm earth-tone family — the palette is ivory/oat/clay, period.
+- Don't use box-shadow for elevation — this system elevates through surface tone (#f0eee6 → #faf9f5 → #f5e3c7) and 1px borders only.
+- Don't use the Clay accent for decoration, icons, hover states, or non-CTA elements; reserve #d97757 for filled action buttons only.
+- Don't set body text in sans-serif — body must be serif at 20px; sans is UI chrome only.
+- Don't apply uniform border-radius to buttons; the bottom-only 8px is a signature, not a default that should be rounded everywhere.
+- Don't use bright white (#ffffff) as a surface — the system is ivory-tinted throughout (#faf9f5, #f0eee6, #f5e3c7); pure white would feel clinical and break the paper metaphor.
+- Don't add gradients, glows, or color washes to backgrounds; surfaces are flat solid fills only.
 
 ## Surfaces
 
 | Level | Name | Value | Purpose |
 |-------|------|-------|---------|
-| 1 | Paper Canvas | `#ead7b8` | The base page background — every section inherits this warm cream field. |
-| 2 | Card Sand | `#e5dfd5` | Inside cards and the lighter band that frames product screenshots, separating surface from canvas. |
-| 3 | Ink Field | `#2e2d2b` | The dark inverted surface used inside the app screenshot for the sidebar — used sparingly as a counterpoint. |
+| 0 | Canvas | `#f0eee6` | Page-level background — the parchment that everything sits on |
+| 1 | Card Surface | `#faf9f5` | Standard card and elevated panel — one tonal step above canvas |
+| 2 | Warm Feature Surface | `#f5e3c7` | Featured hero card and editorial highlights — manilla paper tone for visual emphasis |
+| 3 | Deep Warm Surface | `#e3dacc` | Secondary grouped panels and deeper warm containers |
+| 4 | Inversion Surface | `#141413` | Footer and dark utility bands — the only dark surface in the system |
 
 ## Elevation
 
-Strut deliberately avoids traditional drop shadows. The single shadow token in the system — a 1px rgba(0,0,0,0.5) inset line — is functionally a hairline border, not a shadow. Surfaces separate through color contrast and 1px Slate Border rules, not depth. This keeps the page feeling flat, printed, and paper-like rather than skeuomorphic or iOS-glass. When a product screenshot or app preview appears, it sits directly on the cream canvas with no lift.
+- **Card:** `none — elevated through surface tone shift, not shadow`
+- **Button:** `none — identity through fill color and bottom-corner radius`
+- **Navigation:** `none — flat, relies on tonal difference from page canvas`
 
 ## Imagery
 
-No photography or illustration. The only imagery is product screenshots of the Strut app itself, shown as full app window mockups (traffic-light chrome, sidebar, document cards) embedded in the page like printed spreads. The screenshots use the same cream-and-ink palette internally, so they read as part of the same paper system rather than foreign UI dropped in. Iconography inside the screenshots is a mix of filled and outlined glyphs at ~16–20px, mostly in Stone and Slate tones. No lifestyle photography, no abstract graphics, no stock imagery — the writing workspace IS the visual content.
-
-## Layout
-
-Pages are max-width contained at ~1200px, centered on the warm cream canvas. The hero is a 2-column split: oversized GT Pressura headline (filling the left half at 68–104px) beside a full app window screenshot (right half, with ~24px corners). Below the hero, long-form prose sections appear as centered text blocks ~640–720px wide, capped and floored with hairline Sand Border rules. Feature sections alternate into asymmetric 2-column compositions: text on the left (a small uppercase micro-label like 'FOCUSED WRITING' in 10px Inter with 0.25em tracking, followed by a 48–68px GT Pressura heading, followed by body copy), and 1–2 product screenshots stacked on the right with generous gutter space. Detail lists use a flush-left accordion pattern: small uppercase label, bolded item title, 1px hairline rule, +/- toggle on the right. Vertical rhythm opens dramatically between sections — 80–120px of pure cream — giving the page a printed-spread cadence rather than a dashboard cadence. Navigation is minimal: a small logomark + wordmark in the top-left, nothing else competing.
+Imagery leans heavily into vintage scientific illustration: the hero feature card contains a dense botanical/zoological collage of butterflies and moths rendered in classic naturalist plate style, evoking 19th-century field guides. Illustrations are warm-toned to harmonize with the parchment background rather than pop against it. No photography, no product screenshots, no abstract gradients. Iconography is minimal — small chevrons for dropdowns and sparse line indicators, always in the same warm-neutral family as text. The visual density is low: large blocks of text and whitespace dominate, with imagery appearing only at hero-feature scale.
 
 ## Agent Prompt Guide
 
-**Quick Color Reference**
-- text: #2e2d2b (headings) / #333333 (body) / #73706b (muted)
-- background: #ead7b8 (canvas) / #e5dfd5 (card surface)
-- border: #676460 (mid) / #e5dfd5 (hairline)
-- accent: #ffb546 (amber — decorative only)
-- primary action: no distinct CTA color
+## Quick Color Reference
+- text: #141413 (Slate Dark)
+- background: #f0eee6 (Ivory Medium)
+- card surface: #faf9f5 (Ivory Light)
+- border: #cccbc8 (Stone)
+- muted text: #b0aea5 (Cloud Medium)
+- primary action: #d97757 (filled action)
 
-**3–5 Example Component Prompts**
-1. *Build a hero section:* Cream canvas (#ead7b8). Left column: 104px GT Pressura 500 headline, Ink Black (#2e2d2b), letter-spacing 7.4px, line-height 0.92. Right column: app window screenshot frame, 24px radius, 1px #676460 border, 32px inner chrome bar with three small dots. 120px vertical padding above and below.
-2. *Build a feature split section:* Two columns. Left: uppercase micro-label 'FOCUSED WRITING' in 10px Inter 400, Stone (#73706b), 0.25em letter-spacing, bottom 16px margin. Then 48px GT Pressura 500 heading, Ink Black, line-height 1.17. Then 16px Inter 400 body, Charcoal (#333333), max-width 480px. Right: stacked product screenshots, 24px radius each, 24px gap.
-3. *Build a workspace card grid:* 3-column grid, 24px gap. Each card: 28px radius, 1px #676460 border, Paper Cream background, 32px padding. Title in GT Pressura 500 18px Ink Black, body in Inter 400 14px Stone.
-4. *Build a detail accordion:* Single column, full content width. Each row: 1px #e5dfd5 top border, 24px vertical padding, Inter 600 18px title in Ink Black flush left, '+' icon in Stone flush right. Expanded state: body copy in Inter 400 16px Charcoal, 16px top margin.
-5. *Build a sidebar nav item:* 14px Inter 400, Charcoal, 12px vertical padding, 16px horizontal padding. Active state: 3px Amber Honey (#ffb546) left border, text in Ink Black. No background fill.
+## Example Component Prompts
 
-## Editorial Typography Discipline
+1. **Hero section**: Canvas #f0eee6. Left column: headline at 61px Anthropic Sans weight 700, #141413, letter-spacing -0.12px. Inline links within the headline underlined persistently in #141413. Right column: supporting paragraph at 20px Anthropic Serif weight 400, #141413. Two-column layout, max-width 1280px centered, generous vertical padding (~120px top).
 
-GT Pressura at display sizes is non-negotiable — it carries the brand voice. Do not substitute a standard bold sans (no Inter Bold at 104px, no Helvetica Black). The slight geometric tension in Pressura's forms is what makes the page read as editorial rather than corporate. Inter handles everything that is not a headline, with one exception: the 0.214–0.25em letter-spaced uppercase micro-labels are a secondary signature and should be used consistently as section markers, list introductions, and supporting metadata — never write uppercase body copy in tight tracking.
+2. Create a Primary Action Button: #d97757 background, #141413 text, 9999px radius, compact pill padding. Use this filled treatment for the main CTA.
 
-## The Cream-First Rule
+3. **Three-column release grid**: Three cards on #f0eee6 canvas, each card #faf9f5 with 24px radius and 24px padding. Card title at 24px Anthropic Sans weight 600, #141413. Card body at 20px Anthropic Serif weight 400, #141413. Inline link at bottom: 'Model details →' in #141413 with persistent underline.
 
-White should never appear as a primary background on a marketing surface. Paper Cream (#ead7b8) is the canvas everywhere. The only whites allowed are inside app screenshots and the lighter Sand Border (#e5dfd5) inside cards. This is what makes the page feel like printed paper instead of a software product — violating it instantly breaks the system.
+
+5. **Dark footer**: Full-bleed #141413 background, #faf9f5 text, max-width 1280px content centered. Column headings at 12px Anthropic Sans weight 600, #faf9f5. Link items at 12px sans weight 400, #b0aea5 with 8px vertical gaps.
 
 ## Similar Brands
 
-- **iA Writer** — Same writing-tool identity with oversized editorial display type and a deliberately paper-like surface treatment.
-- **Read.cv** — Same warm cream canvas, oversized masthead-style display type, and hairline-bordered flat cards over generous whitespace.
-- **Substack** — Same editorial broadsheet rhythm — large display headlines, centered prose blocks, and a warm neutral palette that feels like reading a magazine spread.
-- **Notion** — Same workspace/productivity positioning with flat card-based content organization, but Strut applies an editorial type system where Notion uses a neutral sans.
-- **Linear** — Same hairline-border, no-shadow component philosophy and single restrained accent color, but Strut wraps it in a warm paper aesthetic instead of a cool dark UI.
+- **Arc Browser** — Same warm parchment neutrals and nature-inspired accent palette, editorial type treatment, and rejection of cold tech-blue UI conventions
+- **Stripe** — Editorial documentation aesthetic with serif body text paired with sans UI, warm grays instead of cool blues, and section-based max-width reading layout
+- **Notion** — Type-driven minimal interface where typography carries hierarchy more than color or shadow, generous whitespace, restrained palette
+- **Linear** — Monochrome restraint and the discipline of using a single accent color only at decisive action moments
+- **Cursor** — Contemporary AI-product visual language with custom sans + serif type pairing and minimal decorative chrome
 
 ## Quick Start
 
@@ -242,50 +236,46 @@ White should never appear as a primary background on a marketing surface. Paper 
 ```css
 :root {
   /* Colors */
-  --color-paper-cream: #ead7b8;
-  --color-sand-border: #e5dfd5;
-  --color-ink-black: #2e2d2b;
-  --color-charcoal: #333333;
-  --color-stone: #73706b;
-  --color-slate-border: #676460;
-  --color-deep-stone: #5c5955;
-  --color-amber-honey: #ffb546;
+  --color-slate-dark: #141413;
+  --color-ivory-medium: #f0eee6;
+  --color-ivory-light: #faf9f5;
+  --color-cloud-medium: #b0aea5;
+  --color-cloud-dark: #87867f;
+  --color-stone: #cccbc8;
+  --color-slate-medium: #3d3d3a;
+  --color-oat-warm: #e3dacc;
+  --color-manilla: #f5e3c7;
+  --color-clay: #d97757;
+  --color-clay-deep: #c6613f;
 
   /* Typography — Font Families */
-  --font-gt-pressura-standard: 'GT Pressura Standard', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-inter: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-anthropic-serif: 'Anthropic Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-anthropic-sans: 'Anthropic Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-anthropic-mono: 'Anthropic Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Typography — Scale */
-  --text-micro-label: 10px;
-  --leading-micro-label: 1.6;
-  --tracking-micro-label: 2.5px;
   --text-caption: 12px;
-  --leading-caption: 1.43;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.43;
-  --tracking-body-sm: 3px;
-  --text-body: 16px;
-  --leading-body: 1.5;
-  --text-subheading: 20px;
-  --leading-subheading: 1.4;
-  --tracking-subheading: 2px;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.25;
-  --text-heading: 48px;
-  --leading-heading: 1.17;
-  --text-heading-lg: 68px;
-  --leading-heading-lg: 1;
-  --text-display: 104px;
-  --leading-display: 0.92;
-  --tracking-display: 7.4px;
-  --text-display-xl: 136px;
-  --leading-display-xl: 0.92;
-  --tracking-display-xl: 9.7px;
+  --leading-caption: 1.4;
+  --tracking-caption: -0.24px;
+  --text-body-sm: 16px;
+  --leading-body-sm: 1;
+  --tracking-body-sm: -0.08px;
+  --text-body: 20px;
+  --leading-body: 1.4;
+  --text-subheading: 24px;
+  --leading-subheading: 1.3;
+  --tracking-subheading: -0.05px;
+  --text-heading: 61px;
+  --leading-heading: 1.1;
+  --tracking-heading: -0.12px;
+  --text-display: 68px;
+  --leading-display: 1.1;
 
   /* Typography — Weights */
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* Spacing */
   --spacing-unit: 4px;
@@ -294,38 +284,35 @@ White should never appear as a primary background on a marketing surface. Paper 
   --spacing-12: 12px;
   --spacing-16: 16px;
   --spacing-24: 24px;
-  --spacing-40: 40px;
-  --spacing-80: 80px;
-  --spacing-96: 96px;
-  --spacing-108: 108px;
-  --spacing-120: 120px;
+  --spacing-32: 32px;
+  --spacing-76: 76px;
+  --spacing-100: 100px;
 
   /* Layout */
-  --page-max-width: 1200px;
+  --page-max-width: 1280px;
   --section-gap: 80-120px;
-  --card-padding: 24-40px;
-  --element-gap: 16px;
+  --card-padding: 24-32px;
+  --element-gap: 8px;
 
   /* Border Radius */
   --radius-lg: 8px;
   --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-3xl: 24px;
-  --radius-3xl-2: 28px;
 
   /* Named Radii */
-  --radius-tags: 9999px;
-  --radius-cards: 28px;
-  --radius-inputs: 12px;
-  --radius-buttons: 8px;
-  --radius-appscreenshots: 24px;
-
-  /* Shadows */
-  --shadow-subtle: rgba(0, 0, 0, 0.5) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.5) 0px 1px 0px 0px;
+  --radius-nav: 0px;
+  --radius-cards: 24px;
+  --radius-links: 0px;
+  --radius-badges: 0px;
+  --radius-buttons: 8px (bottom-only on filled variants), 12px (outlined);
 
   /* Surfaces */
-  --surface-paper-canvas: #ead7b8;
-  --surface-card-sand: #e5dfd5;
-  --surface-ink-field: #2e2d2b;
+  --surface-canvas: #f0eee6;
+  --surface-card-surface: #faf9f5;
+  --surface-warm-feature-surface: #f5e3c7;
+  --surface-deep-warm-surface: #e3dacc;
+  --surface-inversion-surface: #141413;
 }
 ```
 
@@ -334,45 +321,40 @@ White should never appear as a primary background on a marketing surface. Paper 
 ```css
 @theme {
   /* Colors */
-  --color-paper-cream: #ead7b8;
-  --color-sand-border: #e5dfd5;
-  --color-ink-black: #2e2d2b;
-  --color-charcoal: #333333;
-  --color-stone: #73706b;
-  --color-slate-border: #676460;
-  --color-deep-stone: #5c5955;
-  --color-amber-honey: #ffb546;
+  --color-slate-dark: #141413;
+  --color-ivory-medium: #f0eee6;
+  --color-ivory-light: #faf9f5;
+  --color-cloud-medium: #b0aea5;
+  --color-cloud-dark: #87867f;
+  --color-stone: #cccbc8;
+  --color-slate-medium: #3d3d3a;
+  --color-oat-warm: #e3dacc;
+  --color-manilla: #f5e3c7;
+  --color-clay: #d97757;
+  --color-clay-deep: #c6613f;
 
   /* Typography */
-  --font-gt-pressura-standard: 'GT Pressura Standard', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-inter: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-anthropic-serif: 'Anthropic Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-anthropic-sans: 'Anthropic Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-anthropic-mono: 'Anthropic Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Typography — Scale */
-  --text-micro-label: 10px;
-  --leading-micro-label: 1.6;
-  --tracking-micro-label: 2.5px;
   --text-caption: 12px;
-  --leading-caption: 1.43;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.43;
-  --tracking-body-sm: 3px;
-  --text-body: 16px;
-  --leading-body: 1.5;
-  --text-subheading: 20px;
-  --leading-subheading: 1.4;
-  --tracking-subheading: 2px;
-  --text-heading-sm: 32px;
-  --leading-heading-sm: 1.25;
-  --text-heading: 48px;
-  --leading-heading: 1.17;
-  --text-heading-lg: 68px;
-  --leading-heading-lg: 1;
-  --text-display: 104px;
-  --leading-display: 0.92;
-  --tracking-display: 7.4px;
-  --text-display-xl: 136px;
-  --leading-display-xl: 0.92;
-  --tracking-display-xl: 9.7px;
+  --leading-caption: 1.4;
+  --tracking-caption: -0.24px;
+  --text-body-sm: 16px;
+  --leading-body-sm: 1;
+  --tracking-body-sm: -0.08px;
+  --text-body: 20px;
+  --leading-body: 1.4;
+  --text-subheading: 24px;
+  --leading-subheading: 1.3;
+  --tracking-subheading: -0.05px;
+  --text-heading: 61px;
+  --leading-heading: 1.1;
+  --tracking-heading: -0.12px;
+  --text-display: 68px;
+  --leading-display: 1.1;
 
   /* Spacing */
   --spacing-4: 4px;
@@ -380,19 +362,14 @@ White should never appear as a primary background on a marketing surface. Paper 
   --spacing-12: 12px;
   --spacing-16: 16px;
   --spacing-24: 24px;
-  --spacing-40: 40px;
-  --spacing-80: 80px;
-  --spacing-96: 96px;
-  --spacing-108: 108px;
-  --spacing-120: 120px;
+  --spacing-32: 32px;
+  --spacing-76: 76px;
+  --spacing-100: 100px;
 
   /* Border Radius */
   --radius-lg: 8px;
   --radius-xl: 12px;
+  --radius-2xl: 16px;
   --radius-3xl: 24px;
-  --radius-3xl-2: 28px;
-
-  /* Shadows */
-  --shadow-subtle: rgba(0, 0, 0, 0.5) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.5) 0px 1px 0px 0px;
 }
 ```

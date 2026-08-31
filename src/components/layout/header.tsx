@@ -21,15 +21,15 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur-sm border-b border-sand no-print">
+      <header className="sticky top-0 z-40 bg-ivory-medium/95 backdrop-blur-sm border-b border-stone no-print">
         <AccessibilityBar />
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+        <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 gap-3">
             {/* Logotipo */}
             <Link href="/" className="flex items-center gap-3 group py-1 shrink-0" title="Página Inicial - Linguagem Simples Unicamp">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/linguagem-simples.svg"
+                src="/images/logo-dgrh.svg"
                 alt="Linguagem Simples - Unicamp"
                 className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
               />
@@ -43,10 +43,10 @@ export function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`relative px-3 py-2 text-micro-label uppercase tracking-micro font-sans transition-colors ${
+                    className={`relative px-3 py-2 text-caption uppercase tracking-caption font-sans transition-colors ${
                       isActive
-                        ? "text-ink font-semibold border-l-[3px] border-amber pl-3"
-                        : "text-stone hover:text-charcoal hover:bg-sand/40 rounded-btn"
+                        ? "text-slate-dark font-semibold border-l-[3px] border-clay pl-3"
+                        : "text-cloud-medium hover:text-slate-dark hover:bg-oat-warm/40 rounded-[0px]"
                     }`}
                   >
                     <span>{item.label}</span>
@@ -59,7 +59,7 @@ export function Header() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="text-stone hover:text-ink flex items-center gap-1.5 px-2.5 py-1.5 rounded-btn hover:bg-sand/40 transition-colors"
+                className="text-cloud-medium hover:text-slate-dark flex items-center gap-1.5 px-2.5 py-1.5 rounded-[0px] hover:bg-oat-warm/40 transition-colors"
                 title="Configurações de IA"
                 aria-label="Configurações de IA"
               >
@@ -68,7 +68,7 @@ export function Header() {
 
               <Link
                 href="/analisar"
-                className="font-sans text-micro-label uppercase tracking-micro text-charcoal hover:text-ink border-b border-deep-stone hover:border-ink pb-px transition-all"
+                className="font-sans text-caption uppercase tracking-caption text-slate-dark hover:text-slate-dark border-b border-slate-dark hover:border-slate-dark pb-px transition-all"
               >
                 Avaliar Texto
               </Link>

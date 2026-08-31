@@ -1,0 +1,182 @@
+[
+  {
+    "termoEstrangeiro": "status",
+    "alternativa": "situação",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "feedback",
+    "alternativa": "retorno",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "deadline",
+    "alternativa": "prazo",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "meeting",
+    "alternativa": "reunião",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "email",
+    "alternativa": "e-mail ou correspondência eletrônica",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "workflow",
+    "alternativa": "fluxo de trabalho",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "deadline",
+    "alternativa": "prazo final",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "briefing",
+    "alternativa": "reunião preparatória",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "budget",
+    "alternativa": "orçamento",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "marketing",
+    "alternativa": "divulgação ou comunicação",
+    "explicacao": "Termo em inglês amplamente difundido, mas prefira o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "layout",
+    "alternativa": "disposição ou layout",
+    "explicacao": "Termo em inglês. Em contextos técnicos pode ser mantido, mas prefira o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "software",
+    "alternativa": "programa ou aplicativo",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "hardware",
+    "alternativa": "equipamento",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "on-line",
+    "alternativa": "on-line ou em linha",
+    "explicacao": "Termo em inglês. Pode ser mantido quando amplamente difundido.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "off-line",
+    "alternativa": "off-line ou fora de linha",
+    "explicacao": "Termo em inglês. Pode ser mantido quando amplamente difundido.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "internet",
+    "alternativa": "internet",
+    "explicacao": "Termo em inglês amplamente aceito em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "site",
+    "alternativa": "site ou página web",
+    "explicacao": "Termo em inglês amplamente difundido.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "blog",
+    "alternativa": "blog ou diário eletrônico",
+    "explicacao": "Termo em inglês amplamente difundido.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "download",
+    "alternativa": "download ou transferência",
+    "explicacao": "Termo em inglês. Use o equivalente em português quando possível.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "upload",
+    "alternativa": "upload ou envio",
+    "explicacao": "Termo em inglês. Use o equivalente em português quando possível.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "login",
+    "alternativa": "acesso ou entrada",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "password",
+    "alternativa": "senha",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "file",
+    "alternativa": "arquivo",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "folder",
+    "alternativa": "pasta",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "print",
+    "alternativa": "impressão ou imprimir",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "scan",
+    "alternativa": "digitalização ou digitalizar",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "copy",
+    "alternativa": "cópia ou copiar",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "paste",
+    "alternativa": "colar",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "save",
+    "alternativa": "salvar ou gravar",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  },
+  {
+    "termoEstrangeiro": "delete",
+    "alternativa": "excluir ou apagar",
+    "explicacao": "Termo em inglês. Use o equivalente em português.",
+    "fonte": "Linguagem Simples Unicamp"
+  }
+]

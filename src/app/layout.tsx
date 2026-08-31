@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Source_Serif_4, Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-const inter = Inter({
+const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
   weight: ["400", "600"],
-  variable: "--font-inter",
+  variable: "--font-anthropic-serif",
   display: "swap"
 });
 
-const spaceGrotesk = Space_Grotesk({
+const interSans = Inter({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-gt-pressura-standard",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-anthropic-sans",
   display: "swap"
 });
 
@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="pt-BR" className={`${sourceSerif.variable} ${interSans.variable}`} data-scroll-behavior="smooth">
       <body className="antialiased flex flex-col min-h-screen">
         <Header />
         <main id="main-content" className="flex-1">

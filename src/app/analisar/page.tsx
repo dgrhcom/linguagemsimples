@@ -24,7 +24,8 @@ import {
 	Download,
 	RotateCcw,
 	Cpu,
-	Settings
+	Settings,
+	ArrowRight
 } from "lucide-react";
 
 import { safeStorage } from "@/lib/storage";
@@ -397,12 +398,16 @@ export default function AnalisarPage() {
 			{/* Se houver resultado, exibe o Painel de Análise */}
 			{result && (
 				<div className="space-y-6">
-					{/* Barra Superior de Ações e Abas */}
-					<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-paper p-4 rounded-card border border-sand">
+					{/* Barra Sticky de Ferramentas e Abas */}
+					<div className="sticky top-24 z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-4 rounded-[24px]" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
+						{/* Ferramentas - Esquerda */}
 						<div className="flex items-center gap-2">
 							<button
 								onClick={handleResetAnalysis}
-								className="text-body-sm font-sans text-stone hover:text-ink flex items-center gap-1.5 px-3 py-1.5 rounded-btn hover:bg-sand/40 transition-colors"
+								className="text-[14px] flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] transition-colors"
+								style={{ color: "#b0aea5" }}
+								onMouseEnter={(e) => { e.currentTarget.style.color = "#141413"; e.currentTarget.style.backgroundColor = "rgba(227, 218, 204, 0.4)"; }}
+								onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; e.currentTarget.style.backgroundColor = "transparent"; }}
 								title="Voltar ao editor completo"
 							>
 								<RotateCcw className="w-3.5 h-3.5" />
@@ -412,16 +417,19 @@ export default function AnalisarPage() {
 							<button
 								onClick={() => handleReanalyze()}
 								disabled={loading}
-								className="text-body-sm font-display text-ink hover:text-ink-light flex items-center gap-1.5 px-3 py-1.5 rounded-btn hover:bg-sand/40 transition-colors"
+								className="text-[14px] flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] transition-colors"
+								style={{ color: "#141413" }}
+								onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(227, 218, 204, 0.4)"; }}
+								onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
 								title="Reanalisar o texto"
 							>
-								<RotateCcw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-amber" : "text-amber"}`} />
+								<RotateCcw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} style={{ color: "#d97757" }} />
 								<span>{loading ? "Reanalisando..." : "Reanalisar"}</span>
 							</button>
 						</div>
 
-						{/* Abas de Navegação */}
-						<div className="inline-flex p-1 bg-sand/50 rounded-btn border border-sand self-start lg:self-center">
+						{/* Abas - Centro */}
+						<div className="inline-flex p-1 rounded-[8px] self-start lg:self-center" style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", border: "1px solid #cccbc8" }}>
 							{[
 								{ key: "overview" as const, label: "Visão Geral", Icon: LayoutDashboard },
 								{ key: "findings" as const, label: `Problemas (${result.findings.length})`, Icon: CheckSquare },
@@ -430,11 +438,13 @@ export default function AnalisarPage() {
 								<button
 									key={tab.key}
 									onClick={() => setActiveTab(tab.key)}
-									className={`text-body-sm font-sans px-3 py-1.5 rounded-btn flex items-center gap-1.5 transition-colors ${
-										activeTab === tab.key
-											? "bg-paper text-ink font-semibold border border-sand"
-											: "text-stone hover:text-ink"
-									}`}
+									className="text-[14px] px-3 py-1.5 rounded-[8px] flex items-center gap-1.5 transition-colors"
+									style={{
+										backgroundColor: activeTab === tab.key ? "#faf9f5" : "transparent",
+										color: activeTab === tab.key ? "#141413" : "#b0aea5",
+										border: activeTab === tab.key ? "1px solid #cccbc8" : "1px solid transparent",
+										fontWeight: activeTab === tab.key ? 600 : 400
+									}}
 								>
 									<tab.Icon className="w-3.5 h-3.5" />
 									<span>{tab.label}</span>
@@ -442,23 +452,25 @@ export default function AnalisarPage() {
 							))}
 						</div>
 
-						{/* Ações Rápidas */}
+						{/* CTA - Direita */}
 						<div className="flex items-center gap-2 self-start lg:self-auto">
 							<button
 								onClick={() => setIsExportOpen(true)}
-								className="text-body-sm font-sans text-charcoal border border-sand hover:border-deep-stone px-4 py-2 rounded-btn flex items-center gap-1.5 transition-colors bg-paper"
+								className="text-[14px] px-4 py-2 rounded-[8px] flex items-center gap-1.5 transition-colors"
+								style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", color: "#141413" }}
 							>
-								<Download className="w-3.5 h-3.5 text-stone" />
+								<Download className="w-3.5 h-3.5" style={{ color: "#b0aea5" }} />
 								<span>Exportar</span>
 							</button>
 
 							<button
 								type="button"
 								onClick={() => setIsTemplateDrawerOpen(true)}
-								className="text-body-sm font-display text-paper bg-ink hover:bg-deep-stone border border-ink px-4 py-2 rounded-btn flex items-center gap-1.5 transition-colors"
+								className="text-[14px] px-4 py-2 rounded-[8px] flex items-center gap-1.5 transition-colors font-semibold"
+								style={{ backgroundColor: "#d97757", border: "1px solid #c6613f", color: "#ffffff" }}
 								title={`Ver ${documentTypesData.find(dt => dt.type === (result.input.documentType || "comunicado"))?.label || "Documento"}`}
 							>
-								<FileText className="w-3.5 h-3.5 text-amber" />
+								<FileText className="w-3.5 h-3.5" />
 								<span>Ver {documentTypesData.find(dt => dt.type === (result.input.documentType || "comunicado"))?.label || "Documento"}</span>
 							</button>
 						</div>
@@ -470,48 +482,28 @@ export default function AnalisarPage() {
 						<div className="space-y-6">
 							<ScoreOverview score={result.score} metrics={result.metrics} />
 
+							{/* CTA para aba de Problemas */}
 							{result.findings.length > 0 && (
-								<div className="pt-4">
-									<div className="flex justify-between items-center mb-4">
-										<h3 className="font-display text-subheading text-ink">
-											Principais Oportunidades de Melhoria
-										</h3>
-										<button
-											onClick={() => setActiveTab("findings")}
-											className="ghost-link text-body-sm font-sans text-charcoal"
-										>
-											Ver todos os {result.findings.length} apontamentos →
-										</button>
-									</div>
-
-									<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-										<div className="lg:col-span-6">
-											<AnnotatedText
-												text={result.workingText || result.input.text}
-												originalInputText={result.input.text}
-												findings={result.findings}
-												selectedFinding={selectedFinding}
-												onSelectFinding={setSelectedFinding}
-												onUpdateText={handleUpdateWorkingText}
-												onReanalyze={handleReanalyze}
-												isReanalyzing={loading}
-											/>
-										</div>
-										<div className="lg:col-span-6">
-											<FindingsList
-												findings={result.findings.slice(0, 5)}
-												targetAudience={result.input.targetAudience}
-												documentType={result.input.documentType}
-												selectedFinding={selectedFinding}
-												onSelectFinding={setSelectedFinding}
-												onApplySuggestion={handleApplySuggestion}
-												onRevertSuggestion={handleRevertSuggestion}
-												onIgnoreFinding={handleIgnoreFinding}
-												onUpdateFindingSuggestion={handleUpdateFindingSuggestion}
-												onApplyAllSuggestions={handleApplyAllSuggestions}
-											/>
-										</div>
-									</div>
+								<div className="text-center py-8">
+									<button
+										onClick={() => setActiveTab("findings")}
+										className="text-[16px] font-semibold px-8 py-4 rounded-[8px] inline-flex items-center gap-2 transition-all"
+										style={{
+											backgroundColor: "#141413",
+											border: "1px solid #3d3d3a",
+											color: "#faf9f5",
+											fontFamily: "var(--font-anthropic-sans)"
+										}}
+										onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#3d3d3a"; }}
+										onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#141413"; }}
+									>
+										<CheckSquare className="w-5 h-5" style={{ color: "#d97757" }} />
+										<span>Ver todos os {result.findings.length} problemas</span>
+										<ArrowRight className="w-4 h-4" />
+									</button>
+									<p className="text-[14px] mt-3" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#b0aea5" }}>
+										Visualize o texto anotado e todas as sugestões de melhoria
+									</p>
 								</div>
 							)}
 						</div>
@@ -520,7 +512,7 @@ export default function AnalisarPage() {
 					{activeTab === "findings" && (
 						<div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 							<div className="lg:col-span-5">
-								<div className="sticky top-28">
+								<div className="sticky top-36">
 									<AnnotatedText
 										text={result.workingText || result.input.text}
 										originalInputText={result.input.text}

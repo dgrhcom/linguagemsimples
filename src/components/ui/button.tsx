@@ -11,9 +11,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-ink text-paper border border-slate hover:bg-ink-light text-charcoal",
-  secondary: "bg-transparent text-charcoal border border-sand hover:bg-sand/50",
-  ghost: "text-stone hover:text-ink hover:bg-sand/40",
+  primary: "bg-clay text-white border border-clay-deep hover:bg-clay-deep",
+  secondary: "bg-transparent text-slate-dark border border-cloud-dark hover:bg-oat-warm/50",
+  ghost: "text-cloud-medium hover:text-slate-dark hover:bg-oat-warm/40",
   destructive: "bg-error-light hover:bg-error text-error-dark border border-error-border",
   success: "bg-success hover:bg-success-dark text-white border border-success-dark",
   info: "bg-info-light hover:bg-info text-info-dark border border-info-border",
@@ -21,10 +21,10 @@ const variantStyles: Record<ButtonVariant, string> = {
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  xs: "text-[10px] px-2 py-1 rounded-btn gap-1",
-  sm: "text-xs px-2.5 py-1.5 rounded-btn gap-1.5",
-  md: "text-xs px-3.5 py-2 rounded-btn gap-1.5",
-  lg: "text-sm px-5 py-2.5 rounded-btn gap-2",
+  xs: "text-[10px] px-2 py-1 rounded-[8px] gap-1",
+  sm: "text-[12px] px-2.5 py-1.5 rounded-[8px] gap-1.5",
+  md: "text-[12px] px-3.5 py-2 rounded-[8px] gap-1.5",
+  lg: "text-[16px] px-5 py-2.5 rounded-[8px] gap-2",
 };
 
 export function Button({

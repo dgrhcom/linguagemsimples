@@ -17,11 +17,32 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
   private fallback: MockLanguageModelProvider;
   private candidateModels: string[];
 
-  constructor(apiKey: string, model: string = "gemini-2.0-flash") {
+  constructor(apiKey: string, model: string = "gemini-2.5-flash") {
     this.apiKey = apiKey;
     this.primaryModel = model;
-    this.candidateModels = Array.from(new Set([model, "gemini-2.0-flash", "gemini-1.5-flash"]));
+    this.candidateModels = Array.from(new Set([model, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]));
     this.fallback = new MockLanguageModelProvider();
+  }
+
+  /**
+   * Lista modelos disponíveis na API do Gemini e retorna os que suportam generateContent
+   */
+  private async listAvailableModels(): Promise<string[]> {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${this.apiKey}`,
+        { signal: AbortSignal.timeout(5000) }
+      );
+      if (!response.ok) return [];
+      const data = await response.json();
+      const models = data.models || [];
+      return models
+        .filter((m: any) => m.supportedGenerationMethods?.includes("generateContent"))
+        .map((m: any) => m.name.replace("models/", ""))
+        .filter((name: string) => name.includes("flash") || name.includes("lite"));
+    } catch {
+      return [];
+    }
   }
 
 
@@ -49,6 +70,7 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
   private async callGemini(systemPrompt: string, userPrompt: string, isJson: boolean = false): Promise<string> {
     let lastError: any = null;
 
+    // Tenta os modelos candidatos primeiro
     for (const model of this.candidateModels) {
       try {
         const response = await fetch(
@@ -122,6 +144,42 @@ export class GeminiLanguageModelProvider implements LanguageModelProvider {
       } catch (err: any) {
         console.warn(`[Gemini API] Erro de conexão com ${model}:`, err.message);
         lastError = err;
+      }
+    }
+
+    // Se todos os candidatos falharam, tenta descobrir modelos disponíveis dinamicamente
+    console.log("[Gemini API] Tentando descobrir modelos disponíveis dinamicamente...");
+    const availableModels = await this.listAvailableModels();
+    const newModels = availableModels.filter(m => !this.candidateModels.includes(m));
+
+    for (const model of newModels.slice(0, 3)) { // Limita a 3 novos modelos
+      try {
+        console.log(`[Gemini API] Tentando modelo descoberto: ${model}`);
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: AbortSignal.timeout(10000),
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: systemPrompt }] },
+              contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+              generationConfig: { temperature: 0.2, ...(isJson ? { responseMimeType: "application/json" } : {}) }
+            })
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text && text.trim()) {
+            console.log(`[Gemini API] Modelo ${model} funcionou!`);
+            // Atualiza a lista de candidatos para próximas chamadas
+            this.candidateModels.unshift(model);
+            return text.trim();
+          }
+        }
+      } catch (err: any) {
+        console.warn(`[Gemini API] Modelo descoberto ${model} falhou:`, err.message);
       }
     }
 

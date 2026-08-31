@@ -1,39 +1,36 @@
 "use client";
 
 import { useState } from "react";
+import { CheckCheck, SlidersHorizontal, CheckCircle2 } from "lucide-react";
 import { Finding } from "@/types/analysis";
 import { FindingCard } from "./finding-card";
-import { CheckCheck, CheckCircle2, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FindingsListProps {
   findings: Finding[];
   targetAudience?: string;
   documentType?: string;
+  selectedFinding?: Finding | null;
+  onSelectFinding?: (finding: Finding | null) => void;
   onApplySuggestion?: (finding: Finding) => void;
   onRevertSuggestion?: (finding: Finding) => void;
   onIgnoreFinding?: (finding: Finding) => void;
   onUpdateFindingSuggestion?: (finding: Finding, newSuggestion: string) => void;
   onApplyAllSuggestions?: () => void;
-  selectedFindingId?: string;
-  selectedFinding?: Finding | null;
-  onSelectFinding: (finding: Finding) => void;
 }
 
 export function FindingsList({
   findings,
   targetAudience,
   documentType,
+  selectedFinding,
+  onSelectFinding,
   onApplySuggestion,
   onRevertSuggestion,
   onIgnoreFinding,
   onUpdateFindingSuggestion,
-  onApplyAllSuggestions,
-  selectedFindingId,
-  selectedFinding,
-  onSelectFinding
+  onApplyAllSuggestions
 }: FindingsListProps) {
-  const activeSelectedId = selectedFinding?.id || selectedFindingId;
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "applied">("all");
 
@@ -72,9 +69,9 @@ export function FindingsList({
   return (
     <div className="space-y-4">
       {/* Filtros e Ações */}
-      <div className="bg-paper p-4 rounded-card border border-sand space-y-3">
+      <div className="p-4 rounded-[24px] space-y-3" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="inline-flex p-1 bg-sand/50 rounded-btn border border-sand self-start">
+          <div className="inline-flex p-1 rounded-[8px] self-start" style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", border: "1px solid #cccbc8" }}>
             <Button
               onClick={() => setStatusFilter("all")}
               variant={statusFilter === "all" ? "primary" : "ghost"}
@@ -112,8 +109,8 @@ export function FindingsList({
         </div>
 
         {categories.length > 1 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-sand scrollbar-none">
-            <SlidersHorizontal className="w-3 h-3 text-stone shrink-0 ml-0.5" />
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-2 scrollbar-none" style={{ borderTop: "1px solid #cccbc8" }}>
+            <SlidersHorizontal className="w-3 h-3 shrink-0 ml-0.5" style={{ color: "#b0aea5" }} />
             <Button
               onClick={() => setSelectedCategory("all")}
               variant={selectedCategory === "all" ? "primary" : "secondary"}
@@ -143,12 +140,12 @@ export function FindingsList({
       {/* Lista de Cards */}
       <div className="space-y-3">
         {filteredFindings.length === 0 ? (
-          <div className="bg-paper rounded-card border border-sand p-8 text-center space-y-2">
-            <div className="w-10 h-10 rounded-full bg-success-light text-success mx-auto flex items-center justify-center">
+          <div className="rounded-[24px] p-8 text-center space-y-2" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
+            <div className="w-10 h-10 rounded-full mx-auto flex items-center justify-center" style={{ backgroundColor: "#ecfdf5", color: "#10b981" }}>
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <h4 className="text-body font-display text-ink">Tudo limpo!</h4>
-            <p className="text-body-sm text-stone max-w-sm mx-auto">
+            <h4 className="text-[20px] font-semibold" style={{ color: "#141413", fontFamily: "var(--font-anthropic-sans)" }}>Tudo limpo!</h4>
+            <p className="text-[14px] max-w-sm mx-auto" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#b0aea5" }}>
               Nenhum apontamento pendente com os filtros selecionados.
             </p>
           </div>
@@ -163,8 +160,8 @@ export function FindingsList({
               onRevertSuggestion={onRevertSuggestion}
               onIgnoreFinding={onIgnoreFinding}
               onUpdateFindingSuggestion={onUpdateFindingSuggestion}
-              isSelected={activeSelectedId === finding.id}
-              onSelect={() => onSelectFinding(finding)}
+              isSelected={selectedFinding?.id === finding.id}
+              onSelect={() => onSelectFinding?.(finding)}
             />
           ))
         )}

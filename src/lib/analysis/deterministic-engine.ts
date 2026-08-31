@@ -10,6 +10,7 @@ import termosNaoOfensivosData from "../../data/terminology/termos-nao-ofensivos.
 import tratamentosData from "../../data/terminology/tratamentos.json" with { type: "json" };
 import siglasPadraoData from "../../data/terminology/siglas-padrao.json" with { type: "json" };
 import ortografiaData from "../../data/terminology/ortografia.json" with { type: "json" };
+import termosEstrangeirosData from "../../data/terminology/termos-estrangeiros.json" with { type: "json" };
 
 function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -311,6 +312,102 @@ export function runDeterministicAnalysis(input: AnalysisInput): Finding[] {
           type: "unicamp"
         }
       });
+    }
+  }
+
+  // 10. REGRA: Termos Estrangeiros que devem ser substituídos por equivalentes em português
+  for (const item of termosEstrangeirosData) {
+    const regex = new RegExp(`\\b${escapeRegExp(item.termoEstrangeiro)}\\b`, "gi");
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      const matchText = match[0];
+      const startIndex = match.index;
+      const endIndex = startIndex + matchText.length;
+
+      addFinding({
+        ruleId: "unicamp-foreign-term",
+        category: "vocabulary",
+        severity: "suggestion",
+        originalText: matchText,
+        location: { startIndex, endIndex },
+        explanation: item.explicacao,
+        recommendation: `Substitua '${matchText}' por '${item.alternativa}'.`,
+        suggestedText: item.alternativa,
+        source: {
+          title: item.fonte || "Linguagem Simples Unicamp - Termos Estrangeiros",
+          url: "https://linguagemsimples.unicamp.br/escreva/",
+          type: "unicamp"
+        }
+      });
+    }
+  }
+
+  // 11. REGRA: Detecção de frases com múltiplos itens conectados por "e" que poderiam ser listas
+  // Ex: "O servidor deve apresentar documento de identidade e comprovante de residência e certidão de nascimento"
+  const listPattern = /[^.;]+(?:\s+e\s+[^.;]+){2,}/gi;
+  let listMatch: RegExpExecArray | null;
+  while ((listMatch = listPattern.exec(text)) !== null) {
+    const matchText = listMatch[0].trim();
+    const startIndex = listMatch.index;
+    const endIndex = startIndex + matchText.length;
+
+    // Verifica se a frase tem pelo menos 3 itens conectados por "e"
+    const eCount = (matchText.match(/\s+e\s+/gi) || []).length;
+    if (eCount >= 2) {
+      addFinding({
+        ruleId: "unicamp-list-suggestion",
+        category: "clarity",
+        severity: "suggestion",
+        originalText: matchText,
+        location: { startIndex, endIndex },
+        explanation: "Esta frase contém múltiplos itens conectados por 'e'. Considere usar uma lista com marcadores para facilitar a leitura e compreensão.",
+        recommendation: "Separe os itens em uma lista com marcadores (tópicos) em vez de conectar tudo com 'e'.",
+        suggestedText: undefined,
+        source: {
+          title: "Linguagem Simples Unicamp - Escreva",
+          url: "https://linguagemsimples.unicamp.br/escreva/",
+          section: "Use marcadores de tópicos",
+          type: "unicamp"
+        }
+      });
+    }
+  }
+
+  // 12. REGRA: Detecção de títulos inconsistentes (alternância entre maiúsculas e minúsculas)
+  // Verifica se o texto tem seções com títulos em formatos mistos
+  const titlePatterns = [
+    /^#{1,6}\s+.+$/gm, // Markdown headings
+    /^[A-ZÁÉÍÓÚÇÃÕ]{2,}[\s\S]*:\s*$/gm, // Títulos em maiúsculas seguidos de dois-pontos
+  ];
+
+  for (const pattern of titlePatterns) {
+    let titleMatch: RegExpExecArray | null;
+    while ((titleMatch = pattern.exec(text)) !== null) {
+      const matchText = titleMatch[0].trim();
+      const startIndex = titleMatch.index;
+      const endIndex = startIndex + matchText.length;
+
+      // Verifica se há alternância de estilos de título no texto
+      const hasMixedTitleStyles = /^[A-ZÁÉÍÓÚÇÃÕ]/.test(matchText) && /[a-záéíóúçãõ]/.test(matchText.replace(/[:#]/g, ""));
+      if (hasMixedTitleStyles && matchText.length > 5) {
+        addFinding({
+          ruleId: "unicamp-title-consistency",
+          category: "formatting",
+          severity: "info",
+          originalText: matchText,
+          location: { startIndex, endIndex },
+          explanation: "Verifique a consistência dos estilos de título no documento. Mantenha o mesmo padrão visual para informações do mesmo nível hierárquico.",
+          recommendation: "Utilize o mesmo estilo de fonte e formatação para títulos do mesmo nível hierárquico.",
+          suggestedText: undefined,
+          source: {
+            title: "Linguagem Simples Unicamp - Escreva",
+            url: "https://linguagemsimples.unicamp.br/escreva/",
+            section: "Títulos e subtítulos",
+            type: "unicamp"
+          }
+        });
+      }
     }
   }
 

@@ -22,16 +22,85 @@
   }
 
   :root {
-    /* Strut Design System tokens */
-    --color-paper-cream: #ead7b8;
-    --color-sand-border: #e5dfd5;
-    --color-ink-black: #2e2d2b;
-    --color-charcoal: #333333;
-    --color-stone: #73706b;
-    --color-slate-border: #676460;
-    --color-deep-stone: #5c5955;
-    --color-amber-honey: #ffb546;
-    --color-input-surface: #f2e8d5;
+    /* Anthropic Design System — Colors */
+    --color-slate-dark: #141413;
+    --color-ivory-medium: #f0eee6;
+    --color-ivory-light: #faf9f5;
+    --color-cloud-medium: #b0aea5;
+    --color-cloud-dark: #87867f;
+    --color-stone: #cccbc8;
+    --color-slate-medium: #3d3d3a;
+    --color-oat-warm: #e3dacc;
+    --color-manilla: #f5e3c7;
+    --color-clay: #d97757;
+    --color-clay-deep: #c6613f;
+
+    /* Typography — Font Families */
+    --font-anthropic-serif: 'Anthropic Serif', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-anthropic-sans: 'Anthropic Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-anthropic-mono: 'Anthropic Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+    /* Typography — Scale */
+    --text-caption: 12px;
+    --leading-caption: 1.4;
+    --tracking-caption: -0.24px;
+    --text-body-sm: 16px;
+    --leading-body-sm: 1;
+    --tracking-body-sm: -0.08px;
+    --text-body: 20px;
+    --leading-body: 1.4;
+    --text-subheading: 24px;
+    --leading-subheading: 1.3;
+    --tracking-subheading: -0.05px;
+    --text-heading: 61px;
+    --leading-heading: 1.1;
+    --tracking-heading: -0.12px;
+    --text-display: 68px;
+    --leading-display: 1.1;
+
+    /* Typography — Weights */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Spacing */
+    --spacing-unit: 4px;
+    --spacing-4: 4px;
+    --spacing-8: 8px;
+    --spacing-12: 12px;
+    --spacing-16: 16px;
+    --spacing-24: 24px;
+    --spacing-32: 32px;
+    --spacing-76: 76px;
+    --spacing-100: 100px;
+
+    /* Layout */
+    --page-max-width: 1280px;
+    --section-gap: 80-120px;
+    --card-padding: 24-32px;
+    --element-gap: 8px;
+
+    /* Border Radius */
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+    --radius-3xl: 24px;
+
+    /* Named Radii */
+    --radius-nav: 0px;
+    --radius-cards: 24px;
+    --radius-links: 0px;
+    --radius-badges: 0px;
+    --radius-buttons: 8px;
+    --radius-buttons-outlined: 12px;
+
+    /* Surfaces */
+    --surface-canvas: #f0eee6;
+    --surface-card: #faf9f5;
+    --surface-warm-feature: #f5e3c7;
+    --surface-deep-warm: #e3dacc;
+    --surface-inversion: #141413;
 
     /* Legacy HSL tokens for shadcn compat */
     --background: 36 30% 83%;
@@ -58,12 +127,12 @@
 }
 
 /* ==========================================================================
-   BASE STYLES — Paper Canvas
+   BASE STYLES — Anthropic Parchment Canvas
    ========================================================================== */
 body {
-  background-color: #ead7b8;
-  color: #2e2d2b;
-  font-family: var(--font-inter), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--color-ivory-medium);
+  color: var(--color-slate-dark);
+  font-family: var(--font-anthropic-serif), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -73,7 +142,7 @@ body {
 
 /* Focus visible — accessible focus ring */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-  outline: 2px solid #5c5955 !important;
+  outline: 2px solid var(--color-slate-dark) !important;
   outline-offset: 2px !important;
 }
 
@@ -81,12 +150,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    EDITORIAL MICRO-LABEL — Section markers
    ========================================================================== */
 .editorial-label {
-  font-family: var(--font-inter), 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 400;
+  font-family: var(--font-anthropic-sans), 'Inter', sans-serif;
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-regular);
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: #73706b;
+  color: var(--color-cloud-medium);
 }
 
 /* ==========================================================================
@@ -94,7 +163,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    ========================================================================== */
 .section-divider {
   border: none;
-  border-top: 1px solid #e5dfd5;
+  border-top: 1px solid var(--color-stone);
   margin: 0;
 }
 
@@ -102,9 +171,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
    GHOST TEXT LINK — Primary CTA pattern
    ========================================================================== */
 .ghost-link {
-  color: #333333;
+  color: var(--color-slate-dark);
   text-decoration: none;
-  border-bottom: 1px solid #5c5955;
+  border-bottom: 1px solid var(--color-slate-dark);
   padding-bottom: 1px;
   transition: border-bottom-width 0.15s ease;
 }
@@ -187,25 +256,25 @@ html[data-high-contrast="true"] .diff-deleted {
    DIFF HIGHLIGHTS (Revision marks)
    ========================================================================== */
 .diff-deleted {
-  background-color: #e5dfd5;
-  color: #73706b;
+  background-color: var(--color-oat-warm);
+  color: var(--color-cloud-medium);
   text-decoration: line-through;
   padding: 0.125rem 0.35rem;
   border-radius: 0.25rem;
   margin: 0 0.125rem;
-  font-weight: 500;
-  border: 1px solid #d9d1c4;
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--color-stone);
 }
 
 .diff-inserted {
-  background-color: #fff3d6;
-  color: #5c5955;
+  background-color: var(--color-manilla);
+  color: var(--color-slate-dark);
   padding: 0.125rem 0.35rem;
   border-radius: 0.25rem;
   margin: 0 0.125rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
-  border: 1px solid #ffb546;
+  border: 1px solid var(--color-clay);
 }
 
 /* ==========================================================================
@@ -229,6 +298,20 @@ html[data-high-contrast="true"] .diff-deleted {
   header, footer, nav, aside, .no-print, button, input, select, textarea {
     display: none !important;
     visibility: hidden !important;
+  }
+
+  /* Hide drawer/modal overlays when printing */
+  [role="dialog"],
+  [data-radix-portal] > div:first-child,
+  .fixed.inset-0 {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Only show the document sheet */
+  #printable-document-sheet {
+    display: block !important;
+    visibility: visible !important;
   }
 
   #printable-comunicado {
@@ -255,6 +338,36 @@ html[data-high-contrast="true"] .diff-deleted {
   }
 
   #printable-comunicado img {
+    visibility: visible !important;
+    display: inline-block !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  /* Document Sheet printing */
+  #printable-document-sheet {
+    visibility: visible !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 !important;
+    padding-top: 15mm !important;
+    padding-bottom: 15mm !important;
+    padding-left: 25mm !important;
+    padding-right: 20mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    transform: none !important;
+  }
+
+  #printable-document-sheet * {
+    visibility: visible !important;
+  }
+
+  #printable-document-sheet img {
     visibility: visible !important;
     display: inline-block !important;
     -webkit-print-color-adjust: exact !important;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ZoomIn, ZoomOut, RotateCcw, Eye, HelpCircle } from "lucide-react";
+import { Eye } from "lucide-react";
 import Link from "next/link";
 
 import { safeStorage } from "@/lib/storage";
@@ -49,33 +49,43 @@ export function AccessibilityBar() {
   return (
     <aside
       aria-label="Barra de Acessibilidade"
-      className="bg-ink text-slate-200 border-b border-deep-stone text-xs font-semibold py-1.5 px-4 transition-colors no-print"
+      className="text-xs font-semibold py-1.5 px-4 transition-colors no-print"
+      style={{ backgroundColor: "#1e1d1c", color: "#b0aea5", borderBottom: "1px solid #3d3d3a" }}
     >
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         {/* Atalhos Rápidos de Acessibilidade */}
-        <div className="flex items-center gap-3 text-micro-label text-stone">
-          <span className="hidden sm:inline text-amber font-semibold uppercase tracking-micro">
+        <div className="flex items-center gap-3 text-[10px]">
+          <span className="hidden sm:inline font-semibold uppercase" style={{ color: "#d97757", letterSpacing: "0.25em" }}>
             Acessibilidade:
           </span>
           <a
             href="#main-content"
-            className="hover:text-amber underline underline-offset-2 transition-colors"
+            className="underline underline-offset-2 transition-colors"
+            style={{ color: "#b0aea5" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#d97757"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
             title="Ir direto para o conteúdo principal [Alt + 1]"
           >
             Conteúdo [1]
           </a>
-          <span className="text-deep-stone">|</span>
+          <span style={{ color: "#3d3d3a" }}>|</span>
           <a
             href="#main-nav"
-            className="hover:text-amber underline underline-offset-2 transition-colors"
+            className="underline underline-offset-2 transition-colors"
+            style={{ color: "#b0aea5" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#d97757"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
             title="Ir para o menu de navegação [Alt + 2]"
           >
             Menu [2]
           </a>
-          <span className="text-deep-stone">|</span>
+          <span style={{ color: "#3d3d3a" }}>|</span>
           <Link
             href="/acessibilidade"
-            className="hover:text-amber underline underline-offset-2 transition-colors flex items-center gap-1"
+            className="underline underline-offset-2 transition-colors flex items-center gap-1"
+            style={{ color: "#b0aea5" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#d97757"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
             title="Ver declaração de acessibilidade e todos os atalhos [Alt + 4]"
           >
             <span>Guia e Atalhos [4]</span>
@@ -85,57 +95,61 @@ export function AccessibilityBar() {
         {/* Ferramentas de Ajuste Visual */}
         <div className="flex items-center gap-3">
           {/* Controle de Tamanho da Fonte */}
-          <div className="flex items-center bg-deep-stone border border-slate rounded-btn p-0.5" role="group" aria-label="Ajustar tamanho do texto">
-            <Button
+          <div className="flex items-center rounded-[8px] p-0.5" style={{ backgroundColor: "#3d3d3a", border: "1px solid #504d4a" }} role="group" aria-label="Ajustar tamanho do texto">
+            <button
               onClick={() => handleFontSizeChange(-1)}
               disabled={fontSize === "sm"}
-              variant="ghost"
-              size="xs"
-              className="px-2 py-0.5 text-micro-label text-stone hover:text-amber hover:bg-ink rounded-btn"
+              className="px-2 py-0.5 text-[10px] rounded-[8px] transition-colors"
+              style={{ color: fontSize === "sm" ? "#504d4a" : "#b0aea5" }}
+              onMouseEnter={(e) => { if (fontSize !== "sm") { e.currentTarget.style.color = "#d97757"; }}}
+              onMouseLeave={(e) => { if (fontSize !== "sm") { e.currentTarget.style.color = "#b0aea5"; }}}
               title="Diminuir tamanho da fonte"
               aria-label="Diminuir fonte"
             >
               A-
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={handleResetFontSize}
-              variant="ghost"
-              size="xs"
-              className="px-2 py-0.5 text-micro-label text-stone hover:text-amber hover:bg-ink rounded-btn"
+              className="px-2 py-0.5 text-[10px] rounded-[8px] transition-colors"
+              style={{ color: "#b0aea5" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#d97757"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
               title="Restaurar tamanho padrão da fonte"
               aria-label="Fonte normal"
             >
               A
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => handleFontSizeChange(1)}
               disabled={fontSize === "xl"}
-              variant="ghost"
-              size="xs"
-              className="px-2 py-0.5 text-micro-label text-stone hover:text-amber hover:bg-ink rounded-btn"
+              className="px-2 py-0.5 text-[10px] rounded-[8px] transition-colors"
+              style={{ color: fontSize === "xl" ? "#504d4a" : "#b0aea5" }}
+              onMouseEnter={(e) => { if (fontSize !== "xl") { e.currentTarget.style.color = "#d97757"; }}}
+              onMouseLeave={(e) => { if (fontSize !== "xl") { e.currentTarget.style.color = "#b0aea5"; }}}
               title="Aumentar tamanho da fonte"
               aria-label="Aumentar fonte"
             >
               A+
-            </Button>
+            </button>
           </div>
 
           {/* Alternador de Alto Contraste */}
-          <Button
+          <button
             onClick={toggleHighContrast}
-            variant={highContrast ? "primary" : "secondary"}
-            size="sm"
-            className={`px-3 py-1 text-micro-label font-semibold rounded-btn border flex items-center gap-1.5 transition-all ${
-              highContrast
-                ? "bg-amber text-ink border-amber"
-                : "bg-deep-stone text-stone border-slate hover:border-amber hover:text-amber"
-            }`}
+            className="px-3 py-1 text-[10px] font-semibold rounded-[8px] flex items-center gap-1.5 transition-all"
+            style={{
+              backgroundColor: highContrast ? "#d97757" : "#3d3d3a",
+              color: highContrast ? "#141413" : "#b0aea5",
+              border: `1px solid ${highContrast ? "#c6613f" : "#504d4a"}`
+            }}
+            onMouseEnter={(e) => { if (!highContrast) { e.currentTarget.style.borderColor = "#d97757"; e.currentTarget.style.color = "#d97757"; }}}
+            onMouseLeave={(e) => { if (!highContrast) { e.currentTarget.style.borderColor = "#504d4a"; e.currentTarget.style.color = "#b0aea5"; }}}
             title="Alternar modo de alto contraste [Alt + 3]"
             aria-pressed={highContrast}
-            leftIcon={<Eye className="w-3.5 h-3.5" />}
           >
+            <Eye className="w-3.5 h-3.5" />
             {highContrast ? "Contraste Ativo" : "Alto Contraste"}
-          </Button>
+          </button>
         </div>
       </div>
     </aside>

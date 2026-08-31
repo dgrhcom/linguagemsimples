@@ -72,14 +72,14 @@ export function FindingCard({
     switch (category) {
       case "spelling":
       case "grammar":
-        return { label: "Ortografia & Gramática", icon: SpellCheck, badge: "bg-success-light text-success-dark border-success/30" };
+        return { label: "Ortografia & Gramática", icon: SpellCheck, badgeBg: "#ecfdf5", badgeText: "#065f46", badgeBorder: "#a7f3d0" };
       case "sentence":
-        return { label: "Frase Longa", icon: AlignLeft, badge: "bg-amber/10 text-amber-dark border-amber/30" };
+        return { label: "Frase Longa", icon: AlignLeft, badgeBg: "rgba(217, 119, 87, 0.1)", badgeText: "#c6613f", badgeBorder: "rgba(217, 119, 87, 0.3)" };
       case "inclusion":
       case "nonsexist":
-        return { label: "Linguagem Inclusiva", icon: HeartHandshake, badge: "bg-purple-50 text-purple-900 border-purple-200" };
+        return { label: "Linguagem Inclusiva", icon: HeartHandshake, badgeBg: "#f5f3ff", badgeText: "#5b21b6", badgeBorder: "#ddd6fe" };
       default:
-        return { label: "Clareza & Simplicidade", icon: FileCheck2, badge: "bg-info-light text-info-dark border-info/30" };
+        return { label: "Clareza & Simplicidade", icon: FileCheck2, badgeBg: "#eff6ff", badgeText: "#1e40af", badgeBorder: "#bfdbfe" };
     }
   };
 
@@ -206,35 +206,44 @@ export function FindingCard({
     setRewriteNotice(null);
   };
 
+  const getCardStyle = () => {
+    if (isApplied) return { backgroundColor: "rgba(227, 218, 204, 0.3)", borderColor: "rgba(217, 119, 87, 0.3)" };
+    if (isIgnored) return { backgroundColor: "rgba(227, 218, 204, 0.2)", borderColor: "#cccbc8", opacity: 0.5 };
+    if (isSelected) return { backgroundColor: "#faf9f5", borderColor: "#141413", boxShadow: "0 0 0 2px rgba(217, 119, 87, 0.4)" };
+    return { backgroundColor: "#faf9f5", borderColor: "#cccbc8" };
+  };
+
   return (
     <div
       onClick={onSelect}
-      className={`rounded-card border transition-all duration-200 p-5 ${
-        isApplied
-          ? "bg-sand/30 border-amber/30"
-          : isIgnored
-          ? "bg-sand/20 border-sand opacity-50"
-          : isSelected
-          ? "bg-paper border-ink ring-2 ring-amber/40"
-          : "bg-paper border-sand hover:border-deep-stone"
-      }`}
+      className="rounded-[24px] border transition-all duration-200 p-5 cursor-pointer"
+      style={getCardStyle()}
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <span className={`text-caption font-sans font-semibold px-2.5 py-0.5 rounded-btn border flex items-center gap-1.5 ${catConfig.badge}`}>
+          <span
+            className="text-[12px] font-semibold px-2.5 py-0.5 rounded-[8px] border flex items-center gap-1.5"
+            style={{ backgroundColor: catConfig.badgeBg, color: catConfig.badgeText, borderColor: catConfig.badgeBorder }}
+          >
             <CatIcon className="w-3 h-3 opacity-90" />
             <span>{catConfig.label}</span>
           </span>
 
           {finding.severity === "critical" && !isApplied && (
-            <span className="text-micro-label font-sans px-2 py-0.5 rounded-btn bg-error-light text-error-dark border border-error/30">
+            <span
+              className="text-[10px] font-semibold px-2 py-0.5 rounded-[8px]"
+              style={{ backgroundColor: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}
+            >
               Prioritário
             </span>
           )}
 
           {isCustomized && !isApplied && (
-            <span className="text-micro-label font-sans px-2 py-0.5 rounded-btn bg-amber/10 text-amber-dark border border-amber/30">
+            <span
+              className="text-[10px] font-semibold px-2 py-0.5 rounded-[8px]"
+              style={{ backgroundColor: "rgba(217, 119, 87, 0.1)", color: "#c6613f", border: "1px solid rgba(217, 119, 87, 0.3)" }}
+            >
               Editada por você
             </span>
           )}
@@ -242,12 +251,18 @@ export function FindingCard({
 
         <div>
           {isApplied ? (
-            <span className="text-body-sm font-sans font-semibold text-ink bg-amber/20 border border-amber/40 px-2.5 py-0.5 rounded-btn flex items-center gap-1">
-              <Check className="w-3 h-3 text-ink stroke-[3]" />
+            <span
+              className="text-[14px] font-semibold px-2.5 py-0.5 rounded-[8px] flex items-center gap-1"
+              style={{ backgroundColor: "rgba(217, 119, 87, 0.2)", color: "#141413", border: "1px solid rgba(217, 119, 87, 0.4)" }}
+            >
+              <Check className="w-3 h-3 stroke-[3]" style={{ color: "#141413" }} />
               <span>Aplicada</span>
             </span>
           ) : isIgnored ? (
-            <span className="text-body-sm font-sans text-stone bg-sand/50 px-2.5 py-0.5 rounded-btn">
+            <span
+              className="text-[14px] px-2.5 py-0.5 rounded-[8px]"
+              style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", color: "#b0aea5" }}
+            >
               Ignorada
             </span>
           ) : null}
@@ -255,26 +270,27 @@ export function FindingCard({
       </div>
 
       {/* Problema */}
-      <p className="text-body-sm text-charcoal leading-relaxed mb-3">
+      <p className="text-[14px] leading-relaxed mb-3" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
         {finding.explanation}
       </p>
 
       {/* Bloco Comparativo */}
-      <div className="space-y-2 rounded-tile bg-sand/30 p-3 border border-sand mb-3">
-        <div className="text-body-sm">
-          <span className="text-micro-label font-sans text-stone block mb-1">
-            Texto Original
-          </span>
-          <p className="font-mono text-charcoal bg-paper border border-sand rounded-input p-2.5 line-through opacity-80 leading-relaxed">
+      <div className="space-y-2 rounded-[12px] p-3 mb-3" style={{ backgroundColor: "rgba(227, 218, 204, 0.3)", border: "1px solid #cccbc8" }}>
+        <div className="text-[14px]">
+          <span className="text-[10px] block mb-1" style={{ color: "#b0aea5" }}>Texto Original</span>
+          <p
+            className="font-mono text-[14px] rounded-[8px] p-2.5 line-through leading-relaxed"
+            style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", color: "#141413", opacity: 0.8 }}
+          >
             {finding.originalText}
           </p>
         </div>
 
         {isEditing ? (
           <div className="pt-1 space-y-2">
-            <div className="flex items-center justify-between text-caption font-sans text-stone">
-              <span className="font-semibold text-ink flex items-center gap-1">
-                <Pencil className="w-3 h-3 text-amber" />
+            <div className="flex items-center justify-between text-[12px]" style={{ color: "#b0aea5" }}>
+              <span className="font-semibold flex items-center gap-1" style={{ color: "#141413" }}>
+                <Pencil className="w-3 h-3" style={{ color: "#d97757" }} />
                 <span>Edição Manual:</span>
               </span>
               <span>{customDraft.trim().split(/\s+/).filter(Boolean).length} palavras</span>
@@ -283,7 +299,8 @@ export function FindingCard({
               value={customDraft}
               onChange={(e) => setCustomDraft(e.target.value)}
               rows={2}
-              className="w-full text-body-sm font-mono font-semibold text-ink bg-paper border-2 border-amber rounded-input p-2.5 focus:outline-hidden focus:ring-1 focus:ring-amber"
+              className="w-full text-[14px] font-mono font-semibold rounded-[8px] p-2.5 focus:outline-hidden"
+              style={{ backgroundColor: "#faf9f5", border: "2px solid #d97757", color: "#141413" }}
               placeholder="Digite sua versão..."
               autoFocus
             />
@@ -302,20 +319,24 @@ export function FindingCard({
             </div>
           </div>
         ) : hasSuggestion ? (
-          <div className="text-body-sm pt-1">
-            <span className="text-micro-label font-sans text-stone block mb-1">
-              Sugestão de Simplificação
-            </span>
-            <div className="font-mono text-ink font-semibold bg-paper-light border border-amber/40 rounded-input p-2.5 leading-relaxed">
+          <div className="text-[14px] pt-1">
+            <span className="text-[10px] block mb-1" style={{ color: "#b0aea5" }}>Sugestão de Simplificação</span>
+            <div
+              className="font-mono font-semibold rounded-[8px] p-2.5 leading-relaxed"
+              style={{ backgroundColor: "#faf9f5", border: "1px solid rgba(217, 119, 87, 0.4)", color: "#141413" }}
+            >
               {finding.suggestedText}
             </div>
           </div>
         ) : (
           <div className="pt-1 space-y-2">
-            <div className="bg-amber/10 border border-amber/30 rounded-input p-3 text-body-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+            <div
+              className="rounded-[8px] p-3 text-[14px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5"
+              style={{ backgroundColor: "rgba(217, 119, 87, 0.1)", border: "1px solid rgba(217, 119, 87, 0.3)" }}
+            >
               <div>
-                <p className="font-semibold text-ink">Frase longa ({finding.originalText.split(/\s+/).filter(Boolean).length} palavras)</p>
-                <p className="text-charcoal text-caption mt-0.5">{finding.recommendation}</p>
+                <p className="font-semibold" style={{ color: "#141413" }}>Frase longa ({finding.originalText.split(/\s+/).filter(Boolean).length} palavras)</p>
+                <p className="text-[12px] mt-0.5" style={{ color: "#141413" }}>{finding.recommendation}</p>
               </div>
               <Button
                 type="button"
@@ -323,40 +344,41 @@ export function FindingCard({
                 disabled={aiRewriting}
                 variant="primary"
                 size="sm"
-                leftIcon={<Sparkles className="w-3.5 h-3.5 text-amber" />}
+                leftIcon={<Sparkles className="w-3.5 h-3.5" style={{ color: "#d97757" }} />}
               >
                 {aiRewriting ? "Reescrevendo..." : "Reescrever com IA"}
               </Button>
             </div>
 
             {rewriteNotice && (
-              <div className={`p-3 rounded-tile text-body-sm space-y-2 border animate-in fade-in slide-in-from-top-1 ${
-                rewriteNotice.type === "offline"
-                  ? "bg-amber/10 border-amber/40 text-ink"
-                  : rewriteNotice.type === "error"
-                  ? "bg-error-light border-error/30 text-error-dark"
-                  : "bg-info-light border-info/30 text-info-dark"
-              }`}>
+              <div
+                className="p-3 rounded-[12px] text-[14px] space-y-2 border animate-in fade-in slide-in-from-top-1"
+                style={{
+                  backgroundColor: rewriteNotice.type === "offline" ? "rgba(217, 119, 87, 0.1)" : rewriteNotice.type === "error" ? "#fef2f2" : "#eff6ff",
+                  borderColor: rewriteNotice.type === "offline" ? "rgba(217, 119, 87, 0.4)" : rewriteNotice.type === "error" ? "#fecaca" : "#bfdbfe",
+                  color: rewriteNotice.type === "offline" ? "#141413" : rewriteNotice.type === "error" ? "#991b1b" : "#1e40af"
+                }}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-1">
                     <div className="font-semibold flex items-center gap-1.5">
                       {rewriteNotice.type === "offline" ? (
-                        <Info className="w-3.5 h-3.5 text-amber shrink-0" />
+                        <Info className="w-3.5 h-3.5 shrink-0" style={{ color: "#d97757" }} />
                       ) : rewriteNotice.type === "error" ? (
-                        <AlertCircle className="w-3.5 h-3.5 text-error shrink-0" />
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                       ) : (
-                        <Info className="w-3.5 h-3.5 text-info shrink-0" />
+                        <Info className="w-3.5 h-3.5 shrink-0" />
                       )}
                       <span>{rewriteNotice.message}</span>
                     </div>
                     {rewriteNotice.detail && (
-                      <p className="text-caption opacity-90 leading-relaxed">{rewriteNotice.detail}</p>
+                      <p className="text-[12px] opacity-90 leading-relaxed">{rewriteNotice.detail}</p>
                     )}
                   </div>
                   <Button type="button" onClick={() => setRewriteNotice(null)} variant="ghost" size="xs" className="p-0.5" leftIcon={<X className="w-3.5 h-3.5" />} />
                 </div>
                 <div className="flex items-center gap-2 pt-1">
-                  <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-ai-settings"))} variant="secondary" size="xs" leftIcon={<Settings className="w-3 h-3 text-amber" />}>
+                  <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-ai-settings"))} variant="secondary" size="xs" leftIcon={<Settings className="w-3 h-3" style={{ color: "#d97757" }} />}>
                     Configurar IA
                   </Button>
                   <Button type="button" onClick={() => { setCustomDraft(finding.suggestedText || finding.originalText); setIsEditing(true); setRewriteNotice(null); }} variant="ghost" size="xs">
@@ -404,12 +426,12 @@ export function FindingCard({
 
           {!isApplied && !isEditing && (
             <>
-              <Button type="button" onClick={(e) => { e.stopPropagation(); setCustomDraft(finding.suggestedText || finding.originalText); setIsEditing(true); }} variant="secondary" size="sm" leftIcon={<Pencil className="w-3 h-3 text-stone" />}>
+              <Button type="button" onClick={(e) => { e.stopPropagation(); setCustomDraft(finding.suggestedText || finding.originalText); setIsEditing(true); }} variant="secondary" size="sm" leftIcon={<Pencil className="w-3 h-3" style={{ color: "#b0aea5" }} />}>
                 Editar
               </Button>
 
               {hasSuggestion && (
-                <Button type="button" onClick={(e) => { e.stopPropagation(); handleAiRewriteSegment(); }} disabled={aiRewriting} variant="secondary" size="sm" leftIcon={<Sparkles className="w-3 h-3 text-amber" />}>
+                <Button type="button" onClick={(e) => { e.stopPropagation(); handleAiRewriteSegment(); }} disabled={aiRewriting} variant="secondary" size="sm" leftIcon={<Sparkles className="w-3 h-3" style={{ color: "#d97757" }} />}>
                   {aiRewriting ? "Gerando..." : "Nova IA"}
                 </Button>
               )}
@@ -426,25 +448,28 @@ export function FindingCard({
 
       {/* Fundamentação */}
       {showExplanation && (
-        <div className="mt-3 pt-3 border-t border-sand text-body-sm bg-sand/20 p-3.5 rounded-tile space-y-2 text-charcoal animate-in fade-in">
+        <div
+          className="mt-3 pt-3 text-[14px] p-3.5 rounded-[12px] space-y-2 animate-in fade-in"
+          style={{ borderTop: "1px solid #cccbc8", backgroundColor: "rgba(227, 218, 204, 0.2)", color: "#141413" }}
+        >
           {detailedLoading ? (
-            <div className="flex items-center gap-2 text-stone py-1">
-              <div className="w-3 h-3 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center gap-2 py-1" style={{ color: "#b0aea5" }}>
+              <div className="w-3 h-3 border-2 rounded-full animate-spin" style={{ borderColor: "#141413", borderTopColor: "transparent" }} />
               <span>Consultando diretrizes da Unicamp...</span>
             </div>
           ) : (
             <>
               <div>
-                <strong className="text-ink block mb-0.5">Por que isso importa na comunicação pública?</strong>
-                <p className="leading-relaxed">{detailedData?.whyItMatters || "Comunicações diretas e acessíveis garantem que o cidadão encontre, compreenda e aja sem dúvidas na primeira leitura."}</p>
+                <strong className="block mb-0.5" style={{ color: "#141413" }}>Por que isso importa na comunicação pública?</strong>
+                <p className="leading-relaxed" style={{ fontFamily: "var(--font-anthropic-serif)" }}>{detailedData?.whyItMatters || "Comunicações diretas e acessíveis garantem que o cidadão encontre, compreenda e aja sem dúvidas na primeira leitura."}</p>
               </div>
               <div>
-                <strong className="text-ink block mb-0.5">Dica Prática:</strong>
-                <p className="leading-relaxed">{detailedData?.pedagogicalTip || finding.recommendation}</p>
+                <strong className="block mb-0.5" style={{ color: "#141413" }}>Dica Prática:</strong>
+                <p className="leading-relaxed" style={{ fontFamily: "var(--font-anthropic-serif)" }}>{detailedData?.pedagogicalTip || finding.recommendation}</p>
               </div>
               {finding.source?.url && (
-                <a href={finding.source.url} target="_blank" rel="noopener noreferrer" className="ghost-link text-caption text-ink inline-flex items-center gap-1 pt-0.5">
-                  <BookOpen className="w-3 h-3 text-amber" />
+                <a href={finding.source.url} target="_blank" rel="noopener noreferrer" className="ghost-link text-[12px] inline-flex items-center gap-1 pt-0.5" style={{ color: "#141413" }}>
+                  <BookOpen className="w-3 h-3" style={{ color: "#d97757" }} />
                   <span>Consultar guia Unicamp</span>
                 </a>
               )}
