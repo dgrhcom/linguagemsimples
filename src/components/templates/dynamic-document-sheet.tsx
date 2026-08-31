@@ -55,26 +55,26 @@ export function DynamicDocumentSheet({
         {/* CABEÇALHO INSTITUCIONAL OFICIAL (Apenas se não for Certificado) */}
         {/* ========================================================================= */}
         {!isCertificado && (
-          <header className="border-b border-zinc-950 pb-4">
-            <div className="flex justify-between items-center gap-4">
+          <header className="border-b border-zinc-950 pb-3">
+            <div className="flex justify-between items-center gap-3">
               {/* Logotipos Institucionais à Esquerda */}
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 {!metadata.hideUnicampLogo && (
-                  <div className="relative h-14 w-32 shrink-0 flex items-center">
+                  <div className="relative h-[40px] w-[120px] shrink-0 flex items-center">
                     <img
                       src="/images/logo-unicamp.svg"
                       alt="Logo Unicamp"
-                      className="h-14 w-auto max-h-14 object-contain object-left"
+                      className="h-[40px] w-[120px] object-contain object-left"
                     />
                   </div>
                 )}
 
                 {metadata.customUnitLogo && (
-                  <div className="relative h-14 w-32 shrink-0 border-l border-zinc-200 pl-3 flex items-center">
+                  <div className="relative h-[40px] w-[100px] shrink-0 border-l border-zinc-200 pl-2 flex items-center">
                     <img
                       src={metadata.customUnitLogo}
                       alt="Logo da Unidade"
-                      className="h-14 w-auto max-h-14 object-contain object-left"
+                      className="h-[30px] w-auto max-w-[100px] object-contain object-left"
                     />
                   </div>
                 )}
@@ -83,13 +83,13 @@ export function DynamicDocumentSheet({
 
               {/* Informações da Unidade e Contato à Direita */}
               <div className="text-right space-y-0.5">
-                <h1 className="text-xs font-bold text-zinc-900 tracking-tight">
+                <h1 className="text-[9px] font-bold text-zinc-900 tracking-tight leading-tight">
                   {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
                 </h1>
-                <p className="text-[10px] text-zinc-600 font-medium">
+                <p className="text-[7.5px] text-zinc-600 font-medium leading-tight">
                   {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
                 </p>
-                <p className="text-[10px] text-zinc-500 font-medium">
+                <p className="text-[7.5px] text-zinc-500 font-medium leading-tight">
                   Universidade Estadual de Campinas
                 </p>
               </div>

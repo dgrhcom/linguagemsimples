@@ -238,11 +238,6 @@ export function DynamicDocumentDrawer({
     }
   };
 
-  const handleOpenInGoogleDocs = async () => {
-    await handleCopyFormatted();
-    setShowGDocsModal(true);
-  };
-
   const inputClasses = "w-full text-[14px] leading-[1] tracking-[-0.08px] p-2 bg-ivory-light border border-stone rounded-[8px] focus:bg-white focus:ring-1 focus:ring-cloud-dark outline-hidden";
 
   return (
@@ -332,15 +327,6 @@ export function DynamicDocumentDrawer({
               </Button>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                onClick={handleOpenInGoogleDocs}
-                variant="secondary"
-                size="md"
-                leftIcon={<ExternalLink className="w-3.5 h-3.5 text-clay" />}
-              >
-                Abrir no Google Docs
-              </Button>
               <Button
                 type="button"
                 onClick={handleDownloadDocx}
