@@ -44,45 +44,6 @@ function getUnicampLogoBytes(): Uint8Array | null {
 
 
 /**
- * Gera documento Word (.DOCX) profissional nos padrões rigorosos da Unicamp
- */
-export async function generateDocumentDocx(
-  docType: DocumentType = "comunicado",
-  text: string,
-  metadata: UniversalDocumentMetadata
-): Promise<Blob> {
-  // Margens Oficiais da Unicamp (em DXA: 1 cm = 567 dxa):
-  // Superior: 2,5 cm, Inferior: 2,5 cm
-  // Esquerda: 3,0 cm, Direita: 2,0 cm
-  const MARGIN_TOP = 1417;    // 2.5 cm
-  const MARGIN_BOTTOM = 1417; // 2.5 cm
-  const MARGIN_LEFT = 1701;   // 3.0 cm
-  const MARGIN_RIGHT = 1134;  // 2.0 cm
-  const CONTENT_WIDTH_DXA = 11906 - MARGIN_LEFT - MARGIN_RIGHT; // 9071 dxa
-
-  const LOGO_COL_WIDTH = 3400;  // Espaço flexível para Unicamp + Logo da Unidade
-  const TEXT_COL_WIDTH = CONTENT_WIDTH_DXA - LOGO_COL_WIDTH;
-
-  const isNormative = [
-    "portaria", "resolucao", "deliberacao", "instrucao-normativa",
-    "ordinance", "resolution", "instruction", "regulation"
-  ].includes(docType);
-
-  const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
-  const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);
-  const isCarta = ["carta"].includes(docType);
-  const isMemo = ["memorando", "memo"].includes(docType);
-  const isMinutes = ["ata", "minutes"].includes(docType);
-  const isPauta = ["pauta"].includes(docType);
-  const isParecer = ["parecer", "opinion"].includes(docType);
-  const isDecisaoOuDespacho = ["decisao", "despacho"].includes(docType);
-  const isInformacao = ["informacao"].includes(docType);
-  const isDeclaracao = ["declaracao", "declaration"].includes(docType);
-  const isCertificado = ["certificado"].includes(docType);
-
-  const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
-
-/**
  * Detecta as dimensões nativas (largura e altura) de uma imagem em Base64 / Data URL
  */
 function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height: number } {
@@ -124,6 +85,177 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
 
   return { width: 120, height: 40 };
 }
+
+/**
+ * Converte marcação markdown (**negrito** e *itálico*) em TextRuns formatados
+ */
+function parseMarkdownToTextRuns(
+  str: string,
+  baseOptions: { size?: number; font?: string; color?: string; bold?: boolean; italics?: boolean } = {}
+): TextRun[] {
+  const { size = 22, font = "Arial", color, bold = false, italics = false } = baseOptions;
+  const runs: TextRun[] = [];
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(str)) !== null) {
+    if (match.index > lastIndex) {
+      runs.push(
+        new TextRun({
+          text: str.substring(lastIndex, match.index),
+          size,
+          font,
+          color,
+          bold,
+          italics
+        })
+      );
+    }
+    const token = match[0];
+    if (token.startsWith("**") && token.endsWith("**")) {
+      runs.push(
+        new TextRun({
+          text: token.slice(2, -2),
+          bold: true,
+          size,
+          font,
+          color,
+          italics
+        })
+      );
+    } else if (token.startsWith("*") && token.endsWith("*")) {
+      runs.push(
+        new TextRun({
+          text: token.slice(1, -1),
+          italics: true,
+          size,
+          font,
+          color,
+          bold
+        })
+      );
+    }
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < str.length) {
+    runs.push(
+      new TextRun({
+        text: str.substring(lastIndex),
+        size,
+        font,
+        color,
+        bold,
+        italics
+      })
+    );
+  }
+  return runs.length > 0 ? runs : [new TextRun({ text: str, size, font, color, bold, italics })];
+}
+
+/**
+ * Converte blocos de texto em parágrafos do Word com suporte a listas (- item e 1. item)
+ */
+function parseParagraphsToDocx(
+  str: string,
+  options: {
+    alignment?: (typeof AlignmentType)[keyof typeof AlignmentType];
+    indentFirstLine?: number;
+    size?: number;
+    font?: string;
+    lineSpacing?: number;
+    afterSpacing?: number;
+  } = {}
+): Paragraph[] {
+  const {
+    alignment = AlignmentType.JUSTIFIED,
+    indentFirstLine = 567,
+    size = 22,
+    font = "Arial",
+    lineSpacing = 360,
+    afterSpacing = 120
+  } = options;
+
+  const paragraphs: Paragraph[] = [];
+  const lines = str.split("\n").map(l => l.trim()).filter(Boolean);
+
+  for (const line of lines) {
+    const bulletMatch = line.match(/^[-*•]\s+(.*)$/);
+    const numMatch = line.match(/^(\d+)[.)]\s+(.*)$/);
+
+    if (bulletMatch) {
+      paragraphs.push(
+        new Paragraph({
+          bullet: { level: 0 },
+          alignment: AlignmentType.LEFT,
+          spacing: { line: lineSpacing, after: 60 },
+          children: parseMarkdownToTextRuns(bulletMatch[1], { size, font })
+        })
+      );
+    } else if (numMatch) {
+      paragraphs.push(
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          indent: { left: 567, firstLine: -283 },
+          spacing: { line: lineSpacing, after: 60 },
+          children: [
+            new TextRun({ text: `${numMatch[1]}.  `, bold: true, size, font }),
+            ...parseMarkdownToTextRuns(numMatch[2], { size, font })
+          ]
+        })
+      );
+    } else {
+      paragraphs.push(
+        new Paragraph({
+          alignment,
+          indent: indentFirstLine ? { firstLine: indentFirstLine } : undefined,
+          spacing: { line: lineSpacing, after: afterSpacing },
+          children: parseMarkdownToTextRuns(line, { size, font })
+        })
+      );
+    }
+  }
+  return paragraphs;
+}
+
+/**
+ * Gera documento Word (.DOCX) profissional nos padrões rigorosos da Unicamp
+ */
+export async function generateDocumentDocx(
+  docType: DocumentType = "comunicado",
+  text: string,
+  metadata: UniversalDocumentMetadata
+): Promise<Blob> {
+  // Margens Oficiais da Unicamp (em DXA: 1 cm = 567 dxa):
+  // Superior: 2,5 cm, Inferior: 2,5 cm
+  // Esquerda: 3,0 cm, Direita: 2,0 cm
+  const MARGIN_TOP = 1417;    // 2.5 cm
+  const MARGIN_BOTTOM = 1417; // 2.5 cm
+  const MARGIN_LEFT = 1701;   // 3.0 cm
+  const MARGIN_RIGHT = 1134;  // 2.0 cm
+  const CONTENT_WIDTH_DXA = 11906 - MARGIN_LEFT - MARGIN_RIGHT; // 9071 dxa
+
+  const LOGO_COL_WIDTH = 3400;  // Espaço flexível para Unicamp + Logo da Unidade
+  const TEXT_COL_WIDTH = CONTENT_WIDTH_DXA - LOGO_COL_WIDTH;
+
+  const isNormative = [
+    "portaria", "resolucao", "deliberacao", "instrucao-normativa",
+    "ordinance", "resolution", "instruction", "regulation"
+  ].includes(docType);
+
+  const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
+  const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);
+  const isCarta = ["carta"].includes(docType);
+  const isMemo = ["memorando", "memo"].includes(docType);
+  const isMinutes = ["ata", "minutes"].includes(docType);
+  const isPauta = ["pauta"].includes(docType);
+  const isParecer = ["parecer", "opinion"].includes(docType);
+  const isDecisaoOuDespacho = ["decisao", "despacho"].includes(docType);
+  const isInformacao = ["informacao"].includes(docType);
+  const isDeclaracao = ["declaracao", "declaration"].includes(docType);
+  const isCertificado = ["certificado"].includes(docType);
+
+  const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
 
   // 1. Preparação dos Logotipos do Cabeçalho
   const logoRuns: ImageRun[] = [];
@@ -314,17 +446,12 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
     }
 
     // Corpo do documento
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
 
     if (metadata.effectiveClause) {
       docChildren.push(
@@ -471,17 +598,12 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
     );
 
     // Corpo
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
 
     // Fecho
     docChildren.push(
@@ -554,17 +676,13 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
       );
     }
 
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    // Memorando Corpo
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
 
     docChildren.push(
       new Paragraph({
@@ -593,17 +711,12 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
       })
     );
 
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
   }
 
   // F. PARECER
@@ -623,17 +736,12 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
       })
     );
 
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
 
     docChildren.push(
       new Paragraph({
@@ -721,17 +829,12 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
       })
     );
 
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
 
     docChildren.push(
       new Paragraph({
@@ -777,17 +880,12 @@ function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height
       );
     }
 
-    const rawParagraphs = text.split(/\n+/).filter(p => p.trim());
-    for (const p of rawParagraphs) {
-      docChildren.push(
-        new Paragraph({
-          alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
-          spacing: { line: 360, after: 120 },
-          children: [new TextRun({ text: p.trim(), size: 22, font: "Arial" })]
-        })
-      );
-    }
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
   }
 
   // 4. Rodapé do Documento (Local, Data e Assinatura)

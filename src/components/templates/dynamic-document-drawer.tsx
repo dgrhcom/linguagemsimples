@@ -11,9 +11,13 @@ import {
   Check,
   ExternalLink,
   Upload,
-  Trash2,
   CheckCircle2,
-  BookOpen
+  BookOpen,
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Trash2
 } from "lucide-react";
 import { DynamicDocumentSheet } from "./dynamic-document-sheet";
 import { generateDocumentDocx } from "@/lib/templates/docx-document-generator";
@@ -45,6 +49,56 @@ export function DynamicDocumentDrawer({
   const [zoom, setZoom] = useState(1);
   const [activeGabaritoPage, setActiveGabaritoPage] = useState(0);
 
+  const drawerTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const applyDrawerFormatting = (formatType: "bold" | "italic" | "bullet" | "number") => {
+    const textarea = drawerTextareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = documentText.substring(start, end);
+
+    let replacement = "";
+    let newCursorPos = start;
+
+    if (formatType === "bold") {
+      replacement = selectedText ? `**${selectedText}**` : `**texto em negrito**`;
+      newCursorPos = selectedText ? end + 4 : start + 2;
+    } else if (formatType === "italic") {
+      replacement = selectedText ? `*${selectedText}*` : `*texto em itálico*`;
+      newCursorPos = selectedText ? end + 2 : start + 1;
+    } else if (formatType === "bullet") {
+      if (selectedText) {
+        replacement = selectedText
+          .split("\n")
+          .map(line => `- ${line.replace(/^[-*•]\s*/, "")}`)
+          .join("\n");
+      } else {
+        replacement = "- Item da lista";
+      }
+      newCursorPos = start + replacement.length;
+    } else if (formatType === "number") {
+      if (selectedText) {
+        replacement = selectedText
+          .split("\n")
+          .map((line, idx) => `${idx + 1}. ${line.replace(/^\d+[.)]\s*/, "")}`)
+          .join("\n");
+      } else {
+        replacement = "1. Item numerado";
+      }
+      newCursorPos = start + replacement.length;
+    }
+
+    const updated = documentText.substring(0, start) + replacement + documentText.substring(end);
+    setDocumentText(updated);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
   useEffect(() => {
     setCurrentDocType(docType);
   }, [docType]);
@@ -53,7 +107,10 @@ export function DynamicDocumentDrawer({
     setDocumentText(text);
   }, [text]);
 
-  const currentTypeInfo = documentTypesData.find(dt => dt.type === currentDocType) || documentTypesData[0];
+  const enabledDocumentTypes = (documentTypesData as any[]).filter(
+    dt => dt.enabled !== false && !dt.disabled
+  );
+  const currentTypeInfo = enabledDocumentTypes.find(dt => dt.type === currentDocType) || documentTypesData[0];
   const gabaritoPages = currentTypeInfo.modelImagePages || (currentTypeInfo.modelImagePath ? [currentTypeInfo.modelImagePath] : []);
 
   const [metadata, setMetadata] = useState<UniversalDocumentMetadata>(() => {
@@ -480,7 +537,7 @@ export function DynamicDocumentDrawer({
                 onChange={(e) => {
                   const newType = e.target.value as DocumentType;
                   setCurrentDocType(newType);
-                  const newTypeInfo = documentTypesData.find(dt => dt.type === newType);
+                  const newTypeInfo = enabledDocumentTypes.find(dt => dt.type === newType);
                   if (newTypeInfo?.defaultMetadata) {
                     setMetadata(prev => ({
                       ...prev,
@@ -490,7 +547,7 @@ export function DynamicDocumentDrawer({
                 }}
                 className="w-full text-[13px] p-2 bg-ivory-light border border-stone rounded-[8px] focus:bg-white focus:ring-1 focus:ring-cloud-dark outline-hidden font-medium text-slate-dark cursor-pointer"
               >
-                {documentTypesData.map((dt) => (
+                {enabledDocumentTypes.map((dt) => (
                   <option key={dt.type} value={dt.type}>
                     {dt.label} ({dt.category})
                   </option>
@@ -508,7 +565,46 @@ export function DynamicDocumentDrawer({
                   {documentText.trim() ? documentText.trim().split(/\s+/).length : 0} palavras
                 </span>
               </div>
+
+              {/* Barra de Formatação */}
+              <div className="flex items-center gap-1 p-1 bg-oat-warm/30 rounded-[6px] border border-stone">
+                <button
+                  type="button"
+                  onClick={() => applyDrawerFormatting("bold")}
+                  title="Negrito (**texto**)"
+                  className="p-1 rounded-[4px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+                >
+                  <Bold className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyDrawerFormatting("italic")}
+                  title="Itálico (*texto*)"
+                  className="p-1 rounded-[4px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+                >
+                  <Italic className="w-3.5 h-3.5" />
+                </button>
+                <div className="h-3.5 w-[1px] bg-stone mx-0.5" />
+                <button
+                  type="button"
+                  onClick={() => applyDrawerFormatting("bullet")}
+                  title="Lista com marcadores (- item)"
+                  className="p-1 rounded-[4px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+                >
+                  <List className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applyDrawerFormatting("number")}
+                  title="Lista numerada (1. item)"
+                  className="p-1 rounded-[4px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+                >
+                  <ListOrdered className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               <textarea
+                ref={drawerTextareaRef}
                 value={documentText}
                 onChange={(e) => setDocumentText(e.target.value)}
                 placeholder="Edite o conteúdo do documento..."
@@ -827,7 +923,7 @@ export function DynamicDocumentDrawer({
                 <div className="flex items-center justify-between px-3 py-1.5 rounded-[8px]" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
                   <span className="text-[12px] font-semibold" style={{ color: "#141413" }}>Páginas:</span>
                   <div className="flex gap-1">
-                    {gabaritoPages.map((_, idx) => (
+                    {(gabaritoPages as string[]).map((_: string, idx: number) => (
                       <button
                         key={idx}
                         type="button"

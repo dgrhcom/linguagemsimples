@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { DocumentType } from "@/types/document";
 import { AnalysisInput } from "@/types/analysis";
-import { Trash2, Upload, FileText, File } from "lucide-react";
+import { Trash2, Upload, FileText, File, Bold, Italic, List, ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DocumentTypeSelector } from "./document-type-selector";
 
@@ -26,6 +26,55 @@ export function TextEditor({
   const [textGoal, setTextGoal] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const applyFormatting = (formatType: "bold" | "italic" | "bullet" | "number") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = text.substring(start, end);
+
+    let replacement = "";
+    let newCursorPos = start;
+
+    if (formatType === "bold") {
+      replacement = selectedText ? `**${selectedText}**` : `**texto em negrito**`;
+      newCursorPos = selectedText ? end + 4 : start + 2;
+    } else if (formatType === "italic") {
+      replacement = selectedText ? `*${selectedText}*` : `*texto em itálico*`;
+      newCursorPos = selectedText ? end + 2 : start + 1;
+    } else if (formatType === "bullet") {
+      if (selectedText) {
+        replacement = selectedText
+          .split("\n")
+          .map(line => `- ${line.replace(/^[-*•]\s*/, "")}`)
+          .join("\n");
+      } else {
+        replacement = "- Item da lista";
+      }
+      newCursorPos = start + replacement.length;
+    } else if (formatType === "number") {
+      if (selectedText) {
+        replacement = selectedText
+          .split("\n")
+          .map((line, idx) => `${idx + 1}. ${line.replace(/^\d+[.)]\s*/, "")}`)
+          .join("\n");
+      } else {
+        replacement = "1. Item numerado";
+      }
+      newCursorPos = start + replacement.length;
+    }
+
+    const updated = text.substring(0, start) + replacement + text.substring(end);
+    setText(updated);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
 
   useEffect(() => {
     setText(initialText || "");
@@ -200,6 +249,46 @@ export function TextEditor({
           </div>
         </div>
 
+        {/* Barra de Formatação de Estilo */}
+        <div className="bg-oat-warm/20 border-b border-stone px-5 py-1.5 flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => applyFormatting("bold")}
+            title="Negrito (**texto**)"
+            className="p-1.5 rounded-[6px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+          >
+            <Bold className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => applyFormatting("italic")}
+            title="Itálico (*texto*)"
+            className="p-1.5 rounded-[6px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+          >
+            <Italic className="w-4 h-4" />
+          </button>
+          <div className="h-4 w-[1px] bg-stone mx-1" />
+          <button
+            type="button"
+            onClick={() => applyFormatting("bullet")}
+            title="Lista com marcadores (- item)"
+            className="p-1.5 rounded-[6px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => applyFormatting("number")}
+            title="Lista numerada (1. item)"
+            className="p-1.5 rounded-[6px] text-slate-dark hover:bg-oat-warm transition-colors flex items-center justify-center"
+          >
+            <ListOrdered className="w-4 h-4" />
+          </button>
+          <span className="text-[11px] text-cloud-medium ml-auto">
+            Suporta formatação Markdown
+          </span>
+        </div>
+
         {/* Área do Textarea */}
         <div className="p-5 sm:p-6 bg-ivory-light">
           <label htmlFor="main-textarea" className="sr-only">
@@ -207,6 +296,7 @@ export function TextEditor({
           </label>
           <textarea
             id="main-textarea"
+            ref={textareaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Cole ou digite aqui seu texto para análise..."

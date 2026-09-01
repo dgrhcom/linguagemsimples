@@ -8,6 +8,101 @@ import documentTypesData from "@/data/document-types/document-types.json";
 import { DocumentHeader } from "./document-header";
 import { UNICAMP_LOGO_JPG_DATA_URL } from "@/data/unicamp-logo-base64";
 
+/**
+ * Renderiza texto inline com suporte a **negrito** e *itálico*
+ */
+export function FormattedInline({ text }: { text: string }) {
+  if (!text) return null;
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    const token = match[0];
+    if (token.startsWith("**") && token.endsWith("**")) {
+      parts.push(<strong key={match.index} className="font-bold">{token.slice(2, -2)}</strong>);
+    } else if (token.startsWith("*") && token.endsWith("*")) {
+      parts.push(<em key={match.index} className="italic">{token.slice(1, -1)}</em>);
+    }
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  return <>{parts}</>;
+}
+
+/**
+ * Renderiza parágrafos com suporte a listas com marcadores e listas numeradas
+ */
+export function FormattedParagraphs({
+  text,
+  paragraphClassName = "text-xs text-zinc-900 leading-[1.6] text-justify indent-8 font-normal"
+}: {
+  text: string;
+  paragraphClassName?: string;
+}) {
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const elements: React.ReactNode[] = [];
+  let currentList: { type: "bullet" | "numbered"; items: string[] } | null = null;
+
+  const flushList = () => {
+    if (!currentList) return;
+    if (currentList.type === "bullet") {
+      elements.push(
+        <ul key={`ul-${elements.length}`} className="list-disc list-outside my-2 pl-6 space-y-1 text-xs text-zinc-900 leading-[1.6]">
+          {currentList.items.map((item, idx) => (
+            <li key={idx}><FormattedInline text={item} /></li>
+          ))}
+        </ul>
+      );
+    } else {
+      elements.push(
+        <ol key={`ol-${elements.length}`} className="list-decimal list-outside my-2 pl-6 space-y-1 text-xs text-zinc-900 leading-[1.6]">
+          {currentList.items.map((item, idx) => (
+            <li key={idx}><FormattedInline text={item} /></li>
+          ))}
+        </ol>
+      );
+    }
+    currentList = null;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const bulletMatch = line.match(/^[-*•]\s+(.*)$/);
+    const numMatch = line.match(/^(\d+)[.)]\s+(.*)$/);
+
+    if (bulletMatch) {
+      if (!currentList || currentList.type !== "bullet") {
+        flushList();
+        currentList = { type: "bullet", items: [] };
+      }
+      currentList.items.push(bulletMatch[1]);
+    } else if (numMatch) {
+      if (!currentList || currentList.type !== "numbered") {
+        flushList();
+        currentList = { type: "numbered", items: [] };
+      }
+      currentList.items.push(numMatch[2]);
+    } else {
+      flushList();
+      elements.push(
+        <p key={`p-${elements.length}`} className={paragraphClassName}>
+          <FormattedInline text={line} />
+        </p>
+      );
+    }
+  }
+  flushList();
+
+  return <div className="space-y-3">{elements}</div>;
+}
+
 interface DynamicDocumentSheetProps {
   text: string;
   metadata: UniversalDocumentMetadata;
@@ -20,12 +115,6 @@ export function DynamicDocumentSheet({
   docType = "comunicado"
 }: DynamicDocumentSheetProps) {
   const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
-
-  // Helper para dividir o texto em parágrafos limpos
-  const paragraphs = text
-    .split(/\n+/)
-    .map(p => p.trim())
-    .filter(Boolean);
 
   // Categorização do tipo de documento
   const isNormative = [
@@ -89,26 +178,14 @@ export function DynamicDocumentSheet({
             )}
 
             {/* Artigos e Parágrafos */}
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => {
-                const isArtigo = /^(Art\.|Artigo|§|Parágrafo|Capítulo|Seção|TÍTULO|[0-9]+\.)/i.test(p);
-                return (
-                  <p
-                    key={idx}
-                    className={`text-xs text-zinc-900 leading-[1.6] text-justify ${
-                      isArtigo ? "indent-8 font-normal" : "indent-8 font-normal"
-                    }`}
-                  >
-                    {p}
-                  </p>
-                );
-              })}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
 
             {/* Cláusula de Vigência */}
             {metadata.effectiveClause && (
               <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8 pt-2">
-                {metadata.effectiveClause}
+                <FormattedInline text={metadata.effectiveClause} />
               </p>
             )}
 
@@ -133,28 +210,13 @@ export function DynamicDocumentSheet({
               </p>
             </div>
 
-            <div className="space-y-4 pt-2">
-              {paragraphs.map((p, idx) => {
-                const isTitle = /^(TÍTULO|CAPÍTULO|SEÇÃO)/i.test(p);
-                return (
-                  <div key={idx}>
-                    {isTitle ? (
-                      <h3 className="text-xs font-black text-black uppercase tracking-wider text-center pt-3 pb-1 border-b border-zinc-200">
-                        {p}
-                      </h3>
-                    ) : (
-                      <p className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                        {p}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+            <div className="pt-2">
+              <FormattedParagraphs text={text} />
             </div>
 
             {metadata.effectiveClause && (
               <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8 pt-2">
-                {metadata.effectiveClause}
+                <FormattedInline text={metadata.effectiveClause} />
               </p>
             )}
           </div>
@@ -181,7 +243,7 @@ export function DynamicDocumentSheet({
             {metadata.subject && (
               <div className="text-xs text-zinc-900 pt-2">
                 <span className="font-black text-black">Assunto: </span>
-                <span className="font-normal">{metadata.subject}</span>
+                <span className="font-normal"><FormattedInline text={metadata.subject} /></span>
               </div>
             )}
 
@@ -201,12 +263,8 @@ export function DynamicDocumentSheet({
             </div>
 
             {/* Corpo do Ofício */}
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
 
             {/* Fecho Padrão */}
@@ -239,7 +297,7 @@ export function DynamicDocumentSheet({
             {metadata.subject && (
               <div className="text-xs text-zinc-900 pt-1">
                 <span className="font-black text-black">Assunto: </span>
-                <span className="font-normal">{metadata.subject}</span>
+                <span className="font-normal"><FormattedInline text={metadata.subject} /></span>
               </div>
             )}
 
@@ -247,12 +305,8 @@ export function DynamicDocumentSheet({
               {metadata.vocativo || "Prezado(a) Professor(a),"}
             </div>
 
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
 
             <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
@@ -295,12 +349,8 @@ export function DynamicDocumentSheet({
             </div>
 
             {/* Corpo do Memorando */}
-            <div className="space-y-3.5 pt-2">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-2">
+              <FormattedParagraphs text={text} />
             </div>
 
             {/* Saudação */}
@@ -382,12 +432,8 @@ export function DynamicDocumentSheet({
             </div>
 
             {/* Texto da Ata */}
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
 
             {/* Encerramento */}
@@ -425,12 +471,8 @@ export function DynamicDocumentSheet({
               </div>
             </div>
 
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
           </div>
         )}
@@ -472,12 +514,8 @@ export function DynamicDocumentSheet({
             )}
 
             {/* Corpo do Parecer */}
-            <div className="space-y-3.5 pt-2">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-2">
+              <FormattedParagraphs text={text} />
             </div>
 
             {/* Local e Data */}
@@ -515,12 +553,8 @@ export function DynamicDocumentSheet({
             )}
 
             {/* Corpo Técnico */}
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
           </div>
         )}
@@ -536,12 +570,8 @@ export function DynamicDocumentSheet({
               </h2>
             </div>
 
-            <div className="space-y-4 pt-4">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.8] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-4">
+              <FormattedParagraphs text={text} paragraphClassName="text-xs text-zinc-900 leading-[1.8] text-justify indent-8 font-normal" />
             </div>
 
             {/* Data e Local (justificado como o parágrafo do texto) */}
@@ -631,12 +661,8 @@ export function DynamicDocumentSheet({
               )}
             </div>
 
-            <div className="space-y-3.5 pt-1">
-              {paragraphs.map((p, idx) => (
-                <p key={idx} className="text-xs text-zinc-900 leading-[1.6] text-justify indent-8">
-                  {p}
-                </p>
-              ))}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
             </div>
           </div>
         )}
