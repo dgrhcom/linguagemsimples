@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DocumentType } from "@/types/document";
 import { AnalysisInput } from "@/types/analysis";
 import { Trash2, Upload, FileText, File } from "lucide-react";
@@ -25,6 +25,7 @@ export function TextEditor({
   const [targetAudience, setTargetAudience] = useState("");
   const [textGoal, setTextGoal] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setText(initialText || "");
@@ -175,27 +176,27 @@ export function TextEditor({
               </Button>
             )}
 
-            <label className="cursor-pointer">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isImporting}
-                leftIcon={isImporting ? (
-                  <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Upload className="w-3.5 h-3.5" />
-                )}
-              >
-                {isImporting ? "Importando..." : "Importar Arquivo"}
-                <input
-                  type="file"
-                  accept=".txt,.md,.csv,.rtf,.docx,.pdf,.html,.htm"
-                  onChange={handleFileUpload}
-                  className="sr-only"
-                  disabled={isImporting}
-                />
-              </Button>
-            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.md,.csv,.rtf,.docx,.pdf,.html,.htm"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              variant="secondary"
+              size="sm"
+              disabled={isImporting}
+              leftIcon={isImporting ? (
+                <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Upload className="w-3.5 h-3.5" />
+              )}
+            >
+              {isImporting ? "Importando..." : "Importar Arquivo"}
+            </Button>
           </div>
         </div>
 

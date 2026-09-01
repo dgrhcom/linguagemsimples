@@ -36,6 +36,8 @@ export function DynamicDocumentDrawer({
   text,
   docType = "comunicado"
 }: DynamicDocumentDrawerProps) {
+  const [currentDocType, setCurrentDocType] = useState<DocumentType>(docType);
+  const [documentText, setDocumentText] = useState<string>(text);
   const [activeView, setActiveView] = useState<"sheet" | "gabarito">("sheet");
   const [copied, setCopied] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
@@ -43,7 +45,15 @@ export function DynamicDocumentDrawer({
   const [zoom, setZoom] = useState(1);
   const [activeGabaritoPage, setActiveGabaritoPage] = useState(0);
 
-  const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
+  useEffect(() => {
+    setCurrentDocType(docType);
+  }, [docType]);
+
+  useEffect(() => {
+    setDocumentText(text);
+  }, [text]);
+
+  const currentTypeInfo = documentTypesData.find(dt => dt.type === currentDocType) || documentTypesData[0];
   const gabaritoPages = currentTypeInfo.modelImagePages || (currentTypeInfo.modelImagePath ? [currentTypeInfo.modelImagePath] : []);
 
   const [metadata, setMetadata] = useState<UniversalDocumentMetadata>(() => {
@@ -67,7 +77,7 @@ export function DynamicDocumentDrawer({
         ...currentTypeInfo.defaultMetadata
       }));
     }
-  }, [docType]);
+  }, [currentDocType]);
 
   useEffect(() => {
     if (!metadata.locationAndDate) {
@@ -89,19 +99,19 @@ export function DynamicDocumentDrawer({
   const isNormative = [
     "portaria", "resolucao", "deliberacao", "instrucao-normativa",
     "ordinance", "resolution", "instruction", "regulation"
-  ].includes(docType);
+  ].includes(currentDocType);
 
-  const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(docType);
-  const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(docType);
-  const isCarta = ["carta"].includes(docType);
-  const isMemo = ["memorando", "memo"].includes(docType);
-  const isMinutes = ["ata", "minutes"].includes(docType);
-  const isPauta = ["pauta"].includes(docType);
-  const isParecer = ["parecer", "opinion"].includes(docType);
-  const isDecisaoOuDespacho = ["decisao", "despacho"].includes(docType);
-  const isInformacao = ["informacao"].includes(docType);
-  const isDeclaracao = ["declaracao", "declaration"].includes(docType);
-  const isCertificado = ["certificado"].includes(docType);
+  const isRegimentoOuRegulamento = ["regimento", "regulamento"].includes(currentDocType);
+  const isLetter = ["oficio", "oficio-circular", "official-letter"].includes(currentDocType);
+  const isCarta = ["carta"].includes(currentDocType);
+  const isMemo = ["memorando", "memo"].includes(currentDocType);
+  const isMinutes = ["ata", "minutes"].includes(currentDocType);
+  const isPauta = ["pauta"].includes(currentDocType);
+  const isParecer = ["parecer", "opinion"].includes(currentDocType);
+  const isDecisaoOuDespacho = ["decisao", "despacho"].includes(currentDocType);
+  const isInformacao = ["informacao"].includes(currentDocType);
+  const isDeclaracao = ["declaracao", "declaration"].includes(currentDocType);
+  const isCertificado = ["certificado"].includes(currentDocType);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -129,7 +139,7 @@ export function DynamicDocumentDrawer({
   const handleDownloadDocx = async () => {
     try {
       setIsExportingDocx(true);
-      const blob = await generateDocumentDocx(docType, text, metadata);
+      const blob = await generateDocumentDocx(currentDocType, documentText, metadata);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -148,67 +158,87 @@ export function DynamicDocumentDrawer({
   };
 
   const handlePrint = () => {
-    // Create a new window with only the document for printing
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-      alert("Por favor, permita pop-ups para imprimir.");
-      return;
-    }
-
     const sheetElement = document.getElementById("printable-document-sheet");
     if (!sheetElement) {
       alert("Documento não encontrado para impressão.");
       return;
     }
 
-    // Clone the element and inline all computed styles
-    const clonedElement = sheetElement.cloneNode(true) as HTMLElement;
-    const allElements = clonedElement.querySelectorAll("*");
-    allElements.forEach((el) => {
-      const computedStyle = window.getComputedStyle(el as Element);
-      let styleText = "";
-      for (let i = 0; i < computedStyle.length; i++) {
-        const prop = computedStyle[i];
-        styleText += `${prop}: ${computedStyle.getPropertyValue(prop)}; `;
-      }
-      (el as HTMLElement).setAttribute("style", styleText);
-    });
-    // Also inline the root element style
-    const rootStyle = window.getComputedStyle(sheetElement);
-    let rootStyleText = "";
-    for (let i = 0; i < rootStyle.length; i++) {
-      const prop = rootStyle[i];
-      rootStyleText += `${prop}: ${rootStyle.getPropertyValue(prop)}; `;
-    }
-    clonedElement.setAttribute("style", rootStyleText);
+    // Capture all existing document stylesheets and style blocks
+    const headStyles = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+      .map((el) => el.outerHTML)
+      .join("\n");
+
+    const baseHref = window.location.origin;
 
     const htmlContent = `
       <!DOCTYPE html>
       <html lang="pt-BR">
       <head>
         <meta charset="UTF-8">
+        <base href="${baseHref}/">
         <title>Imprimir Documento - ${currentTypeInfo.label}</title>
+        ${headStyles}
         <style>
           @page {
             size: A4 portrait;
-            margin: 20mm 20mm 20mm 25mm;
+            margin: 15mm 20mm 15mm 25mm;
           }
           * {
             box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 12pt;
-            line-height: 1.5;
-            color: #000;
-            margin: 0;
-            padding: 0;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-family: Arial, Helvetica, sans-serif !important;
           }
-          img {
-            max-width: 100%;
-            height: auto;
+          #printable-document-sheet {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+          }
+          #printable-document-sheet header {
+            display: block !important;
+            visibility: visible !important;
+            border-bottom: 1px solid #000000 !important;
+            padding-bottom: 12px !important;
+            margin-bottom: 16px !important;
+            width: 100% !important;
+          }
+          #printable-document-sheet footer {
+            display: block !important;
+            visibility: visible !important;
+          }
+          /* Trava estrita para o logotipo Unicamp (JPG) */
+          #printable-document-sheet header img[alt="Logo Unicamp"],
+          #printable-document-sheet header img[src*="logo-unicamp"] {
+            width: 36px !important;
+            height: 40px !important;
+            max-width: 36px !important;
+            max-height: 40px !important;
+            min-width: 36px !important;
+            object-fit: contain !important;
+            object-position: left center !important;
+            display: block !important;
+            flex-shrink: 0 !important;
+          }
+          /* Logotipo da Unidade com a mesma altura do logo Unicamp e largura proporcional */
+          #printable-document-sheet header img[alt="Logo da Unidade"] {
+            display: block !important;
+            height: 40px !important;
+            max-height: 40px !important;
+            width: auto !important;
+            object-fit: contain !important;
+            object-position: left center !important;
           }
           table {
             width: 100%;
@@ -220,19 +250,53 @@ export function DynamicDocumentDrawer({
         </style>
       </head>
       <body>
-        ${clonedElement.outerHTML}
+        ${sheetElement.outerHTML}
       </body>
       </html>
     `;
 
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    // Remove any leftover iframe
+    const oldFrame = document.getElementById("unicamp-print-frame");
+    if (oldFrame) {
+      oldFrame.remove();
+    }
 
-    // Wait for content to load then print
-    printWindow.onload = () => {
-      printWindow.print();
-      printWindow.close();
-    };
+    const printIframe = document.createElement("iframe");
+    printIframe.id = "unicamp-print-frame";
+    printIframe.style.position = "fixed";
+    printIframe.style.left = "-9999px";
+    printIframe.style.top = "-9999px";
+    printIframe.style.width = "210mm";
+    printIframe.style.height = "297mm";
+    printIframe.style.border = "none";
+    printIframe.style.zIndex = "-9999";
+    document.body.appendChild(printIframe);
+
+    const iframeDoc = printIframe.contentWindow?.document;
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(htmlContent);
+      iframeDoc.close();
+
+      const triggerIframePrint = () => {
+        try {
+          printIframe.contentWindow?.focus();
+          printIframe.contentWindow?.print();
+        } catch (err) {
+          console.error("Print error:", err);
+        } finally {
+          setTimeout(() => {
+            printIframe.remove();
+          }, 1500);
+        }
+      };
+
+      if (iframeDoc.readyState === "complete") {
+        setTimeout(triggerIframePrint, 250);
+      } else {
+        printIframe.onload = () => setTimeout(triggerIframePrint, 250);
+      }
+    }
   };
 
   const handleCopyFormatted = async () => {
@@ -258,7 +322,7 @@ export function DynamicDocumentDrawer({
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
       console.error("Erro ao copiar:", err);
-      navigator.clipboard.writeText(text);
+      navigator.clipboard.writeText(documentText);
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     }
@@ -406,9 +470,56 @@ export function DynamicDocumentDrawer({
         <div className="flex-1 overflow-hidden flex min-h-0" style={{ backgroundColor: "#f0eee6" }}>
           {/* COLUNA ESQUERDA: CAMPOS DO MODELO */}
           <div className="w-[380px] shrink-0 overflow-y-auto p-5 space-y-5" style={{ backgroundColor: "#faf9f5", borderRight: "1px solid #cccbc8" }}>
+            {/* SELETOR DE MODELO OFICIAL */}
+            <div className="space-y-1.5 pb-4 border-b border-stone">
+              <label className="block text-[13px] font-semibold text-slate-dark">
+                Modelo do Documento Oficial
+              </label>
+              <select
+                value={currentDocType}
+                onChange={(e) => {
+                  const newType = e.target.value as DocumentType;
+                  setCurrentDocType(newType);
+                  const newTypeInfo = documentTypesData.find(dt => dt.type === newType);
+                  if (newTypeInfo?.defaultMetadata) {
+                    setMetadata(prev => ({
+                      ...prev,
+                      ...newTypeInfo.defaultMetadata
+                    }));
+                  }
+                }}
+                className="w-full text-[13px] p-2 bg-ivory-light border border-stone rounded-[8px] focus:bg-white focus:ring-1 focus:ring-cloud-dark outline-hidden font-medium text-slate-dark cursor-pointer"
+              >
+                {documentTypesData.map((dt) => (
+                  <option key={dt.type} value={dt.type}>
+                    {dt.label} ({dt.category})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* EDIÇÃO DO TEXTO DO DOCUMENTO */}
+            <div className="space-y-1.5 pb-4 border-b border-stone">
+              <div className="flex justify-between items-center">
+                <label className="block text-[13px] font-semibold text-slate-dark">
+                  Texto do Documento
+                </label>
+                <span className="text-[10px] text-cloud-medium">
+                  {documentText.trim() ? documentText.trim().split(/\s+/).length : 0} palavras
+                </span>
+              </div>
+              <textarea
+                value={documentText}
+                onChange={(e) => setDocumentText(e.target.value)}
+                placeholder="Edite o conteúdo do documento..."
+                rows={6}
+                className="w-full text-[13px] leading-relaxed p-2.5 bg-ivory-light border border-stone rounded-[8px] focus:bg-white focus:ring-1 focus:ring-cloud-dark outline-hidden resize-y font-sans text-slate-dark min-h-[110px]"
+              />
+            </div>
+
             <div>
               <h3 className="text-[16px] tracking-[-0.08px] font-sans" style={{ color: "#141413" }}>
-                Campos: {currentTypeInfo.label}
+                Metadados: {currentTypeInfo.label}
               </h3>
               <p className="text-[12px] text-cloud-medium mt-0.5">
                 Preencha os dados para montar o cabeçalho e a estrutura oficial.
@@ -705,7 +816,7 @@ export function DynamicDocumentDrawer({
                   )}
                 </div>
                 <div style={{ transform: `scale(${zoom})`, transformOrigin: "top center" }} className="transition-transform duration-150 w-full flex justify-center">
-                  <DynamicDocumentSheet text={text} metadata={metadata} docType={docType} />
+                  <DynamicDocumentSheet text={documentText} metadata={metadata} docType={currentDocType} />
                 </div>
               </div>
             )}

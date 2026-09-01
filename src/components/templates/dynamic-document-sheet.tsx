@@ -5,6 +5,9 @@ import Image from "next/image";
 import { DocumentType, UniversalDocumentMetadata } from "@/types/document";
 import documentTypesData from "@/data/document-types/document-types.json";
 
+import { DocumentHeader } from "./document-header";
+import { UNICAMP_LOGO_JPG_DATA_URL } from "@/data/unicamp-logo-base64";
+
 interface DynamicDocumentSheetProps {
   text: string;
   metadata: UniversalDocumentMetadata;
@@ -52,50 +55,9 @@ export function DynamicDocumentSheet({
     >
       <div className="space-y-6">
         {/* ========================================================================= */}
-        {/* CABEÇALHO INSTITUCIONAL OFICIAL (Apenas se não for Certificado) */}
+        {/* CABEÇALHO INSTITUCIONAL OFICIAL UNIFICADO (Apenas se não for Certificado) */}
         {/* ========================================================================= */}
-        {!isCertificado && (
-          <header className="border-b border-zinc-950 pb-3">
-            <div className="flex justify-between items-center gap-3">
-              {/* Logotipos Institucionais à Esquerda */}
-              <div className="flex items-center gap-2 shrink-0">
-                {!metadata.hideUnicampLogo && (
-                  <div className="relative h-[40px] w-[120px] shrink-0 flex items-center">
-                    <img
-                      src="/images/logo-unicamp.svg"
-                      alt="Logo Unicamp"
-                      className="h-[40px] w-[120px] object-contain object-left"
-                    />
-                  </div>
-                )}
-
-                {metadata.customUnitLogo && (
-                  <div className="relative h-[40px] w-[100px] shrink-0 border-l border-zinc-200 pl-2 flex items-center">
-                    <img
-                      src={metadata.customUnitLogo}
-                      alt="Logo da Unidade"
-                      className="h-[30px] w-auto max-w-[100px] object-contain object-left"
-                    />
-                  </div>
-                )}
-              </div>
-
-
-              {/* Informações da Unidade e Contato à Direita */}
-              <div className="text-right space-y-0.5">
-                <h1 className="text-[9px] font-bold text-zinc-900 tracking-tight leading-tight">
-                  {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
-                </h1>
-                <p className="text-[7.5px] text-zinc-600 font-medium leading-tight">
-                  {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
-                </p>
-                <p className="text-[7.5px] text-zinc-500 font-medium leading-tight">
-                  Universidade Estadual de Campinas
-                </p>
-              </div>
-            </div>
-          </header>
-        )}
+        {!isCertificado && <DocumentHeader metadata={metadata} />}
 
         {/* ========================================================================= */}
         {/* 1. ATOS NORMATIVOS (Portaria, Resolução, Deliberação, Instrução Normativa) */}
@@ -607,12 +569,24 @@ export function DynamicDocumentSheet({
         {isCertificado && (
           <div className="border-4 border-double border-[#d98a1a] rounded-2xl p-6 sm:p-8 space-y-6 text-center bg-gradient-to-b from-white to-amber-50/20">
             {/* Logo Unicamp Centralizada */}
-            <div className="flex justify-center">
-              <div className="relative h-16 w-36 flex items-center justify-center">
+            <div className="flex justify-center" style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+              <div
+                className="shrink-0 flex items-center justify-center"
+                style={{ height: "64px", maxHeight: "64px", width: "57px", maxWidth: "57px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+              >
                 <img
-                  src="/images/logo-unicamp.svg"
+                  src={UNICAMP_LOGO_JPG_DATA_URL || "/images/logo-unicamp.jpg"}
                   alt="Logo Unicamp"
-                  className="h-16 w-auto max-h-16 object-contain"
+                  width="57"
+                  height="64"
+                  style={{
+                    width: "57px",
+                    height: "64px",
+                    maxWidth: "57px",
+                    maxHeight: "64px",
+                    objectFit: "contain",
+                    display: "block"
+                  }}
                 />
               </div>
             </div>

@@ -1,5 +1,6 @@
 import {
   Document,
+  Header,
   Paragraph,
   TextRun,
   AlignmentType,
@@ -59,7 +60,7 @@ export async function generateDocumentDocx(
   const MARGIN_RIGHT = 1134;  // 2.0 cm
   const CONTENT_WIDTH_DXA = 11906 - MARGIN_LEFT - MARGIN_RIGHT; // 9071 dxa
 
-  const LOGO_COL_WIDTH = 2500;  // ~1.4cm para o logo
+  const LOGO_COL_WIDTH = 3400;  // Espaço flexível para Unicamp + Logo da Unidade
   const TEXT_COL_WIDTH = CONTENT_WIDTH_DXA - LOGO_COL_WIDTH;
 
   const isNormative = [
@@ -81,12 +82,53 @@ export async function generateDocumentDocx(
 
   const currentTypeInfo = documentTypesData.find(dt => dt.type === docType) || documentTypesData[0];
 
+/**
+ * Detecta as dimensões nativas (largura e altura) de uma imagem em Base64 / Data URL
+ */
+function getImageDimensionsFromDataUrl(dataUrl: string): { width: number; height: number } {
+  try {
+    const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    // 1. Verificar se é PNG (Assinatura: 0x89 0x50 0x4E 0x47)
+    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
+      const width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+      const height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+      if (width > 0 && height > 0) {
+        return { width, height };
+      }
+    }
+
+    // 2. Verificar se é JPEG (Assinatura: 0xFF 0xD8)
+    if (bytes[0] === 0xff && bytes[1] === 0xd8) {
+      let offset = 2;
+      while (offset < bytes.length) {
+        if (bytes[offset] !== 0xff) break;
+        const marker = bytes[offset + 1];
+        if (marker === 0xc0 || marker === 0xc2) {
+          const height = (bytes[offset + 5] << 8) | bytes[offset + 6];
+          const width = (bytes[offset + 7] << 8) | bytes[offset + 8];
+          if (width > 0 && height > 0) {
+            return { width, height };
+          }
+        }
+        const length = (bytes[offset + 2] << 8) | bytes[offset + 3];
+        offset += 2 + length;
+      }
+    }
+  } catch (err) {}
+
+  return { width: 120, height: 40 };
+}
+
   // 1. Preparação dos Logotipos do Cabeçalho
   const logoRuns: ImageRun[] = [];
 
-  // Logotipo Unicamp - 1.5cm x 0.5cm (proporção original ~3:1)
-  // O logo original é 960x1018 (proporção ~1:1.06)
-  // Vamos usar apenas a largura e manter proporção
+  // Logotipo Unicamp: Altura 40px, Largura 36px (proporção oficial)
   if (!metadata.hideUnicampLogo) {
     const defaultLogoBytes = getUnicampLogoBytes();
     if (defaultLogoBytes) {
@@ -95,26 +137,32 @@ export async function generateDocumentDocx(
           new ImageRun({
             data: defaultLogoBytes,
             transformation: {
-              width: 150,  // ~1.5cm em pixels
-              height: 50   // ~0.5cm em pixels (proporção ajustada)
+              width: 36,
+              height: 40
             },
-            type: "png"
+            type: "jpg"
           })
         );
       } catch (err) {}
     }
   }
 
-  // Logotipo Customizado da Unidade - 1.2cm x 0.4cm
+  // Logotipo Customizado da Unidade: Altura 40px (idêntica ao logo da Unicamp),
+  // e Largura calculada PROPORCIONALMENTE às dimensões originais da imagem
   if (metadata.customUnitLogo) {
     try {
       const customBytes = dataUrlToUint8Array(metadata.customUnitLogo);
+      const originalDim = getImageDimensionsFromDataUrl(metadata.customUnitLogo);
+      const TARGET_HEIGHT = 40; // Mesma altura do logotipo Unicamp
+      const aspectRatio = originalDim.width / (originalDim.height || 40);
+      const targetWidth = Math.max(20, Math.min(200, Math.round(TARGET_HEIGHT * aspectRatio)));
+
       logoRuns.push(
         new ImageRun({
           data: customBytes,
           transformation: {
-            width: 120,  // ~1.2cm
-            height: 40   // ~0.4cm
+            width: targetWidth,
+            height: TARGET_HEIGHT
           },
           type: "png"
         })
@@ -216,12 +264,6 @@ export async function generateDocumentDocx(
 
   // 3. Montagem dos Filhos do Documento conforme o Tipo
   const docChildren: (Paragraph | Table)[] = [];
-
-  // Inserir cabeçalho se não for certificado
-  if (headerTable) {
-    docChildren.push(headerTable);
-    docChildren.push(new Paragraph({ spacing: { before: 240, after: 120 } }));
-  }
 
   // A. ATOS NORMATIVOS
   if (isNormative) {
@@ -823,13 +865,21 @@ export async function generateDocumentDocx(
               height: 16838
             },
             margin: {
-              top: MARGIN_TOP,
+              top: headerTable ? 2268 : MARGIN_TOP,
               bottom: MARGIN_BOTTOM,
               left: MARGIN_LEFT,
-              right: MARGIN_RIGHT
+              right: MARGIN_RIGHT,
+              header: 720
             }
           }
         },
+        headers: headerTable
+          ? {
+              default: new Header({
+                children: [headerTable]
+              })
+            }
+          : undefined,
         children: docChildren
       }
     ]

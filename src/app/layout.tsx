@@ -30,8 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${sourceSerif.variable} ${interSans.variable}`} data-scroll-behavior="smooth">
-      <body className="antialiased flex flex-col min-h-screen">
+    <html
+      lang="pt-BR"
+      className={`${sourceSerif.variable} ${interSans.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <body className="antialiased flex flex-col min-h-screen" suppressHydrationWarning>
         <Header />
         <main id="main-content" className="flex-1">
           {children}
