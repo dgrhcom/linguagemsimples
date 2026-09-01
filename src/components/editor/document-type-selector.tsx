@@ -53,6 +53,123 @@ export function DocumentTypeSelector({
 
   return (
     <div className="space-y-3">
+      {/* Modal de Seleção de Modelo */}
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Selecionar Modelo Oficial"
+        description="Escolha um dos 20 modelos disponiveis no Manual de Redação da Unicamp"
+        size="xl"
+      >
+        <ModalBody>
+          {/* Barra de Filtros e Busca */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3" style={{ borderBottom: "1px solid #cccbc8" }}>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+              {categories.map(cat => (
+                <Button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setActiveCategory(cat.id)}
+                  variant={activeCategory === cat.id ? "primary" : "secondary"}
+                  size="sm"
+                  className="whitespace-nowrap"
+                >
+                  <span>{cat.label}</span>
+                  <span className="text-[10px] opacity-60 px-1.5 py-0.2">{cat.count}</span>
+                </Button>
+              ))}
+            </div>
+
+            <div className="relative min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#b0aea5" }} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar modelo oficial..."
+                className="w-full text-[14px] pl-8 pr-3 py-1.5 rounded-[8px] focus:ring-1 outline-hidden"
+                style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", color: "#141413" }}
+              />
+            </div>
+          </div>
+
+          {/* Grade de Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto pr-1">
+            {filteredDocs.map(doc => {
+              const isSelected = selectedType === doc.type;
+              return (
+                <div
+                  key={doc.type}
+                  onClick={() => {
+                    onSelectType(doc.type);
+                    setIsOpen(false);
+                  }}
+                  className={`relative text-left p-3.5 rounded-[24px] border transition-all cursor-pointer flex flex-col justify-between group`}
+                  style={{
+                    backgroundColor: isSelected ? "rgba(217, 119, 87, 0.1)" : "#faf9f5",
+                    borderColor: isSelected ? "rgba(217, 119, 87, 0.4)" : "#cccbc8"
+                  }}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px]" style={{ color: "#b0aea5" }}>{doc.category}</span>
+                      {isSelected ? (
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0" style={{ backgroundColor: "#141413", color: "#d97757" }}>
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </span>
+                      ) : (
+                        doc.modelImagePath && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewingDoc(doc);
+                              setModalPageIdx(0);
+                            }}
+                            className="p-1 rounded-[8px] transition-colors flex items-center gap-1"
+                            style={{ color: "#b0aea5" }}
+                            onMouseEnter={(e) => { e.currentTarget.style.color = "#141413"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
+                            title="Ver gabarito da Unicamp"
+                          >
+                            <Eye className="w-3.5 h-3.5" style={{ color: "#d97757" }} />
+                          </button>
+                        )
+                      )}
+                    </div>
+
+                    <h4 className="text-[14px] font-semibold transition-colors" style={{ color: "#141413", fontFamily: "var(--font-anthropic-sans)" }}>
+                      {doc.label}
+                    </h4>
+
+                    <p className="text-[10px] leading-relaxed font-normal" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
+                      {doc.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 pt-2 flex items-center justify-between" style={{ borderTop: "1px solid #cccbc8" }}>
+                    <span className="text-[10px]" style={{ color: "#b0aea5" }}>{doc.expectedSections?.length || 0} seções</span>
+                    <span className="text-[14px] font-semibold" style={{ color: "#d97757" }}>
+                      {isSelected ? "Selecionado" : "Usar este modelo"}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            variant="secondary"
+            size="md"
+          >
+            Cancelar
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       {/* Modal de Ampliação do Gabarito Oficial */}
       <Modal
         isOpen={!!previewingDoc}
@@ -174,7 +291,7 @@ export function DocumentTypeSelector({
                 {selectedDocInfo.label}
               </span>
             </div>
-            <p className="text-[14px] line-clamp-1 max-w-xl mt-0.5" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
+            <p className="text-[14px] mt-0.5" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
               {selectedDocInfo.description}
             </p>
           </div>
@@ -207,107 +324,6 @@ export function DocumentTypeSelector({
           </Button>
         </div>
       </div>
-
-      {/* Grade de Cards Expansível */}
-      {isOpen && (
-        <div className="p-4 sm:p-5 space-y-4 rounded-[24px]" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
-          {/* Barra de Filtros e Busca */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3" style={{ borderBottom: "1px solid #cccbc8" }}>
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-              {categories.map(cat => (
-                <Button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCategory(cat.id)}
-                  variant={activeCategory === cat.id ? "primary" : "secondary"}
-                  size="sm"
-                  className="whitespace-nowrap"
-                >
-                  <span>{cat.label}</span>
-                  <span className="text-[10px] opacity-60 px-1.5 py-0.2">{cat.count}</span>
-                </Button>
-              ))}
-            </div>
-
-            <div className="relative min-w-[200px]">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#b0aea5" }} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar modelo oficial..."
-                className="w-full text-[14px] pl-8 pr-3 py-1.5 rounded-[8px] focus:ring-1 outline-hidden"
-                style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8", color: "#141413" }}
-              />
-            </div>
-          </div>
-
-          {/* Grade de Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[420px] overflow-y-auto pr-1">
-            {filteredDocs.map(doc => {
-              const isSelected = selectedType === doc.type;
-              return (
-                <div
-                  key={doc.type}
-                  onClick={() => {
-                    onSelectType(doc.type);
-                    setIsOpen(false);
-                  }}
-                  className={`relative text-left p-3.5 rounded-[24px] border transition-all cursor-pointer flex flex-col justify-between group`}
-                  style={{
-                    backgroundColor: isSelected ? "rgba(217, 119, 87, 0.1)" : "#faf9f5",
-                    borderColor: isSelected ? "rgba(217, 119, 87, 0.4)" : "#cccbc8"
-                  }}
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px]" style={{ color: "#b0aea5" }}>{doc.category}</span>
-                      {isSelected ? (
-                        <span className="w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0" style={{ backgroundColor: "#141413", color: "#d97757" }}>
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </span>
-                      ) : (
-                        doc.modelImagePath && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPreviewingDoc(doc);
-                              setModalPageIdx(0);
-                            }}
-                            className="p-1 rounded-[8px] transition-colors flex items-center gap-1"
-                            style={{ color: "#b0aea5" }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = "#141413"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = "#b0aea5"; }}
-                            title="Ver gabarito da Unicamp"
-                          >
-                            <Eye className="w-3.5 h-3.5" style={{ color: "#d97757" }} />
-                          </button>
-                        )
-                      )}
-                    </div>
-
-                    <h4 className="text-[14px] font-semibold transition-colors" style={{ color: "#141413", fontFamily: "var(--font-anthropic-sans)" }}>
-                      {doc.label}
-                    </h4>
-
-                    <p className="text-[10px] line-clamp-2 leading-relaxed font-normal" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
-                      {doc.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 pt-2 flex items-center justify-between" style={{ borderTop: "1px solid #cccbc8" }}>
-                    <span className="text-[10px]" style={{ color: "#b0aea5" }}>{doc.expectedSections?.length || 0} seções</span>
-                    <span className="text-[14px] font-semibold" style={{ color: "#d97757" }}>
-                      {isSelected ? "Selecionado" : "Usar este modelo"}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
