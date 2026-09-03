@@ -8,8 +8,6 @@ import {
   Eye,
   X,
   Search,
-  ChevronDown,
-  ChevronUp,
   BookOpen
 } from "lucide-react";
 import { DocumentType, DocumentTypeMetadata } from "@/types/document";
@@ -20,14 +18,20 @@ import { Modal, ModalBody, ModalFooter } from "@/components/ui/modal";
 interface DocumentTypeSelectorProps {
   selectedType: DocumentType;
   onSelectType: (type: DocumentType) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  isGabaritoOpen?: boolean;
+  onCloseGabarito?: () => void;
 }
 
 export function DocumentTypeSelector({
   selectedType,
-  onSelectType
+  onSelectType,
+  isOpen,
+  onClose,
+  isGabaritoOpen = false,
+  onCloseGabarito
 }: DocumentTypeSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [previewingDoc, setPreviewingDoc] = useState<DocumentTypeMetadata | null>(null);
   const [modalPageIdx, setModalPageIdx] = useState(0);
@@ -38,53 +42,46 @@ export function DocumentTypeSelector({
 
   const selectedDocInfo = enabledDocs.find(dt => dt.type === selectedType) || enabledDocs[0] || (documentTypesData as DocumentTypeMetadata[])[0];
 
-  const categories = [
-    { id: "all", label: `Todos os ${enabledDocs.length} Modelos`, count: enabledDocs.length },
-    { id: "normativo", label: "Atos Normativos e Decisórios", count: enabledDocs.filter(d => d.category === "normativo").length },
-    { id: "correspondencia", label: "Correspondência Oficial", count: enabledDocs.filter(d => d.category === "correspondencia").length },
-    { id: "administrativo", label: "Administrativo, Atas e Colegiados", count: enabledDocs.filter(d => d.category === "administrativo").length }
-  ];
+  React.useEffect(() => {
+    if (isGabaritoOpen) {
+      setPreviewingDoc(selectedDocInfo as DocumentTypeMetadata);
+      setModalPageIdx(0);
+    }
+  }, [isGabaritoOpen, selectedDocInfo]);
+
+  const handleCloseGabarito = () => {
+    setPreviewingDoc(null);
+    setModalPageIdx(0);
+    onCloseGabarito?.();
+  };
 
   const filteredDocs = enabledDocs.filter(doc => {
-    const matchesCategory = activeCategory === "all" || doc.category === activeCategory;
     const matchesSearch =
       doc.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesSearch;
   });
 
   const previewPages = previewingDoc?.modelImagePages || (previewingDoc?.modelImagePath ? [previewingDoc.modelImagePath] : []);
 
   return (
-    <div className="space-y-3">
+    <>
       {/* Modal de Seleção de Modelo */}
       <Modal
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={onClose}
         title="Selecionar Modelo Oficial"
         description={`Escolha um dos ${enabledDocs.length} modelos disponíveis no Manual de Redação da Unicamp`}
         size="xl"
       >
         <ModalBody>
-          {/* Barra de Filtros e Busca */}
+          {/* Barra de Busca */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3" style={{ borderBottom: "1px solid #cccbc8" }}>
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-              {categories.map(cat => (
-                <Button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCategory(cat.id)}
-                  variant={activeCategory === cat.id ? "primary" : "secondary"}
-                  size="sm"
-                  className="whitespace-nowrap"
-                >
-                  <span>{cat.label}</span>
-                  <span className="text-[10px] opacity-60 px-1.5 py-0.2">{cat.count}</span>
-                </Button>
-              ))}
-            </div>
+            <span className="text-[13px] font-sans" style={{ color: "#87867f" }}>
+              Todos os modelos habilitados ({enabledDocs.length})
+            </span>
 
-            <div className="relative min-w-[200px]">
+            <div className="relative min-w-[240px]">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#b0aea5" }} />
               <input
                 type="text"
@@ -106,7 +103,7 @@ export function DocumentTypeSelector({
                   key={doc.type}
                   onClick={() => {
                     onSelectType(doc.type);
-                    setIsOpen(false);
+                    onClose();
                   }}
                   className={`relative text-left p-3.5 rounded-[24px] border transition-all cursor-pointer flex flex-col justify-between group`}
                   style={{
@@ -165,7 +162,7 @@ export function DocumentTypeSelector({
         <ModalFooter>
           <Button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={onClose}
             variant="secondary"
             size="md"
           >
@@ -177,10 +174,7 @@ export function DocumentTypeSelector({
       {/* Modal de Ampliação do Gabarito Oficial */}
       <Modal
         isOpen={!!previewingDoc}
-        onClose={() => {
-          setPreviewingDoc(null);
-          setModalPageIdx(0);
-        }}
+        onClose={handleCloseGabarito}
         title={`Gabarito Oficial: ${previewingDoc?.label || ""}`}
         description={`${previewingDoc?.category || ""} • Manual de Redação da Unicamp`}
         size="lg"
@@ -269,8 +263,8 @@ export function DocumentTypeSelector({
             onClick={() => {
               if (previewingDoc) {
                 onSelectType(previewingDoc.type);
-                setPreviewingDoc(null);
-                setIsOpen(false);
+                handleCloseGabarito();
+                onClose();
               }
             }}
             variant="primary"
@@ -281,53 +275,6 @@ export function DocumentTypeSelector({
           </Button>
         </ModalFooter>
       </Modal>
-
-      {/* Cartão de Tipo Ativo / Resumo Superior */}
-      <div className="p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-3 rounded-[24px]" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-[12px] flex items-center justify-center font-bold shrink-0" style={{ backgroundColor: "#141413", color: "#d97757" }}>
-            <FileText className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px]" style={{ color: "#b0aea5" }}>Modelo Selecionado:</span>
-              <span className="text-[14px] font-semibold px-2 py-0.5 rounded-[8px]" style={{ color: "#141413", backgroundColor: "rgba(227, 218, 204, 0.5)", border: "1px solid #cccbc8" }}>
-                {selectedDocInfo.label}
-              </span>
-            </div>
-            <p className="text-[14px] mt-0.5" style={{ fontFamily: "var(--font-anthropic-serif)", color: "#141413" }}>
-              {selectedDocInfo.description}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {selectedDocInfo.modelImagePath && (
-            <Button
-              type="button"
-              onClick={() => {
-                setPreviewingDoc(selectedDocInfo as DocumentTypeMetadata);
-                setModalPageIdx(0);
-              }}
-              variant="secondary"
-              size="md"
-              leftIcon={<Eye className="w-3.5 h-3.5" style={{ color: "#d97757" }} />}
-            >
-              Ver Gabarito
-            </Button>
-          )}
-
-          <Button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            variant="primary"
-            size="md"
-            rightIcon={isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          >
-            {isOpen ? "Recolher Modelos" : "Trocar Modelo"}
-          </Button>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

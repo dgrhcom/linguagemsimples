@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TextEditor } from "@/components/editor/text-editor";
+import { HeroTitleAnimation } from "@/components/home/hero-title-animation";
 import { AnalysisInput } from "@/types/analysis";
 import { Search, Lightbulb, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
 import casosUnicampData from "@/data/examples/casos-unicamp.json";
@@ -24,16 +25,14 @@ export default function HomePage() {
           ========================================================================== */}
       <section className="pt-[120px] pb-[80px] border-b border-stone">
         <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-6 mb-12">
+          <div className="text-center max-w-5xl mx-auto space-y-6 mb-12">
             {/* Micro-label */}
             <span className="editorial-label block">
               Projeto Linguagem Simples e Inclusiva da Unicamp
             </span>
 
-            {/* Masthead Display Heading */}
-            <h1 className="font-sans text-[61px] leading-[1.1] tracking-[-0.12px] text-slate-dark">
-              Avalie e simplifique seu texto
-            </h1>
+            {/* Masthead Display Heading — Animação Didática de Simplificação */}
+            <HeroTitleAnimation />
 
             <p className="text-[20px] leading-[1.4] text-slate-dark max-w-xl mx-auto" style={{ fontFamily: "var(--font-anthropic-serif)" }}>
               Descubra se sua comunicação está clara, inclusiva e fácil de entender — e veja como transformar seus textos aplicando os princípios de Linguagem Simples.

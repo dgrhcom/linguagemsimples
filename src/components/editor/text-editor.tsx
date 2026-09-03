@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { DocumentType } from "@/types/document";
+import { DocumentType, DocumentTypeMetadata } from "@/types/document";
+import documentTypesData from "@/data/document-types/document-types.json";
 import { AnalysisInput } from "@/types/analysis";
-import { Trash2, Upload, FileText, File, Bold, Italic, List, ListOrdered } from "lucide-react";
+import { Trash2, Upload, FileText, File, Bold, Italic, List, ListOrdered, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DocumentTypeSelector } from "./document-type-selector";
 
@@ -25,8 +26,31 @@ export function TextEditor({
   const [targetAudience, setTargetAudience] = useState("");
   const [textGoal, setTextGoal] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [isGabaritoOpen, setIsGabaritoOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const currentDocInfo = (documentTypesData as DocumentTypeMetadata[]).find(
+    dt => dt.type === documentType
+  ) || (documentTypesData as DocumentTypeMetadata[])[0];
+
+  const getDocumentArticle = (type: string): "do" | "da" => {
+    const feminineTypes = [
+      "declaracao",
+      "informacao",
+      "portaria",
+      "ata",
+      "carta",
+      "pauta",
+      "deliberacao",
+      "instrucao-normativa",
+      "resolucao",
+      "decisao"
+    ];
+    return feminineTypes.includes(type) ? "da" : "do";
+  };
+  const article = getDocumentArticle(documentType);
 
   const applyFormatting = (formatType: "bold" | "italic" | "bullet" | "number") => {
     const textarea = textareaRef.current;
@@ -203,16 +227,23 @@ export function TextEditor({
       <DocumentTypeSelector
         selectedType={documentType}
         onSelectType={setDocumentType}
+        isOpen={isSelectorOpen}
+        onClose={() => setIsSelectorOpen(false)}
+        isGabaritoOpen={isGabaritoOpen}
+        onCloseGabarito={() => setIsGabaritoOpen(false)}
       />
 
       <div className="bg-ivory-light border border-stone rounded-[24px] overflow-hidden">
         {/* Barra superior */}
-        <div className="bg-oat-warm/40 border-b border-stone px-5 py-3 flex justify-between items-center gap-3">
-          <span className="text-[16px] tracking-[-0.08px] font-sans text-slate-dark">
-            Inserir Texto para Simplificação
+        <div className="bg-oat-warm/40 border-b border-stone px-5 py-3 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+          <span className="text-[16px] tracking-[-0.08px] font-sans text-slate-dark flex items-center gap-1.5 flex-wrap">
+            <span>Inserir texto para simplificação {article}</span>
+            <span className="font-semibold px-2 py-0.5 rounded-[6px] bg-oat-warm/60 border border-stone/80 text-slate-dark">
+              {currentDocInfo?.label || "Documento"}
+            </span>
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {text.trim().length > 0 && (
               <Button
                 type="button"
@@ -244,7 +275,31 @@ export function TextEditor({
                 <Upload className="w-3.5 h-3.5" />
               )}
             >
-              {isImporting ? "Importando..." : "Importar Arquivo"}
+              {isImporting ? "Importando..." : "Importar"}
+            </Button>
+
+            {/* Botão Ver gabarito */}
+            {currentDocInfo?.modelImagePath && (
+              <Button
+                type="button"
+                onClick={() => setIsGabaritoOpen(true)}
+                variant="secondary"
+                size="sm"
+                leftIcon={<Eye className="w-3.5 h-3.5 text-[#d97757]" />}
+              >
+                Ver gabarito
+              </Button>
+            )}
+
+            {/* Botão Trocar modelo */}
+            <Button
+              type="button"
+              onClick={() => setIsSelectorOpen(true)}
+              variant="secondary"
+              size="sm"
+              leftIcon={<FileText className="w-3.5 h-3.5" />}
+            >
+              Trocar modelo
             </Button>
           </div>
         </div>
