@@ -50,6 +50,7 @@ export interface DocumentTypeMetadata {
   expectedSections?: string[];
   competence?: string;
   defaultMetadata?: Partial<UniversalDocumentMetadata>;
+  enabled?: boolean;
 }
 
 export interface UniversalDocumentMetadata {

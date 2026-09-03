@@ -18,7 +18,7 @@ export function TextEditor({
   onAnalyze,
   isLoading,
   initialText = "",
-  initialDocumentType = "comunicado"
+  initialDocumentType = "oficio"
 }: TextEditorProps) {
   const [text, setText] = useState(initialText);
   const [documentType, setDocumentType] = useState<DocumentType>(initialDocumentType);

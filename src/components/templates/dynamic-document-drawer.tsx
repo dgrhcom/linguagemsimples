@@ -38,9 +38,19 @@ export function DynamicDocumentDrawer({
   isOpen,
   onClose,
   text,
-  docType = "comunicado"
+  docType = "oficio"
 }: DynamicDocumentDrawerProps) {
-  const [currentDocType, setCurrentDocType] = useState<DocumentType>(docType);
+  const enabledDocumentTypes = (documentTypesData as any[]).filter(
+    dt => dt.enabled !== false && !dt.disabled
+  );
+  const resolveDocType = (type?: DocumentType): DocumentType => {
+    if (type && enabledDocumentTypes.some(dt => dt.type === type)) {
+      return type;
+    }
+    return enabledDocumentTypes[0]?.type || "oficio";
+  };
+
+  const [currentDocType, setCurrentDocType] = useState<DocumentType>(() => resolveDocType(docType));
   const [documentText, setDocumentText] = useState<string>(text);
   const [activeView, setActiveView] = useState<"sheet" | "gabarito">("sheet");
   const [copied, setCopied] = useState(false);
@@ -100,17 +110,14 @@ export function DynamicDocumentDrawer({
   };
 
   useEffect(() => {
-    setCurrentDocType(docType);
+    setCurrentDocType(resolveDocType(docType));
   }, [docType]);
 
   useEffect(() => {
     setDocumentText(text);
   }, [text]);
 
-  const enabledDocumentTypes = (documentTypesData as any[]).filter(
-    dt => dt.enabled !== false && !dt.disabled
-  );
-  const currentTypeInfo = enabledDocumentTypes.find(dt => dt.type === currentDocType) || documentTypesData[0];
+  const currentTypeInfo = enabledDocumentTypes.find(dt => dt.type === currentDocType) || enabledDocumentTypes[0] || documentTypesData[0];
   const gabaritoPages = currentTypeInfo.modelImagePages || (currentTypeInfo.modelImagePath ? [currentTypeInfo.modelImagePath] : []);
 
   const [metadata, setMetadata] = useState<UniversalDocumentMetadata>(() => {

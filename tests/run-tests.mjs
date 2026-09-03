@@ -304,6 +304,20 @@ test("19. Validação do Catálogo Completo dos 20 Modelos de Documentos Oficiai
   });
 });
 
+test("20. Validação dos Modelos Habilitados por Padrão (6 modelos oficiais ativos)", async () => {
+  const typesData = JSON.parse(await import("fs").then(m => m.readFileSync("d:/workspace/active/linguagemsimples/src/data/document-types/document-types.json", "utf8")));
+
+  const enabledDocs = typesData.filter(d => d.enabled === true);
+  assert.equal(enabledDocs.length, 6, "Devem estar habilitados exatamente 6 modelos por padrão");
+
+  const expectedEnabledSlugs = ["declaracao", "informacao", "memorando", "oficio", "parecer", "portaria"];
+  const actualEnabledSlugs = enabledDocs.map(d => d.type).sort();
+  assert.deepEqual(actualEnabledSlugs, expectedEnabledSlugs.sort(), "Os 6 modelos habilitados devem ser Declaração, Informação, Memorando, Ofício, Parecer e Portaria");
+
+  const disabledDocs = typesData.filter(d => d.enabled === false);
+  assert.equal(disabledDocs.length, 14, "Os demais 14 modelos devem estar com enabled: false");
+});
+
 
 
 

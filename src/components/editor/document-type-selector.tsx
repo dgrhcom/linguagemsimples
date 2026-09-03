@@ -32,16 +32,20 @@ export function DocumentTypeSelector({
   const [previewingDoc, setPreviewingDoc] = useState<DocumentTypeMetadata | null>(null);
   const [modalPageIdx, setModalPageIdx] = useState(0);
 
-  const selectedDocInfo = documentTypesData.find(dt => dt.type === selectedType) || documentTypesData[0];
+  const enabledDocs = (documentTypesData as DocumentTypeMetadata[]).filter(
+    dt => dt.enabled !== false
+  );
+
+  const selectedDocInfo = enabledDocs.find(dt => dt.type === selectedType) || enabledDocs[0] || (documentTypesData as DocumentTypeMetadata[])[0];
 
   const categories = [
-    { id: "all", label: "Todos os 20 Modelos", count: documentTypesData.length },
-    { id: "normativo", label: "Atos Normativos e Decisórios", count: documentTypesData.filter(d => d.category === "normativo").length },
-    { id: "correspondencia", label: "Correspondência Oficial", count: documentTypesData.filter(d => d.category === "correspondencia").length },
-    { id: "administrativo", label: "Administrativo, Atas e Colegiados", count: documentTypesData.filter(d => d.category === "administrativo").length }
+    { id: "all", label: `Todos os ${enabledDocs.length} Modelos`, count: enabledDocs.length },
+    { id: "normativo", label: "Atos Normativos e Decisórios", count: enabledDocs.filter(d => d.category === "normativo").length },
+    { id: "correspondencia", label: "Correspondência Oficial", count: enabledDocs.filter(d => d.category === "correspondencia").length },
+    { id: "administrativo", label: "Administrativo, Atas e Colegiados", count: enabledDocs.filter(d => d.category === "administrativo").length }
   ];
 
-  const filteredDocs = (documentTypesData as DocumentTypeMetadata[]).filter(doc => {
+  const filteredDocs = enabledDocs.filter(doc => {
     const matchesCategory = activeCategory === "all" || doc.category === activeCategory;
     const matchesSearch =
       doc.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,7 +62,7 @@ export function DocumentTypeSelector({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Selecionar Modelo Oficial"
-        description="Escolha um dos 20 modelos disponiveis no Manual de Redação da Unicamp"
+        description={`Escolha um dos ${enabledDocs.length} modelos disponíveis no Manual de Redação da Unicamp`}
         size="xl"
       >
         <ModalBody>

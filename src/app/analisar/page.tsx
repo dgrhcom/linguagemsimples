@@ -468,10 +468,10 @@ export default function AnalisarPage() {
 								onClick={() => setIsTemplateDrawerOpen(true)}
 								className="text-[14px] px-4 py-2 rounded-[8px] flex items-center gap-1.5 transition-colors font-semibold"
 								style={{ backgroundColor: "#d97757", border: "1px solid #c6613f", color: "#ffffff" }}
-								title={`Ver ${documentTypesData.find(dt => dt.type === (result.input.documentType || "comunicado"))?.label || "Documento"}`}
+								title={`Ver ${documentTypesData.find(dt => dt.type === (result.input.documentType || "oficio"))?.label || "Documento"}`}
 							>
 								<FileText className="w-3.5 h-3.5" />
-								<span>Ver {documentTypesData.find(dt => dt.type === (result.input.documentType || "comunicado"))?.label || "Documento"}</span>
+								<span>Ver {documentTypesData.find(dt => dt.type === (result.input.documentType || "oficio"))?.label || "Documento"}</span>
 							</button>
 						</div>
 					</div>
@@ -573,7 +573,7 @@ export default function AnalisarPage() {
 					isOpen={isTemplateDrawerOpen}
 					onClose={() => setIsTemplateDrawerOpen(false)}
 					text={result.workingText || result.input.text}
-					docType={result.input.documentType || "comunicado"}
+					docType={result.input.documentType || "oficio"}
 				/>
 			)}
 		</div>
