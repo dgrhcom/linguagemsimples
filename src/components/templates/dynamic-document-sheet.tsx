@@ -481,7 +481,7 @@ export function DynamicDocumentSheet({
         {/* 8. PARECER (conforme modelo timbrado oficial) */}
         {/* ========================================================================= */}
         {isParecer && (
-          <div className="space-y-5 pt-1">
+          <div className="space-y-4 pt-1">
             {/* Título do Parecer */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
@@ -489,27 +489,27 @@ export function DynamicDocumentSheet({
               </h2>
             </div>
 
-            {/* Referência */}
-            {metadata.referenceProcess && (
-              <div className="text-xs text-zinc-900 pt-2">
-                <span className="font-bold text-black">Referência: </span>
-                <span className="font-normal">{metadata.referenceProcess}</span>
-              </div>
-            )}
-
-            {/* Interessado */}
-            {metadata.interestedParty && (
-              <div className="text-xs text-zinc-900 pt-1">
-                <span className="font-bold text-black">Interessado: </span>
-                <span className="font-normal">{metadata.interestedParty}</span>
-              </div>
-            )}
-
-            {/* Assunto */}
-            {metadata.subject && (
-              <div className="text-xs text-zinc-900 pt-1">
-                <span className="font-bold text-black">Assunto: </span>
-                <span className="font-normal">{metadata.subject}</span>
+            {/* Bloco de Referência, Interessado e Assunto contíguos (sem parágrafo extra entre si) */}
+            {(metadata.referenceProcess || metadata.interestedParty || metadata.subject) && (
+              <div className="text-xs text-zinc-900 space-y-0.5 leading-snug">
+                {metadata.referenceProcess && (
+                  <div>
+                    <span className="font-bold text-black">Referência: </span>
+                    <span className="font-normal">{metadata.referenceProcess}</span>
+                  </div>
+                )}
+                {metadata.interestedParty && (
+                  <div>
+                    <span className="font-bold text-black">Interessado: </span>
+                    <span className="font-normal">{metadata.interestedParty}</span>
+                  </div>
+                )}
+                {metadata.subject && (
+                  <div>
+                    <span className="font-bold text-black">Assunto: </span>
+                    <span className="font-normal">{metadata.subject}</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -518,9 +518,21 @@ export function DynamicDocumentSheet({
               <FormattedParagraphs text={text} />
             </div>
 
-            {/* Local e Data */}
-            <div className="text-left text-xs text-zinc-700 font-medium pt-4">
+            {/* Local e Data (próxima ao parágrafo do corpo) */}
+            <div className="text-left text-xs text-zinc-700 font-medium pt-3">
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
+
+            {/* Assinatura trazida para perto do parágrafo e da data */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -672,15 +684,15 @@ export function DynamicDocumentSheet({
       {/* RODAPÉ DO DOCUMENTO: LOCAL, DATA E ASSINATURA */}
       {/* ========================================================================= */}
       <footer className="pt-8 space-y-6">
-        {/* Local e Data à direita (demais documentos, exceto ofício, carta e declaração) */}
-        {!isLetter && !isCarta && !isDeclaracao && (
+        {/* Local e Data à direita (demais documentos, exceto ofício, carta, declaração e parecer) */}
+        {!isLetter && !isCarta && !isDeclaracao && !isParecer && (
           <div className="text-right text-xs text-zinc-700 font-medium">
             {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
           </div>
         )}
 
-        {/* Bloco de Assinatura padrão (demais documentos, exceto declaração) */}
-        {!isDeclaracao && (
+        {/* Bloco de Assinatura padrão (demais documentos, exceto declaração e parecer) */}
+        {!isDeclaracao && !isParecer && (
           <div className="pt-6 flex flex-col items-end text-right">
             <div className="w-64 border-t border-zinc-950 pt-1.5">
               <p className="text-xs font-bold text-black">

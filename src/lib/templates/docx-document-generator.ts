@@ -724,7 +724,7 @@ export async function generateDocumentDocx(
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.LEFT,
-        spacing: { before: 180, after: 180 },
+        spacing: { before: 180, after: 120 },
         children: [
           new TextRun({
             text: `PARECER DGRH nº ${metadata.documentNumber || "01/2026"}`,
@@ -736,6 +736,41 @@ export async function generateDocumentDocx(
       })
     );
 
+    // Campos Referência, Interessado e Assunto contíguos (sem parágrafos extras entre si)
+    if (metadata.referenceProcess) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 40, line: 240 },
+          children: [
+            new TextRun({ text: "Referência: ", bold: true, size: 22, font: "Arial" }),
+            new TextRun({ text: metadata.referenceProcess, size: 22, font: "Arial" })
+          ]
+        })
+      );
+    }
+    if (metadata.interestedParty) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 40, line: 240 },
+          children: [
+            new TextRun({ text: "Interessado: ", bold: true, size: 22, font: "Arial" }),
+            new TextRun({ text: metadata.interestedParty, size: 22, font: "Arial" })
+          ]
+        })
+      );
+    }
+    if (metadata.subject) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 180, line: 240 },
+          children: [
+            new TextRun({ text: "Assunto: ", bold: true, size: 22, font: "Arial" }),
+            new TextRun({ text: metadata.subject, size: 22, font: "Arial" })
+          ]
+        })
+      );
+    }
+
     docChildren.push(
       ...parseParagraphsToDocx(text, {
         alignment: AlignmentType.JUSTIFIED,
@@ -743,15 +778,55 @@ export async function generateDocumentDocx(
       })
     );
 
+    // Data próxima ao parágrafo do corpo (alinhada à esquerda)
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.LEFT,
-        spacing: { before: 360, after: 60 },
+        spacing: { before: 240, after: 60 },
         children: [
           new TextRun({
             text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
             size: 22,
             font: "Arial"
+          })
+        ]
+      })
+    );
+
+    // Assinatura próxima ao parágrafo e à data (sem empurrar para o final da página)
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Coordenação Geral da DGRH",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",
+            size: 18,
+            font: "Arial",
+            color: "555555"
           })
         ]
       })
@@ -889,7 +964,7 @@ export async function generateDocumentDocx(
   }
 
   // 4. Rodapé do Documento (Local, Data e Assinatura)
-  if (!isCertificado && !isLetter && !isCarta && !isDeclaracao) {
+  if (!isCertificado && !isLetter && !isCarta && !isDeclaracao && !isParecer) {
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.RIGHT,
@@ -905,7 +980,7 @@ export async function generateDocumentDocx(
     );
   }
 
-  if (!isDeclaracao) {
+  if (!isDeclaracao && !isParecer) {
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.RIGHT,

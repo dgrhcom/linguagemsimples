@@ -282,6 +282,23 @@ test("18. Geração de DOCX Universal para Portaria, Ofício e Ata", async () =>
     }
   );
   assert.ok(oficioBlob && oficioBlob.size > 1000, "Deve gerar DOCX válido de Ofício com Destinatário e Vocativo");
+
+  // Parecer
+  const parecerBlob = await generateDocumentDocx(
+    "parecer",
+    "Trata-se de parecer favorável à proposta de criação de curso.",
+    {
+      unitName: "Diretoria Geral de Recursos Humanos",
+      documentNumber: "23/2026",
+      referenceProcess: "Processo nº 01-P-33221/2026",
+      interestedParty: "Faculdade de Engenharia Mecânica",
+      subject: "Proposta de criação de curso de especialização",
+      locationAndDate: "Campinas, 27 de agosto de 2026.",
+      authorName: "Prof(a). Dr(a). Relator(a) Designado(a)",
+      authorRole: "Comissão Especial de Ensino - Unicamp"
+    }
+  );
+  assert.ok(parecerBlob && parecerBlob.size > 1000, "Deve gerar DOCX válido de Parecer com Referência, Interessado, Assunto e Assinatura contígua");
 });
 
 test("19. Validação do Catálogo Completo dos 20 Modelos de Documentos Oficiais da Unicamp", async () => {
