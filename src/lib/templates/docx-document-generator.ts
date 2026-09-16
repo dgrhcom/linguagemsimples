@@ -467,12 +467,47 @@ export async function generateDocumentDocx(
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.LEFT,
-        spacing: { before: 360, after: 60 },
+        spacing: { before: 240, after: 60 },
         children: [
           new TextRun({
             text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
             size: 22,
             font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Reitoria da Unicamp",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Reitor(a)",
+            size: 18,
+            font: "Arial",
+            color: "555555"
           })
         ]
       })
@@ -508,6 +543,55 @@ export async function generateDocumentDocx(
         })
       );
     }
+
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 240, after: 60 },
+        children: [
+          new TextRun({
+            text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Coordenação Geral da DGRH",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",
+            size: 18,
+            font: "Arial",
+            color: "555555"
+          })
+        ]
+      })
+    );
   }
 
   // C. OFÍCIO E OFÍCIO CIRCULAR
@@ -618,6 +702,41 @@ export async function generateDocumentDocx(
             font: "Arial"
           })
         ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Coordenação Geral da DGRH",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",
+            size: 18,
+            font: "Arial",
+            color: "555555"
+          })
+        ]
       })
     );
   }
@@ -690,6 +809,41 @@ export async function generateDocumentDocx(
         children: [
           new TextRun({ text: metadata.vocativo || "Atenciosamente,", size: 22, font: "Arial" })
         ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Coordenação Geral da DGRH",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",
+            size: 18,
+            font: "Arial",
+            color: "555555"
+          })
+        ]
       })
     );
   }
@@ -715,6 +869,44 @@ export async function generateDocumentDocx(
       ...parseParagraphsToDocx(text, {
         alignment: AlignmentType.JUSTIFIED,
         indentFirstLine: 567
+      })
+    );
+
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.meetingPresident || "Presidente da Comissão",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: "Presidente",
+            size: 18,
+            font: "Arial",
+            color: "555555"
+          })
+        ]
       })
     );
   }
@@ -922,11 +1114,161 @@ export async function generateDocumentDocx(
             font: "Arial"
           })
         ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Responsável pelo Atendimento Funcional",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Divisão de Atendimento e Benefícios - DGRH",
+            size: 18,
+            font: "Arial",
+            color: "555555"
+          })
+        ]
       })
     );
   }
 
-  // I. DEMAIS MODELOS (Comunicado, Relatório, etc.)
+  // I. INFORMAÇÃO, DECISÃO E DESPACHO
+  else if (isDecisaoOuDespacho || isInformacao) {
+    let titleText = `INFORMAÇÃO Nº ${metadata.documentNumber || "18/2026"} - DGRH`;
+    if (isDecisaoOuDespacho) {
+      titleText = docType === "decisao"
+        ? `DECISÃO Nº ${metadata.documentNumber || "08/2026"}`
+        : "DESPACHO DO COORDENADOR GERAL";
+    }
+
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 180, after: 120 },
+        children: [
+          new TextRun({
+            text: titleText,
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      })
+    );
+
+    if (metadata.referenceProcess) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 40, line: 240 },
+          children: [
+            new TextRun({ text: "Processo nº: ", bold: true, size: 22, font: "Arial" }),
+            new TextRun({ text: metadata.referenceProcess, size: 22, font: "Arial" })
+          ]
+        })
+      );
+    }
+    if (metadata.interestedParty) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 40, line: 240 },
+          children: [
+            new TextRun({ text: "Interessado(a): ", bold: true, size: 22, font: "Arial" }),
+            new TextRun({ text: metadata.interestedParty, size: 22, font: "Arial" })
+          ]
+        })
+      );
+    }
+    if (metadata.subject) {
+      docChildren.push(
+        new Paragraph({
+          spacing: { before: 0, after: 180, line: 240 },
+          children: [
+            new TextRun({ text: "Assunto: ", bold: true, size: 22, font: "Arial" }),
+            new TextRun({ text: metadata.subject, size: 22, font: "Arial" })
+          ]
+        })
+      );
+    }
+
+    docChildren.push(
+      ...parseParagraphsToDocx(text, {
+        alignment: AlignmentType.JUSTIFIED,
+        indentFirstLine: 567
+      })
+    );
+
+    docChildren.push(
+      new Paragraph({
+        alignment: AlignmentType.LEFT,
+        spacing: { before: 240, after: 60 },
+        children: [
+          new TextRun({
+            text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 360, after: 40 },
+        children: [
+          new TextRun({
+            text: "___________________________________",
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 40, after: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorName || "Coordenação Geral da DGRH",
+            bold: true,
+            size: 22,
+            font: "Arial"
+          })
+        ]
+      }),
+      new Paragraph({
+        alignment: AlignmentType.RIGHT,
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",
+            size: 18,
+            font: "Arial",
+            color: "555555"
+          })
+        ]
+      })
+    );
+  }
+
+  // J. DEMAIS MODELOS (Comunicado, Relatório, etc.)
   else {
     docChildren.push(
       new Paragraph({
@@ -961,14 +1303,11 @@ export async function generateDocumentDocx(
         indentFirstLine: 567
       })
     );
-  }
 
-  // 4. Rodapé do Documento (Local, Data e Assinatura)
-  if (!isCertificado && !isLetter && !isCarta && !isDeclaracao && !isParecer) {
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.RIGHT,
-        spacing: { before: 480, after: 60 },
+        spacing: { before: 240, after: 60 },
         children: [
           new TextRun({
             text: metadata.locationAndDate || "Campinas, 27 de agosto de 2026.",
@@ -976,22 +1315,10 @@ export async function generateDocumentDocx(
             font: "Arial"
           })
         ]
-      })
-    );
-  }
-
-  if (!isDeclaracao && !isParecer) {
-    docChildren.push(
-      new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        spacing: { before: 480, after: 60 },
-        children: [
-          new TextRun({ text: "\n\n", size: 22, font: "Arial" })
-        ]
       }),
       new Paragraph({
         alignment: AlignmentType.RIGHT,
-        spacing: { before: 60 },
+        spacing: { before: 360, after: 40 },
         children: [
           new TextRun({
             text: "___________________________________",
@@ -1002,7 +1329,7 @@ export async function generateDocumentDocx(
       }),
       new Paragraph({
         alignment: AlignmentType.RIGHT,
-        spacing: { before: 60 },
+        spacing: { before: 40, after: 20 },
         children: [
           new TextRun({
             text: metadata.authorName || "Coordenação Geral da DGRH",
@@ -1014,7 +1341,7 @@ export async function generateDocumentDocx(
       }),
       new Paragraph({
         alignment: AlignmentType.RIGHT,
-        spacing: { before: 60 },
+        spacing: { before: 20 },
         children: [
           new TextRun({
             text: metadata.authorRole || "Diretoria Geral de Recursos Humanos",

@@ -299,6 +299,53 @@ test("18. Geração de DOCX Universal para Portaria, Ofício e Ata", async () =>
     }
   );
   assert.ok(parecerBlob && parecerBlob.size > 1000, "Deve gerar DOCX válido de Parecer com Referência, Interessado, Assunto e Assinatura contígua");
+
+  // Memorando
+  const memoBlob = await generateDocumentDocx(
+    "memorando",
+    "Encaminhamos para conhecimento e providências o relatório em anexo.",
+    {
+      unitName: "Diretoria Geral de Recursos Humanos",
+      documentNumber: "42/2026",
+      locationAndDate: "Campinas, 27 de agosto de 2026.",
+      recipientName: "Diretoria de Administração",
+      subject: "Encaminhamento de relatório",
+      vocativo: "Atenciosamente,",
+      authorName: "Coordenação Geral da DGRH",
+      authorRole: "Diretoria Geral de Recursos Humanos"
+    }
+  );
+  assert.ok(memoBlob && memoBlob.size > 1000, "Deve gerar DOCX válido de Memorando com data no topo e assinatura contígua");
+
+  // Informação
+  const infoBlob = await generateDocumentDocx(
+    "informacao",
+    "Trata-se de análise técnica fundamentada sobre a matéria.",
+    {
+      unitName: "Diretoria Geral de Recursos Humanos",
+      documentNumber: "18/2026",
+      referenceProcess: "Processo nº 01-P-44556/2026",
+      interestedParty: "Instituto de Artes",
+      subject: "Análise técnica de jornada",
+      locationAndDate: "Campinas, 27 de agosto de 2026.",
+      authorName: "Analista Técnico de Recursos Humanos",
+      authorRole: "Divisão de Legislação Funcional - DGRH"
+    }
+  );
+  assert.ok(infoBlob && infoBlob.size > 1000, "Deve gerar DOCX válido de Informação com processo, interessado e assinatura contígua");
+
+  // Declaração
+  const declaracaoBlob = await generateDocumentDocx(
+    "declaracao",
+    "Declaramos para os devidos fins que o servidor cumpre jornada regular.",
+    {
+      unitName: "Diretoria Geral de Recursos Humanos",
+      locationAndDate: "Campinas, 27 de agosto de 2026.",
+      authorName: "Responsável pelo Atendimento Funcional",
+      authorRole: "Divisão de Atendimento e Benefícios - DGRH"
+    }
+  );
+  assert.ok(declaracaoBlob && declaracaoBlob.size > 1000, "Deve gerar DOCX válido de Declaração com assinatura centralizada contígua");
 });
 
 test("19. Validação do Catálogo Completo dos 20 Modelos de Documentos Oficiais da Unicamp", async () => {

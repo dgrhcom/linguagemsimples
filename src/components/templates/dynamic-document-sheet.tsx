@@ -139,7 +139,7 @@ export function DynamicDocumentSheet({
 
     <div
       id="printable-document-sheet"
-      className="bg-white text-zinc-900 border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-between"
+      className="bg-white text-zinc-900 border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-start"
       style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
       <div className="space-y-6">
@@ -193,6 +193,18 @@ export function DynamicDocumentSheet({
             <div className="text-left text-xs text-zinc-700 font-medium pt-4">
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
+
+            {/* Assinatura contígua ao texto e data */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Reitoria da Unicamp"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Reitor(a)"}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -219,6 +231,23 @@ export function DynamicDocumentSheet({
                 <FormattedInline text={metadata.effectiveClause} />
               </p>
             )}
+
+            {/* Local e Data */}
+            <div className="text-left text-xs text-zinc-700 font-medium pt-3">
+              {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
+
+            {/* Assinatura contígua */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -271,6 +300,18 @@ export function DynamicDocumentSheet({
             <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
               {metadata.fecho || "Atenciosamente,"}
             </div>
+
+            {/* Assinatura contígua ao fecho */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -311,6 +352,18 @@ export function DynamicDocumentSheet({
 
             <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
               {metadata.fecho || "Cordialmente,"}
+            </div>
+
+            {/* Assinatura contígua ao fecho */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -356,6 +409,18 @@ export function DynamicDocumentSheet({
             {/* Saudação */}
             <div className="text-xs text-zinc-900 pt-2">
               {metadata.vocativo || "Atenciosamente,"}
+            </div>
+
+            {/* Assinatura contígua à saudação */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -440,6 +505,22 @@ export function DynamicDocumentSheet({
             <p className="text-xs text-zinc-800 leading-relaxed text-justify indent-8 italic">
               Nada mais havendo a tratar, a Presidência deu por encerrada a reunião, da qual eu, Secretário(a), lavrei a presente ata que, após lida e aprovada, vai assinada por todos os presentes.
             </p>
+
+            {/* Assinaturas da Ata contíguas */}
+            <div className="pt-6 grid grid-cols-2 gap-8 text-center">
+              <div className="border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.meetingPresident || "Presidente da Comissão"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">Presidente</p>
+              </div>
+              <div className="border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.meetingSecretary || "Secretário(a) da Comissão"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">Secretário(a)</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -568,6 +649,23 @@ export function DynamicDocumentSheet({
             <div className="pt-1">
               <FormattedParagraphs text={text} />
             </div>
+
+            {/* Local e Data */}
+            <div className="text-left text-xs text-zinc-700 font-medium pt-3">
+              {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
+
+            {/* Assinatura contígua */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -676,35 +774,26 @@ export function DynamicDocumentSheet({
             <div className="pt-1">
               <FormattedParagraphs text={text} />
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* ========================================================================= */}
-      {/* RODAPÉ DO DOCUMENTO: LOCAL, DATA E ASSINATURA */}
-      {/* ========================================================================= */}
-      <footer className="pt-8 space-y-6">
-        {/* Local e Data à direita (demais documentos, exceto ofício, carta, declaração e parecer) */}
-        {!isLetter && !isCarta && !isDeclaracao && !isParecer && (
-          <div className="text-right text-xs text-zinc-700 font-medium">
-            {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
-          </div>
-        )}
+            {/* Local e Data */}
+            <div className="text-right text-xs text-zinc-700 font-medium pt-4">
+              {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
 
-        {/* Bloco de Assinatura padrão (demais documentos, exceto declaração e parecer) */}
-        {!isDeclaracao && !isParecer && (
-          <div className="pt-6 flex flex-col items-end text-right">
-            <div className="w-64 border-t border-zinc-950 pt-1.5">
-              <p className="text-xs font-bold text-black">
-                {metadata.authorName || "Coordenação Geral da DGRH"}
-              </p>
-              <p className="text-[10px] text-zinc-600 font-medium">
-                {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
-              </p>
+            {/* Assinatura contígua */}
+            <div className="pt-6 flex flex-col items-end text-right">
+              <div className="w-64 border-t border-zinc-950 pt-1.5">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Coordenação Geral da DGRH"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
+                </p>
+              </div>
             </div>
           </div>
         )}
-      </footer>
+      </div>
     </div>
   );
 }
