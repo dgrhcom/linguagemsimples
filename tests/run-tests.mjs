@@ -409,6 +409,73 @@ test("21. Sanitização de Headers HTTP para Evitar Erro de 'non ISO-8859-1 code
   }
 });
 
+test("22. Validação dos 5 Modelos Revisados (Declaração, Informação, Memorando, Ofício, Parecer)", async () => {
+  const { generateDocumentDocx } = await import("../src/lib/templates/docx-document-generator.ts");
+
+  // 1. Declaração (data com recuo, sem linha sobre assinatura)
+  const declBlob = await generateDocumentDocx("declaracao", "Declaramos para os devidos fins a situação funcional.", {
+    locationAndDate: "Campinas, 27 de agosto de 2026.",
+    authorName: "Responsável pelo Atendimento",
+    authorRole: "Divisão de Atendimento"
+  });
+  assert.ok(declBlob && declBlob.size > 1000, "DOCX de Declaração deve ser gerado com sucesso");
+
+  // 2. Informação (data no topo à direita, saudação recuada, sem linha sobre assinatura)
+  const infoBlob = await generateDocumentDocx("informacao", "Manifestação técnica conclusiva sobre o caso em análise.", {
+    documentNumber: "18/2026",
+    referenceProcess: "Processo nº 01-P-44556/2026",
+    interestedParty: "Instituto de Artes",
+    subject: "Análise sobre aplicação de jornada especial",
+    saudacao: "Atenciosamente,",
+    locationAndDate: "Campinas, 27 de agosto de 2026.",
+    authorName: "Analista Técnico de RH",
+    authorRole: "Divisão de Legislação Funcional"
+  });
+  assert.ok(infoBlob && infoBlob.size > 1000, "DOCX de Informação deve ser gerado com sucesso");
+
+  // 3. Memorando (sem DGRH no título, saudação com recuo, assinatura centralizada sem linha)
+  const memoBlob = await generateDocumentDocx("memorando", "Solicitamos o envio do formulário de atualização cadastral.", {
+    documentNumber: "42/2026",
+    recipientName: "Diretoria de Administração",
+    recipientTitle: "Ilmo. Sr.",
+    recipientRole: "Diretor de Administração",
+    subject: "Encaminhamento de relatório",
+    vocativo: "Atenciosamente,",
+    locationAndDate: "Campinas, 27 de agosto de 2026.",
+    authorName: "Chefia de Divisão",
+    authorRole: "Divisão de Desenvolvimento"
+  });
+  assert.ok(memoBlob && memoBlob.size > 1000, "DOCX de Memorando deve ser gerado com sucesso");
+
+  // 4. Ofício (data no topo à direita, sem DGRH no título, fecho recuado, assinatura centralizada sem linha, destinatário no rodapé)
+  const oficioBlob = await generateDocumentDocx("oficio", "Temos a honra de convidar Vossa Senhoria para a sessão solene.", {
+    documentNumber: "105/2026",
+    recipientTitle: "A Sua Senhoria o Senhor",
+    recipientName: "Prof. Dr. Fulano de Tal",
+    recipientRole: "Diretor do Instituto de Computação",
+    recipientInstitution: "Universidade Estadual de Campinas - Unicamp",
+    recipientAddress: "Av. Albert Einstein, 1251 - Cidade Universitária - CEP 13083-852 - Campinas/SP",
+    subject: "Convite para solenidade acadêmica",
+    vocativo: "Senhor Diretor,",
+    fecho: "Atenciosamente,",
+    locationAndDate: "Campinas, 27 de agosto de 2026.",
+    authorName: "Coordenador Geral da DGRH",
+    authorRole: "Diretoria Geral de Recursos Humanos"
+  });
+  assert.ok(oficioBlob && oficioBlob.size > 1000, "DOCX de Ofício deve ser gerado com sucesso com dados completos de destinatário e instituição");
+
+  // 5. Parecer (sem DGRH no título, data recuada, assinatura centralizada sem linha)
+  const parecerBlob = await generateDocumentDocx("parecer", "Opina-se pelo deferimento do pedido formulado pelo servidor.", {
+    documentNumber: "01/2026",
+    referenceProcess: "Processo nº 01-P-12345/2026",
+    interestedParty: "Faculdade de Engenharia",
+    subject: "Solicitação de afastamento",
+    locationAndDate: "Campinas, 27 de agosto de 2026.",
+    authorName: "Relator da Comissão",
+    authorRole: "Comissão de Especialistas"
+  });
+  assert.ok(parecerBlob && parecerBlob.size > 1000, "DOCX de Parecer deve ser gerado com sucesso");
+});
 
 
 

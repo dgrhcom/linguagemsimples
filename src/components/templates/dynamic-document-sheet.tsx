@@ -256,35 +256,25 @@ export function DynamicDocumentSheet({
         {/* ========================================================================= */}
         {isLetter && (
           <div className="space-y-5 pt-1">
-            {/* Local e Data (topo) */}
-            <div className="text-left text-xs text-zinc-700 font-medium">
+            {/* Local e Data de produção à direita e acima do título OFÍCIO */}
+            <div className="text-right text-xs text-zinc-700 font-medium mb-3">
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
-            {/* Título do Ofício */}
-            <div className="border-b border-zinc-300 pb-2">
+            {/* Título do Ofício (sem linha abaixo e sem sigla DGRH fixa) */}
+            <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {docType === "oficio-circular" ? "OFÍCIO CIRCULAR" : "OFÍCIO"} DGRH nº {metadata.documentNumber || "105/2026"}
+                {docType === "oficio-circular" ? "OFÍCIO CIRCULAR" : "OFÍCIO"} nº {metadata.documentNumber || "105/2026"}
               </h2>
             </div>
 
             {/* Assunto em Destaque */}
             {metadata.subject && (
-              <div className="text-xs text-zinc-900 pt-2">
+              <div className="text-xs text-zinc-900 pt-1">
                 <span className="font-black text-black">Assunto: </span>
                 <span className="font-normal"><FormattedInline text={metadata.subject} /></span>
               </div>
             )}
-
-            {/* Bloco de Destinatário */}
-            <div className="text-xs text-zinc-900 space-y-0.5 pt-2">
-              {metadata.recipientTitle && <p className="text-zinc-600">{metadata.recipientTitle}</p>}
-              <p className="font-bold text-black">{metadata.recipientName || "Nome do Destinatário"}</p>
-              {metadata.recipientRole && <p className="font-medium">{metadata.recipientRole}</p>}
-              {metadata.recipientAddress && (
-                <p className="text-zinc-600 text-[11px] leading-tight pt-0.5">{metadata.recipientAddress}</p>
-              )}
-            </div>
 
             {/* Vocativo Formal */}
             <div className="text-xs font-bold text-black pt-2">
@@ -296,14 +286,14 @@ export function DynamicDocumentSheet({
               <FormattedParagraphs text={text} />
             </div>
 
-            {/* Fecho Padrão */}
+            {/* Fecho Padrão com recuo */}
             <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
               {metadata.fecho || "Atenciosamente,"}
             </div>
 
-            {/* Assinatura contígua ao fecho */}
-            <div className="pt-6 flex flex-col items-end text-right">
-              <div className="w-64 border-t border-zinc-950 pt-1.5">
+            {/* Assinatura centralizada e sem linha sobre ela */}
+            <div className="pt-6 flex flex-col items-center text-center">
+              <div className="w-64 text-center">
                 <p className="text-xs font-bold text-black">
                   {metadata.authorName || "Coordenação Geral da DGRH"}
                 </p>
@@ -311,6 +301,17 @@ export function DynamicDocumentSheet({
                   {metadata.authorRole || "Diretoria Geral de Recursos Humanos"}
                 </p>
               </div>
+            </div>
+
+            {/* Bloco de Destinatário na base inferior da página (conforme imagem oficial) */}
+            <div className="pt-10 text-xs text-zinc-900 space-y-0.5 text-left">
+              {metadata.recipientTitle && <p className="text-zinc-700">{metadata.recipientTitle}</p>}
+              <p className="font-bold text-black">{metadata.recipientName || "Nome do Destinatário"}</p>
+              {metadata.recipientRole && <p className="text-zinc-800">{metadata.recipientRole}</p>}
+              {metadata.recipientInstitution && <p className="text-zinc-800">{metadata.recipientInstitution}</p>}
+              {metadata.recipientAddress && (
+                <p className="text-zinc-600 text-[11px] leading-tight pt-0.5">{metadata.recipientAddress}</p>
+              )}
             </div>
           </div>
         )}
@@ -378,10 +379,10 @@ export function DynamicDocumentSheet({
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
-            {/* Título do Memorando */}
-            <div className="border-b-2 border-zinc-900 pb-2">
+            {/* Título do Memorando (sem linha abaixo e sem DGRH fixo) */}
+            <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                MEMORANDO DGRH nº {metadata.documentNumber || "42/2026"}
+                MEMORANDO nº {metadata.documentNumber || "42/2026"}
               </h2>
             </div>
 
@@ -406,14 +407,14 @@ export function DynamicDocumentSheet({
               <FormattedParagraphs text={text} />
             </div>
 
-            {/* Saudação */}
-            <div className="text-xs text-zinc-900 pt-2">
-              {metadata.vocativo || "Atenciosamente,"}
+            {/* Saudação com recuo alinhado ao parágrafo */}
+            <div className="text-xs text-zinc-900 indent-8 pt-2 font-normal">
+              {metadata.vocativo || metadata.saudacao || "Atenciosamente,"}
             </div>
 
-            {/* Assinatura contígua à saudação */}
-            <div className="pt-6 flex flex-col items-end text-right">
-              <div className="w-64 border-t border-zinc-950 pt-1.5">
+            {/* Assinatura centralizada e sem linha sobre ela */}
+            <div className="pt-6 flex flex-col items-center text-center">
+              <div className="w-64 text-center">
                 <p className="text-xs font-bold text-black">
                   {metadata.authorName || "Coordenação Geral da DGRH"}
                 </p>
@@ -563,10 +564,10 @@ export function DynamicDocumentSheet({
         {/* ========================================================================= */}
         {isParecer && (
           <div className="space-y-4 pt-1">
-            {/* Título do Parecer */}
+            {/* Título do Parecer (sem DGRH fixo) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                PARECER DGRH nº {metadata.documentNumber || "01/2026"}
+                PARECER nº {metadata.documentNumber || "01/2026"}
               </h2>
             </div>
 
@@ -599,14 +600,14 @@ export function DynamicDocumentSheet({
               <FormattedParagraphs text={text} />
             </div>
 
-            {/* Local e Data (próxima ao parágrafo do corpo) */}
-            <div className="text-left text-xs text-zinc-700 font-medium pt-3">
+            {/* Local e Data com recuo igual ao do parágrafo */}
+            <div className="text-left text-xs text-zinc-700 font-medium indent-8 pt-3">
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
-            {/* Assinatura trazida para perto do parágrafo e da data */}
-            <div className="pt-6 flex flex-col items-end text-right">
-              <div className="w-64 border-t border-zinc-950 pt-1.5">
+            {/* Assinatura centralizada e sem linha sobre ela */}
+            <div className="pt-6 flex flex-col items-center text-center">
+              <div className="w-64 text-center">
                 <p className="text-xs font-bold text-black">
                   {metadata.authorName || "Coordenação Geral da DGRH"}
                 </p>
@@ -619,14 +620,69 @@ export function DynamicDocumentSheet({
         )}
 
         {/* ========================================================================= */}
-        {/* 8b. INFORMAÇÃO, DECISÃO E DESPACHO */}
+        {/* 8b. INFORMAÇÃO (conforme modelo timbrado oficial) */}
         {/* ========================================================================= */}
-        {(isDecisaoOuDespacho || isInformacao) && (
+        {isInformacao && (
+          <div className="space-y-5 pt-1">
+            {/* Local e Data de produção à direita e acima do título INFORMAÇÃO */}
+            <div className="text-right text-xs text-zinc-700 font-medium mb-3">
+              {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
+            </div>
+
+            {/* Título da Informação (sem - DGRH fixo) */}
+            <div>
+              <h2 className="text-sm font-black text-black tracking-wide uppercase">
+                INFORMAÇÃO Nº {metadata.documentNumber || "18/2026"}
+              </h2>
+            </div>
+
+            {/* Tabela de Referência Processual */}
+            {(metadata.referenceProcess || metadata.interestedParty || metadata.subject) && (
+              <div className="text-xs space-y-1 leading-tight pt-1">
+                {metadata.referenceProcess && (
+                  <p><strong className="text-black">Processo nº:</strong> {metadata.referenceProcess}</p>
+                )}
+                {metadata.interestedParty && (
+                  <p><strong className="text-black">Interessado(a):</strong> {metadata.interestedParty}</p>
+                )}
+                {metadata.subject && (
+                  <p><strong className="text-black">Assunto:</strong> {metadata.subject}</p>
+                )}
+              </div>
+            )}
+
+            {/* Corpo Técnico */}
+            <div className="pt-1">
+              <FormattedParagraphs text={text} />
+            </div>
+
+            {/* Saudação ao destinatário com recuo alinhado ao parágrafo */}
+            <div className="text-xs text-zinc-900 indent-8 pt-3 font-normal">
+              {metadata.saudacao || metadata.fecho || "Atenciosamente,"}
+            </div>
+
+            {/* Assinatura centralizada e sem linha sobre ela */}
+            <div className="pt-6 flex flex-col items-center text-center">
+              <div className="w-64 text-center">
+                <p className="text-xs font-bold text-black">
+                  {metadata.authorName || "Analista Técnico de Recursos Humanos"}
+                </p>
+                <p className="text-[10px] text-zinc-600 font-medium">
+                  {metadata.authorRole || "Divisão de Legislação Funcional - DGRH"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 8c. DECISÃO E DESPACHO */}
+        {/* ========================================================================= */}
+        {isDecisaoOuDespacho && (
           <div className="space-y-5 pt-1">
             <div className="border-b border-zinc-300 pb-2">
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {isInformacao && `INFORMAÇÃO Nº ${metadata.documentNumber || "18/2026"} - DGRH`}
-                {isDecisaoOuDespacho && (docType === "decisao" ? `DECISÃO Nº ${metadata.documentNumber || "08/2026"}` : "DESPACHO DO COORDENADOR GERAL")}
+                {docType === "decisao" ? `DECISÃO Nº ${metadata.documentNumber || "08/2026"}` : "DESPACHO DO COORDENADOR GERAL"}
               </h2>
             </div>
 
@@ -684,14 +740,14 @@ export function DynamicDocumentSheet({
               <FormattedParagraphs text={text} paragraphClassName="text-xs text-zinc-900 leading-[1.8] text-justify indent-8 font-normal" />
             </div>
 
-            {/* Data e Local (justificado como o parágrafo do texto) */}
-            <div className="text-justify text-xs text-zinc-700 font-medium pt-4">
+            {/* Data e Local com recuo de parágrafo */}
+            <div className="text-left text-xs text-zinc-700 font-medium indent-8 pt-4">
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
-            {/* Assinatura Centralizada */}
-            <div className="flex flex-col items-center text-center pt-4">
-              <div className="w-64 border-t border-zinc-950 pt-1.5 text-center">
+            {/* Assinatura Centralizada (sem linha sobre ela) */}
+            <div className="flex flex-col items-center text-center pt-6">
+              <div className="w-64 pt-1.5 text-center">
                 <p className="text-xs font-bold text-black">
                   {metadata.authorName || "Responsável pelo Atendimento Funcional"}
                 </p>

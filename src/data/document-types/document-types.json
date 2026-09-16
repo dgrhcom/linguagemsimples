@@ -234,6 +234,7 @@
       "referenceProcess": "Processo nº 01-P-44556/2026",
       "interestedParty": "Instituto de Artes",
       "subject": "Análise sobre aplicação de jornada especial",
+      "saudacao": "Atenciosamente,",
       "locationAndDate": "Campinas, 27 de agosto de 2026.",
       "authorName": "Analista Técnico de Recursos Humanos",
       "authorRole": "Divisão de Legislação Funcional - DGRH"
@@ -297,6 +298,7 @@
       "recipientTitle": "A Sua Senhoria o Senhor",
       "recipientName": "Prof. Dr. Fulano de Tal",
       "recipientRole": "Diretor do Instituto de Computação",
+      "recipientInstitution": "Universidade Estadual de Campinas - Unicamp",
       "recipientAddress": "Av. Albert Einstein, 1251 - Cidade Universitária - CEP 13083-852 - Campinas/SP",
       "subject": "Solicitação de indicação de representantes docentes para comissão técnica.",
       "vocativo": "Senhor Diretor,",

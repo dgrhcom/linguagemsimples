@@ -74,10 +74,12 @@ export interface UniversalDocumentMetadata {
   recipientTitle?: string;
   recipientName?: string;
   recipientRole?: string;
+  recipientInstitution?: string;
   recipientAddress?: string;
   subject?: string;
   vocativo?: string;
   fecho?: string;
+  saudacao?: string;
 
   // Memorando (Tramitação interna)
   memoPara?: string;

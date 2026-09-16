@@ -771,6 +771,10 @@ export function DynamicDocumentDrawer({
                     <input type="text" value={metadata.recipientRole || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, recipientRole: e.target.value }))} placeholder="Diretor do Instituto de Computação" className={inputClasses} />
                   </div>
                   <div>
+                    <label className="block text-[10px] text-slate-dark mb-0.5">Instituição do Destinatário</label>
+                    <input type="text" value={metadata.recipientInstitution || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, recipientInstitution: e.target.value }))} placeholder="Universidade Estadual de Campinas - Unicamp" className={inputClasses} />
+                  </div>
+                  <div>
                     <label className="block text-[10px] text-slate-dark mb-0.5">Endereço com CEP</label>
                     <input type="text" value={metadata.recipientAddress || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, recipientAddress: e.target.value }))} placeholder="Av. Albert Einstein, 1251 - CEP 13083-852" className={inputClasses} />
                   </div>
@@ -793,7 +797,7 @@ export function DynamicDocumentDrawer({
             {/* MEMORANDO */}
             {isMemo && (
               <div className="space-y-3 pt-3 border-t border-stone">
-                <h4 className="text-[10px] text-cloud-medium border-b border-stone pb-1">Destinatário e Assunto</h4>
+                <h4 className="text-[10px] text-cloud-medium border-b border-stone pb-1">Destinatário, Assunto e Saudação</h4>
                 <div className="space-y-2.5">
                   <div>
                     <label className="block text-[10px] text-slate-dark mb-0.5">Nome do Destinatário</label>
@@ -802,6 +806,10 @@ export function DynamicDocumentDrawer({
                   <div>
                     <label className="block text-[10px] text-slate-dark mb-0.5">Assunto</label>
                     <input type="text" value={metadata.memoAssunto || metadata.subject || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, memoAssunto: e.target.value, subject: e.target.value }))} placeholder="Encaminhamento de relatório..." className={inputClasses} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-dark mb-0.5">Saudação / Fecho</label>
+                    <input type="text" value={metadata.vocativo || metadata.saudacao || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, vocativo: e.target.value, saudacao: e.target.value }))} placeholder="Atenciosamente," className={inputClasses} />
                   </div>
                 </div>
               </div>
@@ -828,7 +836,7 @@ export function DynamicDocumentDrawer({
               </div>
             )}
 
-            {/* PARECER/DECISÃO */}
+            {/* PARECER/DECISÃO/INFORMAÇÃO */}
             {(isParecer || isDecisaoOuDespacho || isInformacao) && (
               <div className="space-y-3 pt-3 border-t border-stone">
                 <h4 className="text-[10px] text-cloud-medium border-b border-stone pb-1">Referência Processual</h4>
@@ -841,6 +849,12 @@ export function DynamicDocumentDrawer({
                     <label className="block text-[10px] text-slate-dark mb-0.5">Interessado(a)</label>
                     <input type="text" value={metadata.interestedParty || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, interestedParty: e.target.value }))} placeholder="Nome da Unidade ou Servidor" className={inputClasses} />
                   </div>
+                  {isInformacao && (
+                    <div>
+                      <label className="block text-[10px] text-slate-dark mb-0.5">Saudação ao Destinatário</label>
+                      <input type="text" value={metadata.saudacao || ""} onChange={(e) => setMetadata((prev) => ({ ...prev, saudacao: e.target.value }))} placeholder="Atenciosamente," className={inputClasses} />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
