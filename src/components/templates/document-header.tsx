@@ -184,47 +184,45 @@ export function DocumentHeader({ metadata }: DocumentHeaderProps) {
             textAlign: "right",
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end"
+            alignItems: "flex-end",
+            fontFamily: "Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif"
           }}
         >
-          <h1
-            className="text-[9px] font-bold text-zinc-900 tracking-tight leading-tight"
-            style={{
-              fontSize: "9px",
-              fontWeight: 700,
-              lineHeight: 1.25,
-              color: "#18181b",
-              margin: 0,
-              fontFamily: "Arial, Helvetica, sans-serif"
-            }}
-          >
-            {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
-          </h1>
           <p
-            className="text-[7.5px] text-zinc-600 font-medium leading-tight"
+            className="text-[9pt] text-zinc-700 leading-tight"
             style={{
-              fontSize: "7.5px",
-              fontWeight: 500,
+              fontSize: "9pt",
               lineHeight: 1.25,
-              color: "#52525b",
+              color: "#3f3f46",
               margin: 0,
-              fontFamily: "Arial, Helvetica, sans-serif"
-            }}
-          >
-            {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
-          </p>
-          <p
-            className="text-[7.5px] text-zinc-500 font-medium leading-tight"
-            style={{
-              fontSize: "7.5px",
-              fontWeight: 500,
-              lineHeight: 1.25,
-              color: "#71717a",
-              margin: 0,
-              fontFamily: "Arial, Helvetica, sans-serif"
+              fontFamily: "Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif"
             }}
           >
             Universidade Estadual de Campinas
+          </p>
+          <p
+            className="text-[9pt] text-zinc-700 leading-tight"
+            style={{
+              fontSize: "9pt",
+              lineHeight: 1.25,
+              color: "#3f3f46",
+              margin: 0,
+              fontFamily: "Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif"
+            }}
+          >
+            {metadata.unitName || "Diretoria Geral de Recursos Humanos"}
+          </p>
+          <p
+            className="text-[9pt] text-zinc-700 leading-tight"
+            style={{
+              fontSize: "9pt",
+              lineHeight: 1.25,
+              color: "#3f3f46",
+              margin: 0,
+              fontFamily: "Calibri, Candara, Segoe, Segoe UI, Optima, Arial, sans-serif"
+            }}
+          >
+            {metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br"}
           </p>
         </div>
       </div>

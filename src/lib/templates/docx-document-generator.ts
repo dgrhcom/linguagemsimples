@@ -351,14 +351,13 @@ export async function generateDocumentDocx(
               children: [
                 new Paragraph({
                   alignment: AlignmentType.RIGHT,
-                  spacing: { line: 240, after: 40 },
+                  spacing: { line: 220, after: 20 },
                   children: [
                     new TextRun({
-                      text: metadata.unitName || "Diretoria Geral de Recursos Humanos",
-                      bold: true,
+                      text: "Universidade Estadual de Campinas",
                       size: 18, // 9pt
-                      font: "Arial",
-                      color: "111111"
+                      font: "Calibri",
+                      color: "333333"
                     })
                   ]
                 }),
@@ -367,10 +366,10 @@ export async function generateDocumentDocx(
                   spacing: { line: 220, after: 20 },
                   children: [
                     new TextRun({
-                      text: metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br",
-                      size: 15, // 7.5pt
-                      font: "Arial",
-                      color: "555555"
+                      text: metadata.unitName || "Diretoria Geral de Recursos Humanos",
+                      size: 18, // 9pt
+                      font: "Calibri",
+                      color: "333333"
                     })
                   ]
                 }),
@@ -379,10 +378,10 @@ export async function generateDocumentDocx(
                   spacing: { line: 220 },
                   children: [
                     new TextRun({
-                      text: "Universidade Estadual de Campinas",
-                      size: 15,
-                      font: "Arial",
-                      color: "777777"
+                      text: metadata.emailSite || "dgrh@unicamp.br | www.dgrh.unicamp.br",
+                      size: 18, // 9pt
+                      font: "Calibri",
+                      color: "333333"
                     })
                   ]
                 })
