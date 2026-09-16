@@ -149,14 +149,12 @@ export function DocumentHeader({ metadata }: DocumentHeaderProps) {
 
           {metadata.customUnitLogo && (
             <div
-              className="shrink-0 border-l border-zinc-300 pl-2.5 flex items-center"
+              className="shrink-0 flex items-center"
               style={{
                 height: "40px",
                 maxHeight: "40px",
                 width: "auto",
                 flexShrink: 0,
-                borderLeft: "1px solid #d4d4d8",
-                paddingLeft: "10px",
                 display: "flex",
                 alignItems: "center"
               }}
