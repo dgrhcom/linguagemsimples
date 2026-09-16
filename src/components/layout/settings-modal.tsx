@@ -34,22 +34,18 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
 
   const handleSave = () => {
     try {
-      let finalProvider = provider;
-      if (geminiKey.trim() && provider === "offline") {
-        finalProvider = "gemini";
-      } else if (openaiKey.trim() && provider === "offline") {
-        finalProvider = "openai";
-      }
+      const cleanGemini = geminiKey.replace(/[^\x21-\x7E]/g, "").trim();
+      const cleanOpenai = openaiKey.replace(/[^\x21-\x7E]/g, "").trim();
 
-      safeStorage.setItem("preferred_ai_provider", finalProvider);
-      if (geminiKey.trim()) {
-        safeStorage.setItem("custom_gemini_api_key", geminiKey.trim());
+      safeStorage.setItem("preferred_ai_provider", provider);
+      if (cleanGemini) {
+        safeStorage.setItem("custom_gemini_api_key", cleanGemini);
       } else {
         safeStorage.removeItem("custom_gemini_api_key");
       }
 
-      if (openaiKey.trim()) {
-        safeStorage.setItem("custom_openai_api_key", openaiKey.trim());
+      if (cleanOpenai) {
+        safeStorage.setItem("custom_openai_api_key", cleanOpenai);
       } else {
         safeStorage.removeItem("custom_openai_api_key");
       }

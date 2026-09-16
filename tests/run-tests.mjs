@@ -382,6 +382,34 @@ test("20. Validação dos Modelos Habilitados por Padrão (6 modelos oficiais at
   assert.equal(disabledDocs.length, 14, "Os demais 14 modelos devem estar com enabled: false");
 });
 
+test("21. Sanitização de Headers HTTP para Evitar Erro de 'non ISO-8859-1 code point'", async () => {
+  const { sanitizeHeaderValue } = await import("../src/lib/ai/index.ts");
+
+  // Casos com caracteres problemáticos fora do ISO-8859-1 / ASCII (em-dash, aspas curvas, zero-width, etc.)
+  const testCases = [
+    { input: "AIzaSy—test", expected: "AIzaSytest" },
+    { input: "“AIzaSyTest”", expected: "AIzaSyTest" },
+    { input: "sk-proj-test\u200B", expected: "sk-proj-test" },
+    { input: "minha chave não funciona", expected: "minhachavenofunciona" },
+    { input: "AIzaSy\u00A0Test", expected: "AIzaSyTest" },
+    { input: "   ", expected: null },
+    { input: null, expected: null },
+    { input: undefined, expected: null }
+  ];
+
+  for (const tc of testCases) {
+    const result = sanitizeHeaderValue(tc.input);
+    assert.equal(result, tc.expected, `Sanitização para '${tc.input}' falhou`);
+    if (result) {
+      // Garante que o Header HTTP do browser/node nunca lançará TypeError
+      assert.doesNotThrow(() => {
+        new Headers({ "x-ai-api-key": result });
+      }, `Headers rejeitou '${result}'`);
+    }
+  }
+});
+
+
 
 
 
