@@ -158,7 +158,44 @@ export function DynamicDocumentDrawer({
     }
   }, []);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleBeforePrint = () => {
+      const sheetElement = document.getElementById("printable-document-sheet");
+      if (sheetElement) {
+        let printContainer = document.getElementById("unicamp-print-container");
+        if (!printContainer) {
+          printContainer = document.createElement("div");
+          printContainer.id = "unicamp-print-container";
+          document.body.appendChild(printContainer);
+        }
+        printContainer.innerHTML = sheetElement.outerHTML;
+        document.body.classList.add("printing-sheet");
+      }
+    };
+
+    const handleAfterPrint = () => {
+      document.body.classList.remove("printing-sheet");
+      const printContainer = document.getElementById("unicamp-print-container");
+      if (printContainer) {
+        printContainer.innerHTML = "";
+      }
+    };
+
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+      document.body.classList.remove("printing-sheet");
+      const printContainer = document.getElementById("unicamp-print-container");
+      if (printContainer) {
+        printContainer.innerHTML = "";
+      }
+    };
+  }, [isOpen]);
 
   const isNormative = [
     "portaria", "resolucao", "deliberacao", "instrucao-normativa",
@@ -220,45 +257,6 @@ export function DynamicDocumentDrawer({
       setIsExportingDocx(false);
     }
   };
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleBeforePrint = () => {
-      const sheetElement = document.getElementById("printable-document-sheet");
-      if (sheetElement) {
-        let printContainer = document.getElementById("unicamp-print-container");
-        if (!printContainer) {
-          printContainer = document.createElement("div");
-          printContainer.id = "unicamp-print-container";
-          document.body.appendChild(printContainer);
-        }
-        printContainer.innerHTML = sheetElement.outerHTML;
-        document.body.classList.add("printing-sheet");
-      }
-    };
-
-    const handleAfterPrint = () => {
-      document.body.classList.remove("printing-sheet");
-      const printContainer = document.getElementById("unicamp-print-container");
-      if (printContainer) {
-        printContainer.innerHTML = "";
-      }
-    };
-
-    window.addEventListener("beforeprint", handleBeforePrint);
-    window.addEventListener("afterprint", handleAfterPrint);
-
-    return () => {
-      window.removeEventListener("beforeprint", handleBeforePrint);
-      window.removeEventListener("afterprint", handleAfterPrint);
-      document.body.classList.remove("printing-sheet");
-      const printContainer = document.getElementById("unicamp-print-container");
-      if (printContainer) {
-        printContainer.innerHTML = "";
-      }
-    };
-  }, [isOpen]);
 
   const handlePrint = () => {
     const sheetElement = document.getElementById("printable-document-sheet");
@@ -331,6 +329,8 @@ export function DynamicDocumentDrawer({
   };
 
   const inputClasses = "w-full text-[14px] leading-[1] tracking-[-0.08px] p-2 bg-ivory-light border border-stone rounded-[8px] focus:bg-white focus:ring-1 focus:ring-cloud-dark outline-hidden";
+
+  if (!isOpen) return null;
 
   return (
     <>
