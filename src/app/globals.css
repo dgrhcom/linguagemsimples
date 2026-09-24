@@ -337,7 +337,27 @@ html[data-high-contrast="true"] .diff-deleted {
     box-sizing: border-box !important;
     width: 210mm !important;
     max-width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    transform: none !important;
+  }
+
+  body.printing-sheet #unicamp-print-container .a4-page {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    visibility: visible !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    height: 297mm !important;
     min-height: 297mm !important;
+    max-height: 297mm !important;
     margin: 0 auto !important;
     padding-top: 15mm !important;
     padding-bottom: 15mm !important;
@@ -347,7 +367,14 @@ html[data-high-contrast="true"] .diff-deleted {
     box-shadow: none !important;
     background: #ffffff !important;
     color: #000000 !important;
-    transform: none !important;
+    break-after: page !important;
+    page-break-after: always !important;
+    overflow: hidden !important;
+  }
+
+  body.printing-sheet #unicamp-print-container .a4-page:last-child {
+    break-after: auto !important;
+    page-break-after: auto !important;
   }
 
   body.printing-sheet #unicamp-print-container * {

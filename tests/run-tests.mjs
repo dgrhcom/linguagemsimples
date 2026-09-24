@@ -495,3 +495,41 @@ test("23. Validação do Modelo Portaria (sem DGRH no título, ementa à direita
   assert.ok(portariaBlob && portariaBlob.size > 1000, "DOCX de Portaria deve ser gerado com sucesso com as regras de layout atualizadas");
 });
 
+test("24. Particionamento Multipágina A4 Dinâmico para Visualização no Drawer e Impressão", async () => {
+  const { parseTextToBlocks, partitionBlocksIntoPages } = await import("../src/components/templates/dynamic-document-sheet.tsx");
+
+  // 1. Documento curto deve caber em exatamente 1 página
+  const shortText = "Art. 1º Fica criado o comitê.\n\nArt. 2º Esta resolução entra em vigor imediatamente.";
+  const shortBlocks = parseTextToBlocks(shortText);
+  assert.strictEqual(shortBlocks.length, 2, "Texto curto deve gerar 2 blocos de parágrafo");
+
+  const singlePageResult = partitionBlocksIntoPages(shortBlocks, "portaria", {
+    documentNumber: "01/2026",
+    unitName: "DGRH",
+    ementa: "Dispõe sobre o comitê."
+  });
+  assert.strictEqual(singlePageResult.length, 1, "Documento com texto curto deve resultar em exatamente 1 página A4");
+
+  // 2. Documento longo com múltiplos artigos deve gerar 2 ou mais páginas A4
+  const longArticles = Array.from({ length: 15 }, (_, i) =>
+    `Art. ${i + 1}º O presente artigo estabelece as diretrizes normativas de número ${i + 1} para o funcionamento dos órgãos colegiados e comissões especiais da Universidade Estadual de Campinas, devendo ser estritamente cumprido por todas as unidades envolvidas.`
+  ).join("\n\n");
+
+  const longBlocks = parseTextToBlocks(longArticles);
+  assert.ok(longBlocks.length >= 15, "Texto longo deve gerar múltiplos blocos");
+
+  const multiPageResult = partitionBlocksIntoPages(longBlocks, "portaria", {
+    documentNumber: "12/2026",
+    unitName: "Gabinete do Reitor",
+    ementa: "Dispõe sobre a regulamentação completa das comissões especiais e grupos de trabalho da Universidade Estadual de Campinas."
+  });
+
+  assert.ok(multiPageResult.length >= 2, `Documento longo deve ser particionado em múltiplas páginas (gerou ${multiPageResult.length})`);
+  assert.ok(multiPageResult[0].length > 0, "A Página 1 deve conter o primeiro conjunto de blocos");
+  assert.ok(multiPageResult[1].length > 0, "A Página 2 deve conter os blocos excedentes");
+
+  // 3. Certificado é sempre página única
+  const certResult = partitionBlocksIntoPages(longBlocks, "certificado", {});
+  assert.strictEqual(certResult.length, 1, "Certificado deve ser sempre de página única");
+});
+

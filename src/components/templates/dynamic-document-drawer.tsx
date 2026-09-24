@@ -58,6 +58,7 @@ export function DynamicDocumentDrawer({
   const [showGDocsModal, setShowGDocsModal] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [activeGabaritoPage, setActiveGabaritoPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
 
   const drawerTextareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -838,31 +839,59 @@ export function DynamicDocumentDrawer({
           <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-start" style={{ backgroundColor: "#f0eee6" }}>
             {activeView === "sheet" && (
               <div className="w-full flex flex-col items-center space-y-3 max-w-4xl">
-                {/* Controles de Zoom - Compactos */}
-                <div className="w-full flex items-center justify-between px-3 py-1.5 rounded-[8px]" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
-                  <div className="flex items-center gap-1.5 text-[12px]" style={{ color: "#141413" }}>
-                    <span className="font-semibold">Zoom:</span>
-                    <button
-                      type="button"
-                      onClick={() => setZoom(Math.max(0.7, zoom - 0.1))}
-                      className="w-6 h-6 rounded-[4px] flex items-center justify-center transition-colors"
-                      style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", color: "#141413" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#d97757"; e.currentTarget.style.color = "#fff"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(227, 218, 204, 0.5)"; e.currentTarget.style.color = "#141413"; }}
-                    >
-                      -
-                    </button>
-                    <span className="font-mono w-10 text-center">{Math.round(zoom * 100)}%</span>
-                    <button
-                      type="button"
-                      onClick={() => setZoom(Math.min(1.3, zoom + 0.1))}
-                      className="w-6 h-6 rounded-[4px] flex items-center justify-center transition-colors"
-                      style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", color: "#141413" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#d97757"; e.currentTarget.style.color = "#fff"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(227, 218, 204, 0.5)"; e.currentTarget.style.color = "#141413"; }}
-                    >
-                      +
-                    </button>
+                {/* Controles de Zoom e Páginas */}
+                <div className="w-full flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 rounded-[8px]" style={{ backgroundColor: "#faf9f5", border: "1px solid #cccbc8" }}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-[12px]" style={{ color: "#141413" }}>
+                      <span className="font-semibold">Zoom:</span>
+                      <button
+                        type="button"
+                        onClick={() => setZoom(Math.max(0.7, zoom - 0.1))}
+                        className="w-6 h-6 rounded-[4px] flex items-center justify-center transition-colors"
+                        style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", color: "#141413" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#d97757"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(227, 218, 204, 0.5)"; e.currentTarget.style.color = "#141413"; }}
+                      >
+                        -
+                      </button>
+                      <span className="font-mono w-10 text-center">{Math.round(zoom * 100)}%</span>
+                      <button
+                        type="button"
+                        onClick={() => setZoom(Math.min(1.3, zoom + 0.1))}
+                        className="w-6 h-6 rounded-[4px] flex items-center justify-center transition-colors"
+                        style={{ backgroundColor: "rgba(227, 218, 204, 0.5)", color: "#141413" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#d97757"; e.currentTarget.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(227, 218, 204, 0.5)"; e.currentTarget.style.color = "#141413"; }}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Indicador de Páginas A4 e navegação rápida */}
+                    <div className="flex items-center gap-1.5 pl-2 border-l border-stone text-[11px] text-zinc-700">
+                      <span className="font-medium bg-oat-warm/40 px-2 py-0.5 rounded-[4px] border border-stone">
+                        {pageCount === 1 ? "1 página (A4)" : `${pageCount} páginas (A4)`}
+                      </span>
+                      {pageCount > 1 && (
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: pageCount }).map((_, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                const el = document.querySelector(`[data-page-number="${idx + 1}"]`);
+                                el?.scrollIntoView({ behavior: "smooth", block: "start" });
+                              }}
+                              className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] hover:bg-clay/20 transition-colors cursor-pointer"
+                              style={{ backgroundColor: "rgba(227, 218, 204, 0.6)", color: "#141413" }}
+                              title={`Rolar para página ${idx + 1}`}
+                            >
+                              Pág. {idx + 1}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   {currentTypeInfo.competence && (
                     <div className="text-[10px]" style={{ color: "#b0aea5" }}>
@@ -871,7 +900,12 @@ export function DynamicDocumentDrawer({
                   )}
                 </div>
                 <div style={{ transform: `scale(${zoom})`, transformOrigin: "top center" }} className="transition-transform duration-150 w-full flex justify-center">
-                  <DynamicDocumentSheet text={documentText} metadata={metadata} docType={currentDocType} />
+                  <DynamicDocumentSheet
+                    text={documentText}
+                    metadata={metadata}
+                    docType={currentDocType}
+                    onPageCountChange={setPageCount}
+                  />
                 </div>
               </div>
             )}
