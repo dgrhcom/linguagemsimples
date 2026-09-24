@@ -42,10 +42,11 @@ export type BodyBlock =
   | { type: "numbered-list"; items: string[]; id: string };
 
 /**
- * Divide parágrafos longos (> 500 caracteres) em frases menores
- * para que a quebra entre páginas ocorra de maneira fluida.
+ * Divide parágrafos longos (> 350 caracteres) em frases menores
+ * para que a interrupção no final da primeira página e a continuação
+ * na segunda folha ocorram de maneira natural e elegante.
  */
-function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 500): BodyBlock[] {
+function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 350): BodyBlock[] {
   if (text.length <= maxChars) {
     return [{ type: "paragraph", text, id: baseId }];
   }
@@ -176,21 +177,22 @@ export function FormattedParagraphs({
 }
 
 /**
- * Estimativa analítica da altura de um bloco (em pixels @ 96 DPI)
+ * Estimativa analítica realista da altura de um bloco (em pixels @ 96 DPI)
  */
 function estimateBlockHeight(block: BodyBlock): number {
   if (block.type === "paragraph") {
-    const lines = Math.max(1, Math.ceil((block.text || "").length / 85));
-    return lines * 19.5 + 14; // linha ~19.5px + margem inferior ~14px
+    // ~75 caracteres por linha para largura útil de 165mm com Arial 12px
+    const lines = Math.max(1, Math.ceil((block.text || "").length / 75));
+    return lines * 20 + 14; // linha ~20px + margem inferior space-y-3 ~14px
   }
   if (block.type === "bullet-list" || block.type === "numbered-list") {
     const totalLines = (block.items || []).reduce(
-      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 80)),
+      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 70)),
       0
     );
-    return totalLines * 19.5 + 16;
+    return totalLines * 20 + 16;
   }
-  return 30;
+  return 34;
 }
 
 /**
@@ -198,39 +200,39 @@ function estimateBlockHeight(block: BodyBlock): number {
  */
 function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 40; // Título
-    if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 45)) * 18 + 12;
-    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 85)) * 19 + 12;
+    let h = 44; // Título
+    if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 45)) * 19 + 14;
+    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 75)) * 20 + 14;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 120 + (metadata.subject ? 30 : 0);
+    return 130 + (metadata.subject ? 30 : 0);
   }
   if (docType === "carta") {
-    return 140 + (metadata.subject ? 30 : 0);
+    return 150 + (metadata.subject ? 30 : 0);
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 130 + (metadata.subject || metadata.memoAssunto ? 30 : 0);
+    return 135 + (metadata.subject || metadata.memoAssunto ? 30 : 0);
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 210; // Título + Grid da Sessão
+    return 260; // Título + Grid da Sessão
   }
   if (docType === "pauta") {
-    return 140;
+    return 150;
   }
   if (["parecer", "opinion"].includes(docType)) {
-    return 110;
+    return 115;
   }
   if (docType === "informacao") {
-    return 125;
+    return 130;
   }
   if (["decisao", "despacho"].includes(docType)) {
-    return 110;
+    return 115;
   }
   if (["declaracao", "declaration"].includes(docType)) {
-    return 65;
+    return 70;
   }
-  return 75; // Comunicado, Relatório, Outros
+  return 80; // Comunicado, Relatório, Outros
 }
 
 /**
@@ -238,72 +240,26 @@ function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMe
  */
 function getClosingHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 120; // Data + Assinatura
-    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 85)) * 19 + 12;
+    let h = 135; // Data + Assinatura
+    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 75)) * 20 + 14;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 190; // Fecho + Assinatura + Bloco de Destinatário na base
+    return 215; // Fecho + Assinatura + Bloco de Destinatário na base
   }
   if (docType === "carta") {
-    return 120;
+    return 130;
   }
   if (["memorando", "memo"].includes(docType)) {
     return 115;
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 120; // Encerramento + Assinaturas duplas
+    return 130; // Encerramento + Assinaturas duplas
   }
   if (docType === "pauta") {
     return 0; // Pauta não possui assinatura na base
   }
-  return 115; // Parecer, Informação, Decisão, Declaração, Outros
-}
-
-/**
- * Título resumido para o cabeçalho de continuação (Páginas 2+)
- */
-function getDocumentTitleSummary(docType: DocumentType, metadata: UniversalDocumentMetadata): string {
-  switch (docType) {
-    case "portaria":
-      return `Portaria ${metadata.documentNumber || "01/2026"}`;
-    case "resolucao":
-      return `Resolução GR-${metadata.documentNumber || "01/2026"}`;
-    case "deliberacao":
-      return `Deliberação CONSU-A-${metadata.documentNumber || "01/2026"}`;
-    case "instrucao-normativa":
-      return `Instrução Normativa ${metadata.documentNumber || "01/2026"}`;
-    case "oficio":
-      return `Ofício ${metadata.documentNumber || "105/2026"}`;
-    case "oficio-circular":
-      return `Ofício Circular ${metadata.documentNumber || "105/2026"}`;
-    case "memorando":
-    case "memo":
-      return `Memorando ${metadata.documentNumber || "42/2026"}`;
-    case "ata":
-    case "minutes":
-      return `Ata ${metadata.meetingNumber || "15ª Reunião"}`;
-    case "pauta":
-      return `Pauta ${metadata.meetingNumber || "12ª Reunião"}`;
-    case "parecer":
-    case "opinion":
-      return `Parecer ${metadata.documentNumber || "01/2026"}`;
-    case "informacao":
-      return `Informação ${metadata.documentNumber || "18/2026"}`;
-    case "decisao":
-      return `Decisão ${metadata.documentNumber || "08/2026"}`;
-    case "despacho":
-      return "Despacho";
-    case "declaracao":
-    case "declaration":
-      return "Declaração";
-    case "regimento":
-      return "Regimento Interno";
-    case "regulamento":
-      return "Regulamento";
-    default:
-      return "Documento Oficial";
-  }
+  return 120; // Parecer, Informação, Decisão, Declaração, Outros
 }
 
 /**
@@ -321,7 +277,9 @@ function getParagraphClassName(docType: DocumentType): string {
 }
 
 /**
- * Algoritmo de particionamento de blocos em páginas A4 com limites estritos
+ * Algoritmo de particionamento estrito em folhas A4:
+ * Garante que o texto seja interrompido no final da primeira página e continue na segunda folha,
+ * sem vazar por baixo nem sobrepor folhas seguintes.
  */
 export function partitionBlocksIntoPages(
   blocks: BodyBlock[],
@@ -339,14 +297,13 @@ export function partitionBlocksIntoPages(
     return [blocks];
   }
 
-  // Dimensões A4 a 96 DPI: 297mm = 1122.5px.
-  // Margens: 15mm superior + 15mm inferior = 113.4px.
-  // Altura útil interna: 1009px.
-  // Reservando 35px para o rodapé oficial ("Página X de Y"):
-  const USABLE_PAGE_HEIGHT = 960;
-  const CONTINUATION_HEADER_HEIGHT = 38;
+  // Dimensões físicas A4 a 96 DPI: 297mm = 1122.5px.
+  // Margens: 15mm superior (56.7px) + 15mm inferior (56.7px) = 113.4px.
+  // Altura útil interna total: 1009px.
+  // Adotamos 920px como limite operacional seguro para garantir margem limpa na base:
+  const PAGE_USABLE_HEIGHT = 920;
 
-  const headerHeight = measuredHeights?.headerHeight ?? 90;
+  const headerHeight = measuredHeights?.headerHeight ?? 105;
   const topMatterHeight = measuredHeights?.topMatterHeight ?? getTopMatterHeight(docType, metadata);
   const closingHeight = measuredHeights?.closingHeight ?? getClosingHeight(docType, metadata);
 
@@ -355,18 +312,20 @@ export function partitionBlocksIntoPages(
   });
 
   const totalBlocksHeight = blockHeights.reduce((acc, h) => acc + h, 0);
-  const page1Capacity = USABLE_PAGE_HEIGHT - headerHeight - topMatterHeight;
+  const page1BodyCapacity = PAGE_USABLE_HEIGHT - headerHeight - topMatterHeight;
 
-  // Se todo o conteúdo + assinaturas couberem na Página 1:
-  if (totalBlocksHeight + closingHeight <= page1Capacity) {
+  // CASO 1: Todo o documento cabe com folga na Página 1 (corpo + fechamento/assinaturas)
+  if (totalBlocksHeight + closingHeight <= page1BodyCapacity) {
     return [blocks];
   }
 
-  // Particionamento multipágina
+  // CASO 2: Documento multipágina.
+  // Na Página 1, o fechamento NÃO entra (será posicionado no final da última página).
+  // A Página 1 recebe o máximo de blocos que couberem estritamente em page1BodyCapacity.
   const pages: BodyBlock[][] = [];
   let currentPageBlocks: BodyBlock[] = [];
   let currentHeight = 0;
-  let currentCapacity = page1Capacity;
+  let currentCapacity = page1BodyCapacity;
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
@@ -376,27 +335,38 @@ export function partitionBlocksIntoPages(
       currentPageBlocks.push(block);
       currentHeight += h;
     } else {
+      // Interromper a folha atual no ponto exato e iniciar a próxima folha A4
       if (currentPageBlocks.length > 0) {
         pages.push(currentPageBlocks);
       }
       currentPageBlocks = [block];
       currentHeight = h;
-      currentCapacity = USABLE_PAGE_HEIGHT - CONTINUATION_HEADER_HEIGHT;
+      // Nas folhas seguintes: NÃO há cabeçalho e NÃO há rodapé!
+      // A folha inteira está disponível para o texto continuado:
+      currentCapacity = PAGE_USABLE_HEIGHT;
     }
   }
 
-  // Verificar se o fechamento/assinatura cabe na página atual
-  if (currentHeight + closingHeight <= currentCapacity) {
-    pages.push(currentPageBlocks);
-  } else {
-    // Se não couber, mover o último bloco (se houver mais de 1) para a nova página junto com a assinatura
+  // Verificação de fechamento na folha final:
+  if (currentHeight + closingHeight > currentCapacity) {
     if (currentPageBlocks.length > 1) {
-      const lastBlock = currentPageBlocks.pop()!;
+      // Mover o último bloco para acompanhar a assinatura na folha seguinte
+      const movedBlock = currentPageBlocks.pop()!;
       pages.push(currentPageBlocks);
-      pages.push([lastBlock]);
+      pages.push([movedBlock]);
     } else {
       pages.push(currentPageBlocks);
       pages.push([]);
+    }
+  } else {
+    // Se todos os blocos couberam na primeira página mas o fechamento não coube,
+    // movemos o último bloco para que a segunda folha não fique apenas com a assinatura.
+    if (pages.length === 0 && currentPageBlocks.length > 1) {
+      const movedBlock = currentPageBlocks.pop()!;
+      pages.push(currentPageBlocks);
+      pages.push([movedBlock]);
+    } else {
+      pages.push(currentPageBlocks);
     }
   }
 
@@ -466,7 +436,7 @@ export function DynamicDocumentSheet({
     const closingEl = container.querySelector('[data-measure="closing"]') as HTMLElement | null;
     const blockEls = container.querySelectorAll('[data-measure="block"]');
 
-    const headerHeight = headerEl ? headerEl.offsetHeight + 16 : 90;
+    const headerHeight = headerEl ? headerEl.offsetHeight + 16 : 105;
     const topMatterHeight = topMatterEl ? topMatterEl.offsetHeight + 12 : getTopMatterHeight(docType, metadata);
     const closingHeight = closingEl ? closingEl.offsetHeight + 16 : getClosingHeight(docType, metadata);
 
@@ -642,7 +612,7 @@ export function DynamicDocumentSheet({
               )}
               {!metadata.membersPresent && !metadata.membersAbsent && (
                 <>
-                  <div className="border-r border-zinc-300 p-2"><strong className="text-black">Membros Presentes:</strong></div>
+                  <div className="border-r border-b border-zinc-300 p-2"><strong className="text-black">Membros Presentes:</strong></div>
                   <div className="p-2">12</div>
                 </>
               )}
@@ -967,7 +937,7 @@ export function DynamicDocumentSheet({
         className="w-full flex flex-col items-center select-text"
       >
         <div
-          className="a4-page bg-white text-zinc-900 border border-zinc-300 shadow-xl w-full max-w-[210mm] min-h-[297mm] h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] font-sans flex flex-col justify-center relative"
+          className="a4-page bg-white text-zinc-900 border border-zinc-300 shadow-xl w-full max-w-[210mm] min-h-[297mm] h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] font-sans flex flex-col justify-center relative overflow-hidden"
           style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
         >
           <div className="border-4 border-double border-[#d98a1a] rounded-2xl p-6 sm:p-8 space-y-6 text-center bg-gradient-to-b from-white to-amber-50/20">
@@ -1022,8 +992,6 @@ export function DynamicDocumentSheet({
   // =========================================================================
   // DOCUMENTOS OFICIAIS PADRONIZADOS MULTIPÁGINA A4
   // =========================================================================
-  const totalPages = pages.length;
-
   return (
     <>
       {/* Container invisível para medição de altura exata com o motor do navegador */}
@@ -1063,56 +1031,33 @@ export function DynamicDocumentSheet({
       >
         {pages.map((pageBlocks, pageIdx) => {
           const isFirst = pageIdx === 0;
-          const isLast = pageIdx === totalPages - 1;
+          const isLast = pageIdx === pages.length - 1;
           const pageNum = pageIdx + 1;
 
           return (
             <div
               key={pageIdx}
               data-page-number={pageNum}
-              className="a4-page bg-white text-zinc-900 border border-zinc-300 shadow-xl w-full max-w-[210mm] min-h-[297mm] h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] font-sans flex flex-col justify-between relative transition-shadow"
+              className="a4-page bg-white text-zinc-900 border border-zinc-300 shadow-xl w-full max-w-[210mm] min-h-[297mm] h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] font-sans flex flex-col justify-start relative transition-shadow overflow-hidden"
               style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
             >
-              {/* Seção Superior e Conteúdo da Página */}
-              <div className="flex-1 flex flex-col justify-start">
-                {/* Página 1: Cabeçalho Institucional Oficial Unicamp */}
-                {isFirst && (
-                  <div className="mb-4">
-                    <DocumentHeader metadata={metadata} />
-                  </div>
-                )}
-
-                {/* Páginas de Continuação (2+): Cabeçalho de Continuação Oficial */}
-                {!isFirst && (
-                  <div className="flex items-center justify-between pb-2 mb-4 border-b border-zinc-300 text-[10px] text-zinc-500 font-sans shrink-0">
-                    <span className="font-semibold uppercase tracking-wider text-zinc-600">
-                      Universidade Estadual de Campinas • {metadata.unitName || "Unicamp"}
-                    </span>
-                    <span className="font-medium text-zinc-500">
-                      {getDocumentTitleSummary(docType, metadata)} — Fls. {pageNum}
-                    </span>
-                  </div>
-                )}
-
-                {/* Página 1: Top Matter (Título, Ementa, Assunto, Vocativo, etc.) */}
-                {isFirst && renderTopMatter()}
-
-                {/* Parágrafos e Listas da Página Corrente */}
-                <div className="pt-2 flex-1">
-                  <RenderBlocks blocks={pageBlocks} paragraphClassName={paragraphClassName} />
+              {/* Página 1: Cabeçalho Institucional Oficial Unicamp */}
+              {isFirst && (
+                <div className="mb-4">
+                  <DocumentHeader metadata={metadata} />
                 </div>
+              )}
 
-                {/* Última Página: Cláusula de Vigência, Fecho, Assinatura e Destinatário */}
-                {isLast && renderClosing()}
+              {/* Página 1: Top Matter (Título, Ementa, Assunto, Vocativo, etc.) */}
+              {isFirst && renderTopMatter()}
+
+              {/* Parágrafos e Listas da Página Corrente */}
+              <div className={isFirst ? "pt-2" : "pt-0"}>
+                <RenderBlocks blocks={pageBlocks} paragraphClassName={paragraphClassName} />
               </div>
 
-              {/* Rodapé Oficial da Página com Numeração */}
-              <div className="pt-3 border-t border-zinc-200 flex items-center justify-between text-[10px] text-zinc-400 font-sans select-none shrink-0 print:border-zinc-300">
-                <span>Universidade Estadual de Campinas</span>
-                <span className="font-medium text-zinc-500">
-                  Página {pageNum} de {totalPages}
-                </span>
-              </div>
+              {/* Última Página: Cláusula de Vigência, Fecho, Assinatura e Destinatário */}
+              {isLast && renderClosing()}
             </div>
           );
         })}

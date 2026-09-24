@@ -349,7 +349,7 @@ html[data-high-contrast="true"] .diff-deleted {
   body.printing-sheet #unicamp-print-container .a4-page {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     visibility: visible !important;
     position: relative !important;
     box-sizing: border-box !important;
