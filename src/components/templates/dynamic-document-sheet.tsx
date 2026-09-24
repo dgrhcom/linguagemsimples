@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useLayoutEffect, useRef, useEffect } from "react";
+import React, { useMemo, useEffect } from "react";
 import Image from "next/image";
 import { DocumentType, UniversalDocumentMetadata } from "@/types/document";
 import documentTypesData from "@/data/document-types/document-types.json";
@@ -37,40 +37,63 @@ export function FormattedInline({ text }: { text: string }) {
 }
 
 export type BodyBlock =
-  | { type: "paragraph"; text: string; id: string }
+  | { type: "paragraph"; text: string; id: string; isContinuation?: boolean }
   | { type: "bullet-list"; items: string[]; id: string }
   | { type: "numbered-list"; items: string[]; id: string };
 
 /**
- * Divide parágrafos longos (> 350 caracteres) em frases menores
+ * Divide parágrafos longos (> 240 caracteres) em frases ou orações menores
  * para que a interrupção no final da primeira página e a continuação
- * na segunda folha ocorram de maneira natural e elegante.
+ * na segunda folha ocorram de maneira natural, fluida e elegante.
  */
-function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 350): BodyBlock[] {
+function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 240): BodyBlock[] {
   if (text.length <= maxChars) {
-    return [{ type: "paragraph", text, id: baseId }];
+    return [{ type: "paragraph", text, id: baseId, isContinuation: false }];
   }
 
-  const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
-  if (sentences.length <= 1) {
-    return [{ type: "paragraph", text, id: baseId }];
+  // Dividir por sentenças (. ! ?)
+  const rawParts = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
+
+  // Se alguma sentença ainda for excessivamente longa (> maxChars), dividir por vírgula / ponto-e-vírgula
+  const parts: string[] = [];
+  for (const part of rawParts) {
+    if (part.length <= maxChars) {
+      parts.push(part);
+    } else {
+      const subParts = part.match(/[^,;:]+[,;:]+(\s+|$)|[^,;:]+$/g) || [part];
+      parts.push(...subParts);
+    }
+  }
+
+  if (parts.length <= 1) {
+    return [{ type: "paragraph", text, id: baseId, isContinuation: false }];
   }
 
   const result: BodyBlock[] = [];
   let current = "";
-  for (let i = 0; i < sentences.length; i++) {
-    const s = sentences[i];
+  for (let i = 0; i < parts.length; i++) {
+    const s = parts[i];
     if (current.length + s.length > maxChars && current.length > 0) {
-      result.push({ type: "paragraph", text: current.trim(), id: `${baseId}-c${result.length}` });
+      result.push({
+        type: "paragraph",
+        text: current.trim(),
+        id: `${baseId}-c${result.length}`,
+        isContinuation: result.length > 0
+      });
       current = s;
     } else {
       current += s;
     }
   }
   if (current.trim()) {
-    result.push({ type: "paragraph", text: current.trim(), id: `${baseId}-c${result.length}` });
+    result.push({
+      type: "paragraph",
+      text: current.trim(),
+      id: `${baseId}-c${result.length}`,
+      isContinuation: result.length > 0
+    });
   }
-  return result.length > 0 ? result : [{ type: "paragraph", text, id: baseId }];
+  return result.length > 0 ? result : [{ type: "paragraph", text, id: baseId, isContinuation: false }];
 }
 
 /**
@@ -132,8 +155,14 @@ export function RenderBlocks({
     <div className="space-y-3">
       {blocks.map((block) => {
         if (block.type === "paragraph") {
+          // Se for uma continuação de frase/parágrafo quebrado entre páginas,
+          // removemos o recuo de primeira linha (indent-8) para manter alinhamento natural
+          const effectiveClassName = block.isContinuation
+            ? paragraphClassName.replace(/\bindent-\d+\b/g, "").trim()
+            : paragraphClassName;
+
           return (
-            <p key={block.id} className={paragraphClassName}>
+            <p key={block.id} className={effectiveClassName}>
               <FormattedInline text={block.text} />
             </p>
           );
@@ -181,18 +210,18 @@ export function FormattedParagraphs({
  */
 function estimateBlockHeight(block: BodyBlock): number {
   if (block.type === "paragraph") {
-    // ~75 caracteres por linha para largura útil de 165mm com Arial 12px
-    const lines = Math.max(1, Math.ceil((block.text || "").length / 75));
-    return lines * 20 + 14; // linha ~20px + margem inferior space-y-3 ~14px
+    // ~70 caracteres por linha para largura útil de 165mm com Arial 12px
+    const lines = Math.max(1, Math.ceil((block.text || "").length / 70));
+    return lines * 21 + 14; // linha ~21px + margem inferior space-y-3 ~14px
   }
   if (block.type === "bullet-list" || block.type === "numbered-list") {
     const totalLines = (block.items || []).reduce(
-      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 70)),
+      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 65)),
       0
     );
-    return totalLines * 20 + 16;
+    return totalLines * 21 + 16;
   }
-  return 34;
+  return 35;
 }
 
 /**
@@ -200,19 +229,19 @@ function estimateBlockHeight(block: BodyBlock): number {
  */
 function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 44; // Título
-    if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 45)) * 19 + 14;
-    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 75)) * 20 + 14;
+    let h = 48; // Título
+    if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 45)) * 20 + 16;
+    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 70)) * 21 + 16;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 130 + (metadata.subject ? 30 : 0);
+    return 135 + (metadata.subject ? 35 : 0);
   }
   if (docType === "carta") {
-    return 150 + (metadata.subject ? 30 : 0);
+    return 155 + (metadata.subject ? 35 : 0);
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 135 + (metadata.subject || metadata.memoAssunto ? 30 : 0);
+    return 140 + (metadata.subject || metadata.memoAssunto ? 35 : 0);
   }
   if (["ata", "minutes"].includes(docType)) {
     return 260; // Título + Grid da Sessão
@@ -221,18 +250,18 @@ function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMe
     return 150;
   }
   if (["parecer", "opinion"].includes(docType)) {
-    return 115;
+    return 120;
   }
   if (docType === "informacao") {
-    return 130;
+    return 135;
   }
   if (["decisao", "despacho"].includes(docType)) {
-    return 115;
+    return 120;
   }
   if (["declaracao", "declaration"].includes(docType)) {
-    return 70;
+    return 75;
   }
-  return 80; // Comunicado, Relatório, Outros
+  return 85; // Comunicado, Relatório, Outros
 }
 
 /**
@@ -240,26 +269,26 @@ function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMe
  */
 function getClosingHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 135; // Data + Assinatura
-    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 75)) * 20 + 14;
+    let h = 140; // Data + Assinatura
+    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 70)) * 21 + 16;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 215; // Fecho + Assinatura + Bloco de Destinatário na base
+    return 225; // Fecho + Assinatura + Bloco de Destinatário na base
   }
   if (docType === "carta") {
-    return 130;
+    return 135;
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 115;
+    return 120;
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 130; // Encerramento + Assinaturas duplas
+    return 140; // Encerramento + Assinaturas duplas
   }
   if (docType === "pauta") {
     return 0; // Pauta não possui assinatura na base
   }
-  return 120; // Parecer, Informação, Decisão, Declaração, Outros
+  return 125; // Parecer, Informação, Decisão, Declaração, Outros
 }
 
 /**
@@ -278,19 +307,13 @@ function getParagraphClassName(docType: DocumentType): string {
 
 /**
  * Algoritmo de particionamento estrito em folhas A4:
- * Garante que o texto seja interrompido no final da primeira página e continue na segunda folha,
+ * Garante que o texto seja interrompido no ponto seguro da primeira página e continue na segunda folha,
  * sem vazar por baixo nem sobrepor folhas seguintes.
  */
 export function partitionBlocksIntoPages(
   blocks: BodyBlock[],
   docType: DocumentType,
-  metadata: UniversalDocumentMetadata,
-  measuredHeights?: {
-    headerHeight?: number;
-    topMatterHeight?: number;
-    closingHeight?: number;
-    blockHeights?: number[];
-  }
+  metadata: UniversalDocumentMetadata
 ): BodyBlock[][] {
   const isCertificado = ["certificado"].includes(docType);
   if (isCertificado) {
@@ -300,28 +323,53 @@ export function partitionBlocksIntoPages(
   // Dimensões físicas A4 a 96 DPI: 297mm = 1122.5px.
   // Margens: 15mm superior (56.7px) + 15mm inferior (56.7px) = 113.4px.
   // Altura útil interna total: 1009px.
-  // Adotamos 920px como limite operacional seguro para garantir margem limpa na base:
-  const PAGE_USABLE_HEIGHT = 920;
+  // Adotamos 860px como teto operacional seguro para garantir margem limpa e respiro generoso:
+  const PAGE_MAX_CONTENT_HEIGHT = 860;
 
-  const headerHeight = measuredHeights?.headerHeight ?? 105;
-  const topMatterHeight = measuredHeights?.topMatterHeight ?? getTopMatterHeight(docType, metadata);
-  const closingHeight = measuredHeights?.closingHeight ?? getClosingHeight(docType, metadata);
+  const headerHeight = 105;
+  const topMatterHeight = getTopMatterHeight(docType, metadata);
+  const closingHeight = getClosingHeight(docType, metadata);
 
-  const blockHeights = blocks.map((b, idx) => {
-    return measuredHeights?.blockHeights?.[idx] ?? estimateBlockHeight(b);
-  });
-
+  const blockHeights = blocks.map(b => estimateBlockHeight(b));
   const totalBlocksHeight = blockHeights.reduce((acc, h) => acc + h, 0);
-  const page1BodyCapacity = PAGE_USABLE_HEIGHT - headerHeight - topMatterHeight;
 
-  // CASO 1: Todo o documento cabe com folga na Página 1 (corpo + fechamento/assinaturas)
-  if (totalBlocksHeight + closingHeight <= page1BodyCapacity) {
+  // Capacidade útil de texto na Página 1 se contiver o fechamento (página única)
+  const singlePageBodyCapacity = Math.max(100, PAGE_MAX_CONTENT_HEIGHT - headerHeight - topMatterHeight - closingHeight);
+
+  // CASO 1: Todo o documento cabe com folga e elegância na Página 1 (corpo + fechamento/assinaturas)
+  if (totalBlocksHeight <= singlePageBodyCapacity) {
     return [blocks];
   }
 
   // CASO 2: Documento multipágina.
-  // Na Página 1, o fechamento NÃO entra (será posicionado no final da última página).
-  // A Página 1 recebe o máximo de blocos que couberem estritamente em page1BodyCapacity.
+  // Capacidade máxima segura de texto da Página 1 (sem fechamento).
+  // Limitamos estritamente a 440px para garantir que o texto seja interrompido
+  // bem antes do final da folha, respeitando rigorosamente a margem inferior de 15mm:
+  const page1BodyCapacity = Math.min(440, PAGE_MAX_CONTENT_HEIGHT - headerHeight - topMatterHeight - 60);
+
+  // Se o total de blocos couber em page1BodyCapacity, mas ultrapassou singlePageBodyCapacity:
+  // Significa que o documento necessita de uma segunda página devido ao bloco de fechamento/assinaturas.
+  // Para evitar que a Página 2 fique com apenas a assinatura isolada (sem texto):
+  // Dividimos os blocos equilibradamente entre a Página 1 e a Página 2:
+  if (totalBlocksHeight <= page1BodyCapacity && blocks.length > 1) {
+    const halfHeight = totalBlocksHeight / 2;
+    const page1: BodyBlock[] = [];
+    const page2: BodyBlock[] = [];
+    let acc = 0;
+    for (let i = 0; i < blocks.length; i++) {
+      if (acc + blockHeights[i] <= halfHeight || page1.length === 0) {
+        page1.push(blocks[i]);
+        acc += blockHeights[i];
+      } else {
+        page2.push(blocks[i]);
+      }
+    }
+    if (page2.length > 0) {
+      return [page1, page2];
+    }
+  }
+
+  // Particionamento padrão em páginas A4:
   const pages: BodyBlock[][] = [];
   let currentPageBlocks: BodyBlock[] = [];
   let currentHeight = 0;
@@ -335,15 +383,15 @@ export function partitionBlocksIntoPages(
       currentPageBlocks.push(block);
       currentHeight += h;
     } else {
-      // Interromper a folha atual no ponto exato e iniciar a próxima folha A4
+      // Interromper a folha no limite seguro e iniciar a folha seguinte
       if (currentPageBlocks.length > 0) {
         pages.push(currentPageBlocks);
       }
       currentPageBlocks = [block];
       currentHeight = h;
       // Nas folhas seguintes: NÃO há cabeçalho e NÃO há rodapé!
-      // A folha inteira está disponível para o texto continuado:
-      currentCapacity = PAGE_USABLE_HEIGHT;
+      // Toda a altura útil está disponível para o texto continuado:
+      currentCapacity = PAGE_MAX_CONTENT_HEIGHT;
     }
   }
 
@@ -355,22 +403,23 @@ export function partitionBlocksIntoPages(
       pages.push(currentPageBlocks);
       pages.push([movedBlock]);
     } else {
+      // Se currentPageBlocks só tem 1 bloco, e pages já tem blocos anteriores:
+      if (pages.length > 0) {
+        const lastPage = pages[pages.length - 1];
+        if (lastPage.length > 1) {
+          const borrowed = lastPage.pop()!;
+          currentPageBlocks.unshift(borrowed);
+        }
+      }
       pages.push(currentPageBlocks);
-      pages.push([]);
     }
   } else {
-    // Se todos os blocos couberam na primeira página mas o fechamento não coube,
-    // movemos o último bloco para que a segunda folha não fique apenas com a assinatura.
-    if (pages.length === 0 && currentPageBlocks.length > 1) {
-      const movedBlock = currentPageBlocks.pop()!;
-      pages.push(currentPageBlocks);
-      pages.push([movedBlock]);
-    } else {
-      pages.push(currentPageBlocks);
-    }
+    pages.push(currentPageBlocks);
   }
 
-  return pages.length > 0 ? pages : [[]];
+  // Garantia absoluta de integridade: NENHUMA página gerada pode ser vazia!
+  const finalPages = pages.filter(p => p.length > 0);
+  return finalPages.length > 0 ? finalPages : [blocks];
 }
 
 interface DynamicDocumentSheetProps {
@@ -410,50 +459,10 @@ export function DynamicDocumentSheet({
   // Converte texto em blocos estruturados
   const blocks = useMemo(() => parseTextToBlocks(text), [text]);
 
-  // Particionamento inicial analítico
-  const [pages, setPages] = useState<BodyBlock[][]>(() =>
-    partitionBlocksIntoPages(blocks, docType, metadata)
-  );
-
-  const measureContainerRef = useRef<HTMLDivElement>(null);
-
-  // Refinamento de paginação com medições reais do motor de renderização do navegador
-  useLayoutEffect(() => {
-    if (isCertificado) {
-      setPages([blocks]);
-      return;
-    }
-
-    const container = measureContainerRef.current;
-    if (!container) {
-      const estimated = partitionBlocksIntoPages(blocks, docType, metadata);
-      setPages(estimated);
-      return;
-    }
-
-    const headerEl = container.querySelector('[data-measure="header"]') as HTMLElement | null;
-    const topMatterEl = container.querySelector('[data-measure="top-matter"]') as HTMLElement | null;
-    const closingEl = container.querySelector('[data-measure="closing"]') as HTMLElement | null;
-    const blockEls = container.querySelectorAll('[data-measure="block"]');
-
-    const headerHeight = headerEl ? headerEl.offsetHeight + 16 : 105;
-    const topMatterHeight = topMatterEl ? topMatterEl.offsetHeight + 12 : getTopMatterHeight(docType, metadata);
-    const closingHeight = closingEl ? closingEl.offsetHeight + 16 : getClosingHeight(docType, metadata);
-
-    const measuredBlockHeights: number[] = [];
-    blockEls.forEach((el) => {
-      measuredBlockHeights.push((el as HTMLElement).offsetHeight + 12);
-    });
-
-    const refined = partitionBlocksIntoPages(blocks, docType, metadata, {
-      headerHeight,
-      topMatterHeight,
-      closingHeight,
-      blockHeights: measuredBlockHeights
-    });
-
-    setPages(refined);
-  }, [blocks, docType, metadata, isCertificado]);
+  // Particionamento A4 analítico e calibrado (sem dependência frágil de medição DOM em drawer)
+  const pages = useMemo(() => {
+    return partitionBlocksIntoPages(blocks, docType, metadata);
+  }, [blocks, docType, metadata]);
 
   useEffect(() => {
     onPageCountChange?.(pages.length);
@@ -993,42 +1002,10 @@ export function DynamicDocumentSheet({
   // DOCUMENTOS OFICIAIS PADRONIZADOS MULTIPÁGINA A4
   // =========================================================================
   return (
-    <>
-      {/* Container invisível para medição de altura exata com o motor do navegador */}
-      <div
-        ref={measureContainerRef}
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          left: "-9999px",
-          top: "-9999px",
-          width: "165mm",
-          visibility: "hidden",
-          pointerEvents: "none",
-          fontFamily: "Arial, Helvetica, sans-serif"
-        }}
-      >
-        <div data-measure="header">
-          <DocumentHeader metadata={metadata} />
-        </div>
-        <div data-measure="top-matter">
-          {renderTopMatter()}
-        </div>
-        {blocks.map((block) => (
-          <div key={block.id} data-measure="block" className="py-1">
-            <RenderBlocks blocks={[block]} paragraphClassName={paragraphClassName} />
-          </div>
-        ))}
-        <div data-measure="closing">
-          {renderClosing()}
-        </div>
-      </div>
-
-      {/* Renderização Real das Páginas A4 */}
-      <div
-        id="printable-document-sheet"
-        className="w-full flex flex-col items-center space-y-8 print:space-y-0 select-text"
-      >
+    <div
+      id="printable-document-sheet"
+      className="w-full flex flex-col items-center space-y-8 print:space-y-0 select-text"
+    >
         {pages.map((pageBlocks, pageIdx) => {
           const isFirst = pageIdx === 0;
           const isLast = pageIdx === pages.length - 1;
@@ -1062,6 +1039,5 @@ export function DynamicDocumentSheet({
           );
         })}
       </div>
-    </>
   );
 }

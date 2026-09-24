@@ -527,8 +527,21 @@ test("24. Particionamento Multipágina A4 Dinâmico para Visualização no Drawe
   assert.ok(multiPageResult.length >= 2, `Documento longo deve ser particionado em múltiplas páginas (gerou ${multiPageResult.length})`);
   assert.ok(multiPageResult[0].length > 0, "A Página 1 deve conter o primeiro conjunto de blocos");
   assert.ok(multiPageResult[1].length > 0, "A Página 2 deve conter os blocos excedentes");
+  assert.ok(multiPageResult.every(p => p.length > 0), "Nenhuma página pode ser vazia no documento multipágina");
 
-  // 3. Certificado é sempre página única
+  // 3. Documento médio que transborda para a Página 2 deve ter texto em ambas as páginas
+  const mediumText = "Cumprimentando-o cordialmente, encaminhamos para conhecimento desta Diretoria o relatório técnico conclusivo elaborado pela Comissão Especial de Avaliação Institucional.\n\nDestacamos que as considerações e apontamentos constantes do anexo deverão ser analisados pelas equipes técnicas da unidade no prazo de 15 dias úteis.\n\nOutrossim, solicitamos a indicação de representante titular e suplente para compor o grupo de trabalho interdepartamental que acompanhará a implementação das recomendações.\n\nInformamos ainda que a próxima reunião deliberativa ocorrerá na primeira semana do mês subsequente, conforme cronograma pactuado.\n\nAdemais, reiteramos a importância do estrito cumprimento dos prazos regimentais para homologação final do certame.\n\nPermanecemos à inteira disposição para prestar quaisquer esclarecimentos adicionais que se façam necessários.";
+  const mediumBlocks = parseTextToBlocks(mediumText);
+  const mediumResult = partitionBlocksIntoPages(mediumBlocks, "oficio", {
+    documentNumber: "105/2026",
+    subject: "Encaminhamento de relatório técnico conclusivo e indicação de membros para grupo de trabalho"
+  });
+
+  assert.strictEqual(mediumResult.length, 2, "Ofício com 6 parágrafos e fechamento completo deve gerar exatamente 2 páginas");
+  assert.ok(mediumResult[0].length > 0, "Página 1 do ofício deve conter texto");
+  assert.ok(mediumResult[1].length > 0, "Página 2 do ofício DEVE conter texto antes das assinaturas");
+
+  // 4. Certificado é sempre página única
   const certResult = partitionBlocksIntoPages(longBlocks, "certificado", {});
   assert.strictEqual(certResult.length, 1, "Certificado deve ser sempre de página única");
 });
