@@ -139,7 +139,7 @@ export function DynamicDocumentSheet({
 
     <div
       id="printable-document-sheet"
-      className="bg-white text-zinc-900 border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:p-0 print:border-none print:shadow-none font-sans select-text flex flex-col justify-start"
+      className="bg-white text-zinc-900 border border-zinc-300 w-full max-w-[210mm] min-h-[297mm] mx-auto p-[15mm_20mm_15mm_25mm] print:border-none print:shadow-none font-sans select-text flex flex-col justify-start"
       style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
       <div className="space-y-6">

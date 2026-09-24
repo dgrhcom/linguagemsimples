@@ -291,7 +291,7 @@ html[data-high-contrast="true"] .diff-deleted {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm 20mm 15mm 25mm;
+    margin: 0;
   }
 
   html, body {
@@ -322,9 +322,9 @@ html[data-high-contrast="true"] .diff-deleted {
     display: block !important;
     visibility: visible !important;
     position: static !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
@@ -334,11 +334,15 @@ html[data-high-contrast="true"] .diff-deleted {
     display: block !important;
     visibility: visible !important;
     position: static !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    padding-top: 15mm !important;
+    padding-bottom: 15mm !important;
+    padding-left: 25mm !important;
+    padding-right: 20mm !important;
     border: none !important;
     box-shadow: none !important;
     background: #ffffff !important;
