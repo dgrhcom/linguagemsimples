@@ -281,13 +281,17 @@ html[data-high-contrast="true"] .diff-deleted {
   border: 1px solid var(--color-clay);
 }
 
+#unicamp-print-container {
+  display: none !important;
+}
+
 /* ==========================================================================
    PRINT CSS (A4 Institucional)
    ========================================================================== */
 @media print {
   @page {
     size: A4 portrait;
-    margin: 0;
+    margin: 15mm 20mm 15mm 25mm;
   }
 
   html, body {
@@ -297,70 +301,65 @@ html[data-high-contrast="true"] .diff-deleted {
     margin: 0 !important;
     padding: 0 !important;
     font-family: Arial, Helvetica, sans-serif !important;
+    overflow: visible !important;
+    height: auto !important;
   }
 
-  body > header, body > footer, nav, aside, .no-print, button, input, select, textarea {
+  /* 1. MODO IMPRESSÃO DA FOLHA OFICIAL DO DOCUMENTO */
+  body.printing-sheet > *:not(#unicamp-print-container) {
     display: none !important;
     visibility: hidden !important;
   }
 
-  /* Hide drawer/modal overlays when printing unless containing printable sheet */
-  [role="dialog"]:not(:has(#printable-document-sheet)),
-  .fixed.inset-0:not(:has(#printable-document-sheet)) {
+  body.printing-sheet [data-radix-portal],
+  body.printing-sheet [role="dialog"],
+  body.printing-sheet .fixed.inset-0 {
     display: none !important;
     visibility: hidden !important;
   }
 
-  [role="dialog"]:has(#printable-document-sheet),
-  .fixed.inset-0:has(#printable-document-sheet) {
+  body.printing-sheet #unicamp-print-container {
     display: block !important;
     visibility: visible !important;
     position: static !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 
-  /* Document Sheet printing */
-  #printable-document-sheet {
+  body.printing-sheet #unicamp-print-container #printable-document-sheet {
     display: block !important;
     visibility: visible !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 210mm !important;
-    min-height: 297mm !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
     margin: 0 !important;
-    padding-top: 15mm !important;
-    padding-bottom: 15mm !important;
-    padding-left: 25mm !important;
-    padding-right: 20mm !important;
-    box-shadow: none !important;
+    padding: 0 !important;
     border: none !important;
+    box-shadow: none !important;
     background: #ffffff !important;
     color: #000000 !important;
     transform: none !important;
   }
 
-  #printable-document-sheet * {
+  body.printing-sheet #unicamp-print-container * {
     visibility: visible !important;
-  }
-
-  #printable-document-sheet header,
-  #printable-document-sheet footer {
-    display: block !important;
-    visibility: visible !important;
-  }
-
-  #printable-document-sheet img {
-    visibility: visible !important;
-    display: inline-block !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  #printable-document-sheet header img[alt="Logo Unicamp"],
-  #printable-document-sheet header img[src*="logo-unicamp"] {
+  body.printing-sheet #unicamp-print-container header,
+  body.printing-sheet #unicamp-print-container footer {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  body.printing-sheet #unicamp-print-container header img[alt="Logo Unicamp"],
+  body.printing-sheet #unicamp-print-container header img[src*="logo-unicamp"] {
     display: block !important;
     height: 40px !important;
     max-height: 40px !important;
@@ -372,7 +371,7 @@ html[data-high-contrast="true"] .diff-deleted {
     flex-shrink: 0 !important;
   }
 
-  #printable-document-sheet header img[alt="Logo da Unidade"] {
+  body.printing-sheet #unicamp-print-container header img[alt="Logo da Unidade"] {
     display: block !important;
     height: 40px !important;
     max-height: 40px !important;
@@ -381,10 +380,23 @@ html[data-high-contrast="true"] .diff-deleted {
     object-position: left center !important;
   }
 
-  #printable-document-sheet img[alt="Logo Unicamp"] {
-    height: 40px !important;
-    max-height: 64px !important;
-    width: 36px !important;
-    max-width: 57px !important;
+  /* 2. MODO IMPRESSÃO GERAL (Relatórios de Avaliação ou páginas convencionais) */
+  body:not(.printing-sheet) > header,
+  body:not(.printing-sheet) > footer,
+  body:not(.printing-sheet) nav,
+  body:not(.printing-sheet) aside,
+  body:not(.printing-sheet) .no-print,
+  body:not(.printing-sheet) button,
+  body:not(.printing-sheet) input,
+  body:not(.printing-sheet) select,
+  body:not(.printing-sheet) textarea {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  body:not(.printing-sheet) [role="dialog"]:not(:has(#printable-document-sheet)),
+  body:not(.printing-sheet) .fixed.inset-0:not(:has(#printable-document-sheet)) {
+    display: none !important;
+    visibility: hidden !important;
   }
 }

@@ -13,13 +13,15 @@ interface TextEditorProps {
   isLoading: boolean;
   initialText?: string;
   initialDocumentType?: DocumentType;
+  onPreviewModel?: (text: string, docType: DocumentType) => void;
 }
 
 export function TextEditor({
   onAnalyze,
   isLoading,
   initialText = "",
-  initialDocumentType = "oficio"
+  initialDocumentType = "oficio",
+  onPreviewModel
 }: TextEditorProps) {
   const [text, setText] = useState(initialText);
   const [documentType, setDocumentType] = useState<DocumentType>(initialDocumentType);
@@ -420,17 +422,30 @@ export function TextEditor({
             <span><strong>{charCount}</strong> caracteres</span>
           </div>
 
-          <Button
-            type="submit"
-            disabled={isLoading || !text.trim()}
-            variant="primary"
-            size="lg"
-            leftIcon={isLoading ? (
-              <div className="w-4 h-4 border-2 border-ivory-light border-t-transparent rounded-full animate-spin" />
-            ) : null}
-          >
-            {isLoading ? "Avaliando..." : "Analisar Texto"}
-          </Button>
+          <div className="flex items-center gap-2.5">
+            <Button
+              type="button"
+              onClick={() => onPreviewModel && onPreviewModel(text, documentType)}
+              variant="secondary"
+              size="lg"
+              leftIcon={<FileText className="w-4 h-4 text-clay" />}
+              title={`Visualizar o texto aplicado no modelo de ${currentDocInfo?.label || "documento"}`}
+            >
+              Ver no Modelo
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={isLoading || !text.trim()}
+              variant="primary"
+              size="lg"
+              leftIcon={isLoading ? (
+                <div className="w-4 h-4 border-2 border-ivory-light border-t-transparent rounded-full animate-spin" />
+              ) : null}
+            >
+              {isLoading ? "Avaliando..." : "Avaliar Texto"}
+            </Button>
+          </div>
         </div>
       </div>
     </form>

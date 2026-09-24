@@ -404,10 +404,10 @@ export async function generateDocumentDocx(
         spacing: { before: 180, after: 180 },
         children: [
           new TextRun({
-            text: docType === "portaria" ? `PORTARIA nº ${metadata.documentNumber || "01/2026"}` :
-                  docType === "resolucao" ? `RESOLUÇÃO GR-nº ${metadata.documentNumber || "01/2026"}` :
-                  docType === "deliberacao" ? `DELIBERAÇÃO CONSU-A-nº ${metadata.documentNumber || "01/2026"}` :
-                  `INSTRUÇÃO NORMATIVA DGRH nº ${metadata.documentNumber || "01/2026"}`,
+            text: docType === "portaria" ? `PORTARIA ${metadata.documentNumber || "01/2026"}` :
+                  docType === "resolucao" ? `RESOLUÇÃO GR-${metadata.documentNumber || "01/2026"}` :
+                  docType === "deliberacao" ? `DELIBERAÇÃO CONSU-A-${metadata.documentNumber || "01/2026"}` :
+                  `INSTRUÇÃO NORMATIVA ${metadata.documentNumber || "01/2026"}`,
             bold: true,
             size: 22,
             font: "Arial"
@@ -651,7 +651,7 @@ export async function generateDocumentDocx(
         spacing: { before: 120, after: 180 },
         children: [
           new TextRun({
-            text: `${docType === "oficio-circular" ? "OFÍCIO CIRCULAR" : "OFÍCIO"} nº ${metadata.documentNumber || "105/2026"}`,
+            text: `${docType === "oficio-circular" ? "OFÍCIO CIRCULAR" : "OFÍCIO"} ${metadata.documentNumber || "105/2026"}`,
             bold: true,
             size: 22,
             font: "Arial"
@@ -809,7 +809,7 @@ export async function generateDocumentDocx(
         spacing: { before: 120, after: 180 },
         children: [
           new TextRun({
-            text: `MEMORANDO nº ${metadata.documentNumber || "42/2026"}`,
+            text: `MEMORANDO ${metadata.documentNumber || "42/2026"}`,
             bold: true,
             size: 22,
             font: "Arial"
@@ -958,7 +958,7 @@ export async function generateDocumentDocx(
         spacing: { before: 180, after: 120 },
         children: [
           new TextRun({
-            text: `PARECER nº ${metadata.documentNumber || "01/2026"}`,
+            text: `PARECER ${metadata.documentNumber || "01/2026"}`,
             bold: true,
             size: 22,
             font: "Arial"
@@ -1197,7 +1197,7 @@ export async function generateDocumentDocx(
         spacing: { before: 120, after: 120 },
         children: [
           new TextRun({
-            text: `INFORMAÇÃO Nº ${metadata.documentNumber || "18/2026"}`,
+            text: `INFORMAÇÃO ${metadata.documentNumber || "18/2026"}`,
             bold: true,
             size: 22,
             font: "Arial"
@@ -1292,7 +1292,7 @@ export async function generateDocumentDocx(
   // J. DECISÃO E DESPACHO
   else if (isDecisaoOuDespacho) {
     const titleText = docType === "decisao"
-      ? `DECISÃO Nº ${metadata.documentNumber || "08/2026"}`
+      ? `DECISÃO ${metadata.documentNumber || "08/2026"}`
       : "DESPACHO DO COORDENADOR GERAL";
 
     docChildren.push(
@@ -1409,7 +1409,7 @@ export async function generateDocumentDocx(
         spacing: { before: 180, after: 180 },
         children: [
           new TextRun({
-            text: `${currentTypeInfo.label.toUpperCase()} DGRH Nº ${metadata.documentNumber || "01/2026"}`,
+            text: `${currentTypeInfo.label.toUpperCase()} ${metadata.documentNumber || "01/2026"}`,
             bold: true,
             size: 22,
             font: "Arial"

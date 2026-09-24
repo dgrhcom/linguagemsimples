@@ -221,6 +221,45 @@ export function DynamicDocumentDrawer({
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleBeforePrint = () => {
+      const sheetElement = document.getElementById("printable-document-sheet");
+      if (sheetElement) {
+        let printContainer = document.getElementById("unicamp-print-container");
+        if (!printContainer) {
+          printContainer = document.createElement("div");
+          printContainer.id = "unicamp-print-container";
+          document.body.appendChild(printContainer);
+        }
+        printContainer.innerHTML = sheetElement.outerHTML;
+        document.body.classList.add("printing-sheet");
+      }
+    };
+
+    const handleAfterPrint = () => {
+      document.body.classList.remove("printing-sheet");
+      const printContainer = document.getElementById("unicamp-print-container");
+      if (printContainer) {
+        printContainer.innerHTML = "";
+      }
+    };
+
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+      document.body.classList.remove("printing-sheet");
+      const printContainer = document.getElementById("unicamp-print-container");
+      if (printContainer) {
+        printContainer.innerHTML = "";
+      }
+    };
+  }, [isOpen]);
+
   const handlePrint = () => {
     const sheetElement = document.getElementById("printable-document-sheet");
     if (!sheetElement) {
@@ -228,139 +267,38 @@ export function DynamicDocumentDrawer({
       return;
     }
 
-    // Capture all existing document stylesheets and style blocks
-    const headStyles = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
-      .map((el) => el.outerHTML)
-      .join("\n");
-
-    const baseHref = window.location.origin;
-
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="pt-BR">
-      <head>
-        <meta charset="UTF-8">
-        <base href="${baseHref}/">
-        <title>Imprimir Documento - ${currentTypeInfo.label}</title>
-        ${headStyles}
-        <style>
-          @page {
-            size: A4 portrait;
-            margin: 15mm 20mm 15mm 25mm;
-          }
-          * {
-            box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #ffffff !important;
-            color: #000000 !important;
-            font-family: Arial, Helvetica, sans-serif !important;
-          }
-          #printable-document-sheet {
-            width: 100% !important;
-            max-width: 100% !important;
-            min-height: auto !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
-            background: #ffffff !important;
-          }
-          #printable-document-sheet header {
-            display: block !important;
-            visibility: visible !important;
-            border-bottom: 1px solid #000000 !important;
-            padding-bottom: 12px !important;
-            margin-bottom: 16px !important;
-            width: 100% !important;
-          }
-          #printable-document-sheet footer {
-            display: block !important;
-            visibility: visible !important;
-          }
-          /* Trava estrita para o logotipo Unicamp (JPG) */
-          #printable-document-sheet header img[alt="Logo Unicamp"],
-          #printable-document-sheet header img[src*="logo-unicamp"] {
-            width: 36px !important;
-            height: 40px !important;
-            max-width: 36px !important;
-            max-height: 40px !important;
-            min-width: 36px !important;
-            object-fit: contain !important;
-            object-position: left center !important;
-            display: block !important;
-            flex-shrink: 0 !important;
-          }
-          /* Logotipo da Unidade com a mesma altura do logo Unicamp e largura proporcional */
-          #printable-document-sheet header img[alt="Logo da Unidade"] {
-            display: block !important;
-            height: 40px !important;
-            max-height: 40px !important;
-            width: auto !important;
-            object-fit: contain !important;
-            object-position: left center !important;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          td, th {
-            padding: 4px 8px;
-          }
-        </style>
-      </head>
-      <body>
-        ${sheetElement.outerHTML}
-      </body>
-      </html>
-    `;
-
-    // Remove any leftover iframe
-    const oldFrame = document.getElementById("unicamp-print-frame");
-    if (oldFrame) {
-      oldFrame.remove();
+    let printContainer = document.getElementById("unicamp-print-container");
+    if (!printContainer) {
+      printContainer = document.createElement("div");
+      printContainer.id = "unicamp-print-container";
+      document.body.appendChild(printContainer);
     }
 
-    const printIframe = document.createElement("iframe");
-    printIframe.id = "unicamp-print-frame";
-    printIframe.style.position = "fixed";
-    printIframe.style.left = "-9999px";
-    printIframe.style.top = "-9999px";
-    printIframe.style.width = "210mm";
-    printIframe.style.height = "297mm";
-    printIframe.style.border = "none";
-    printIframe.style.zIndex = "-9999";
-    document.body.appendChild(printIframe);
+    // Clonar o elemento timbrado oficial no container de impressão direto
+    printContainer.innerHTML = sheetElement.outerHTML;
 
-    const iframeDoc = printIframe.contentWindow?.document;
-    if (iframeDoc) {
-      iframeDoc.open();
-      iframeDoc.write(htmlContent);
-      iframeDoc.close();
+    // Atualizar título para sugerir nome de arquivo limpo no "Salvar como PDF"
+    const originalTitle = document.title;
+    const cleanDocName = (currentTypeInfo.label || "Documento").replace(/[^a-zA-Z0-9À-ž]/g, "_");
+    document.title = `${cleanDocName}_Unicamp`;
 
-      const triggerIframePrint = () => {
-        try {
-          printIframe.contentWindow?.focus();
-          printIframe.contentWindow?.print();
-        } catch (err) {
-          console.error("Print error:", err);
-        } finally {
-          setTimeout(() => {
-            printIframe.remove();
-          }, 1500);
-        }
-      };
+    document.body.classList.add("printing-sheet");
 
-      if (iframeDoc.readyState === "complete") {
-        setTimeout(triggerIframePrint, 250);
-      } else {
-        printIframe.onload = () => setTimeout(triggerIframePrint, 250);
+    const cleanup = () => {
+      document.body.classList.remove("printing-sheet");
+      document.title = originalTitle;
+      if (printContainer) {
+        printContainer.innerHTML = "";
       }
-    }
+      window.removeEventListener("afterprint", cleanup);
+    };
+
+    window.addEventListener("afterprint", cleanup);
+
+    // Disparar o diálogo nativo de impressão
+    setTimeout(() => {
+      window.print();
+    }, 50);
   };
 
   const handleCopyFormatted = async () => {

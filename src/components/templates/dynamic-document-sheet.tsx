@@ -156,10 +156,10 @@ export function DynamicDocumentSheet({
             {/* Título do Ato Normativo (conforme modelo timbrado oficial) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {docType === "portaria" && `PORTARIA nº ${metadata.documentNumber || "01/2026"}`}
-                {docType === "resolucao" && `RESOLUÇÃO GR-nº ${metadata.documentNumber || "01/2026"}`}
-                {docType === "deliberacao" && `DELIBERAÇÃO CONSU-A-nº ${metadata.documentNumber || "01/2026"}`}
-                {docType === "instrucao-normativa" && `INSTRUÇÃO NORMATIVA DGRH nº ${metadata.documentNumber || "01/2026"}`}
+                {docType === "portaria" && `PORTARIA ${metadata.documentNumber || "01/2026"}`}
+                {docType === "resolucao" && `RESOLUÇÃO GR-${metadata.documentNumber || "01/2026"}`}
+                {docType === "deliberacao" && `DELIBERAÇÃO CONSU-A-${metadata.documentNumber || "01/2026"}`}
+                {docType === "instrucao-normativa" && `INSTRUÇÃO NORMATIVA ${metadata.documentNumber || "01/2026"}`}
               </h2>
             </div>
 
@@ -269,7 +269,7 @@ export function DynamicDocumentSheet({
             {/* Título do Ofício (sem linha abaixo e sem sigla DGRH fixa) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {docType === "oficio-circular" ? "OFÍCIO CIRCULAR" : "OFÍCIO"} nº {metadata.documentNumber || "105/2026"}
+                {docType === "oficio-circular" ? "OFÍCIO CIRCULAR" : "OFÍCIO"} {metadata.documentNumber || "105/2026"}
               </h2>
             </div>
 
@@ -387,7 +387,7 @@ export function DynamicDocumentSheet({
             {/* Título do Memorando (sem linha abaixo e sem DGRH fixo) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                MEMORANDO nº {metadata.documentNumber || "42/2026"}
+                MEMORANDO {metadata.documentNumber || "42/2026"}
               </h2>
             </div>
 
@@ -572,7 +572,7 @@ export function DynamicDocumentSheet({
             {/* Título do Parecer (sem DGRH fixo) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                PARECER nº {metadata.documentNumber || "01/2026"}
+                PARECER {metadata.documentNumber || "01/2026"}
               </h2>
             </div>
 
@@ -637,7 +637,7 @@ export function DynamicDocumentSheet({
             {/* Título da Informação (sem - DGRH fixo) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                INFORMAÇÃO Nº {metadata.documentNumber || "18/2026"}
+                INFORMAÇÃO {metadata.documentNumber || "18/2026"}
               </h2>
             </div>
 
@@ -687,7 +687,7 @@ export function DynamicDocumentSheet({
           <div className="space-y-5 pt-1">
             <div className="border-b border-zinc-300 pb-2">
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {docType === "decisao" ? `DECISÃO Nº ${metadata.documentNumber || "08/2026"}` : "DESPACHO DO COORDENADOR GERAL"}
+                {docType === "decisao" ? `DECISÃO ${metadata.documentNumber || "08/2026"}` : "DESPACHO DO COORDENADOR GERAL"}
               </h2>
             </div>
 
@@ -823,7 +823,7 @@ export function DynamicDocumentSheet({
           <div className="space-y-5 pt-1">
             <div className="pb-2">
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {currentTypeInfo.label.toUpperCase()} DGRH Nº {metadata.documentNumber || "01/2026"}
+                {currentTypeInfo.label.toUpperCase()} {metadata.documentNumber || "01/2026"}
               </h2>
               {metadata.subject && (
                 <p className="text-xs text-zinc-800 font-bold mt-2">

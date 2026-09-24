@@ -11,6 +11,7 @@ import { ExportModal } from "@/components/export/export-modal";
 import { SettingsModal } from "@/components/layout/settings-modal";
 import { DynamicDocumentDrawer } from "@/components/templates/dynamic-document-drawer";
 import { AnalysisInput, AnalysisResult, Finding } from "@/types/analysis";
+import { DocumentType } from "@/types/document";
 
 import { getStoredAiHeaders } from "@/lib/ai";
 import documentTypesData from "@/data/document-types/document-types.json";
@@ -38,6 +39,15 @@ export default function AnalisarPage() {
 	const [isExportOpen, setIsExportOpen] = useState(false);
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 	const [isTemplateDrawerOpen, setIsTemplateDrawerOpen] = useState(false);
+	const [preAnalysisDrawer, setPreAnalysisDrawer] = useState<{
+		isOpen: boolean;
+		text: string;
+		docType: DocumentType;
+	}>({
+		isOpen: false,
+		text: "",
+		docType: "oficio"
+	});
 	const [toastMessage, setToastMessage] = useState<string | null>(null);
 
 	const [aiProviderName, setAiProviderName] = useState<string>("Motor Unicamp (Offline)");
@@ -391,7 +401,18 @@ export default function AnalisarPage() {
 						</button>
 					</div>
 
-					<TextEditor onAnalyze={handleAnalyze} isLoading={loading} initialText={draftInitialText} />
+					<TextEditor
+						onAnalyze={handleAnalyze}
+						isLoading={loading}
+						initialText={draftInitialText}
+						onPreviewModel={(editorText, docType) => {
+							setPreAnalysisDrawer({
+								isOpen: true,
+								text: editorText,
+								docType
+							});
+						}}
+					/>
 				</div>
 			)}
 
@@ -576,6 +597,13 @@ export default function AnalisarPage() {
 					docType={result.input.documentType || "oficio"}
 				/>
 			)}
+
+			<DynamicDocumentDrawer
+				isOpen={preAnalysisDrawer.isOpen}
+				onClose={() => setPreAnalysisDrawer(prev => ({ ...prev, isOpen: false }))}
+				text={preAnalysisDrawer.text}
+				docType={preAnalysisDrawer.docType}
+			/>
 		</div>
 	);
 }
