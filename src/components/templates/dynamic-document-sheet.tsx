@@ -42,11 +42,11 @@ export type BodyBlock =
   | { type: "numbered-list"; items: string[]; id: string };
 
 /**
- * Divide parágrafos longos (> 240 caracteres) em frases ou orações menores
- * para que a interrupção no final da primeira página e a continuação
- * na segunda folha ocorram de maneira natural, fluida e elegante.
+ * Divide parágrafos excepcionalmente longos (> 750 caracteres) em sentenças
+ * para permitir que quebras de página ocorram no final de uma frase sem transbordar a folha.
+ * Parágrafos normais (até ~750 caracteres) são mantidos 100% íntegros como uma unidade textual coesa.
  */
-function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 240): BodyBlock[] {
+function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 750): BodyBlock[] {
   if (text.length <= maxChars) {
     return [{ type: "paragraph", text, id: baseId, isContinuation: false }];
   }
@@ -210,18 +210,18 @@ export function FormattedParagraphs({
  */
 function estimateBlockHeight(block: BodyBlock): number {
   if (block.type === "paragraph") {
-    // ~65 caracteres por linha para largura útil de 165mm com Arial 12px
-    const lines = Math.max(1, Math.ceil((block.text || "").length / 65));
-    return lines * 22 + 16; // linha ~22px + margem inferior space-y-3 ~16px
+    // ~75 caracteres por linha para largura útil de 165mm com Arial 12px
+    const lines = Math.max(1, Math.ceil((block.text || "").length / 75));
+    return lines * 20 + 12; // linha ~20px + espaçamento inferior space-y-3 ~12px
   }
   if (block.type === "bullet-list" || block.type === "numbered-list") {
     const totalLines = (block.items || []).reduce(
-      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 60)),
+      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 70)),
       0
     );
-    return totalLines * 22 + 18;
+    return totalLines * 20 + 16;
   }
-  return 38;
+  return 32;
 }
 
 /**
@@ -306,9 +306,13 @@ function getParagraphClassName(docType: DocumentType): string {
 }
 
 /**
- * Algoritmo de particionamento estrito em folhas A4:
- * Garante que o texto seja interrompido no ponto seguro da primeira página e continue na segunda folha,
- * sem vazar por baixo nem sobrepor folhas seguintes.
+ * Algoritmo de particionamento estrito em folhas A4 (Natural Fill-First):
+ * - A Página 1 acomoda o máximo de parágrafos que couberem naturalmente até a margem segura (~25mm a 30mm),
+ *   sem cortes prematuros ou áreas vazias na folha.
+ * - Quando o texto exceder a capacidade da primeira folha, ele flui sem sobressaltos para as folhas seguintes.
+ * - As folhas seguintes NÃO contêm cabeçalho nem rodapé, aproveitando toda a extensão vertical útil da página.
+ * - Regra anti-assinatura órfã: se todo o texto couber na Página 1 mas as assinaturas exigirem Página 2,
+ *   o último parágrafo acompanha o fechamento para a Página 2, garantindo conformidade com a redação oficial.
  */
 export function partitionBlocksIntoPages(
   blocks: BodyBlock[],
@@ -320,9 +324,11 @@ export function partitionBlocksIntoPages(
     return [blocks];
   }
 
-  // Teto seguro para página única com fechamento e margens generosas (~25mm a 35mm):
-  const SINGLE_PAGE_MAX_HEIGHT = 760;
-  const MULTI_PAGE_MAX_HEIGHT = 860;
+  // Teto seguro de conteúdo útil por folha A4:
+  // Página única: margem de respiro generosa para fecho + assinaturas (~30mm a 40mm)
+  const SINGLE_PAGE_MAX_HEIGHT = 860;
+  // Multipágina: aproveitamento natural do espaço até a margem segura (~25mm a 30mm)
+  const MULTI_PAGE_MAX_HEIGHT = 940;
 
   const headerHeight = 105;
   const topMatterHeight = getTopMatterHeight(docType, metadata);
@@ -331,84 +337,66 @@ export function partitionBlocksIntoPages(
   const blockHeights = blocks.map(b => estimateBlockHeight(b));
   const totalBlocksHeight = blockHeights.reduce((acc, h) => acc + h, 0);
 
-  // Capacidade útil de texto na Página 1 se contiver o fechamento completo (página única)
+  // Capacidade útil de texto na Página 1 se contiver cabeçalho, top matter, texto e fechamento completo (página única)
   const singlePageBodyCapacity = Math.max(80, SINGLE_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - closingHeight);
 
-  // CASO 1: Documento curto que cabe com total elegância em página única
+  // CASO 1: Documento cabe com elegância em página única com fechamento completo
   if (totalBlocksHeight <= singlePageBodyCapacity) {
     return [blocks];
   }
 
-  // CASO 2: Documento que requer 2 ou mais páginas.
-  // Capacidade máxima de texto da Página 1 (sem fechamento):
-  const maxPage1BodyCapacity = Math.min(380, MULTI_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - 60);
-  const page2Capacity = MULTI_PAGE_MAX_HEIGHT - closingHeight;
+  // CASO 2: Documento multipágina.
+  // Modelo Natural Fill-First: a Página 1 acomoda o máximo de parágrafos que couberem naturalmente
+  // até a margem inferior de segurança, sem cortes artificiais ou buracos vazios na folha.
+  const page1BodyCapacity = Math.max(150, MULTI_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - 40);
 
-  // Se o documento couber em 2 páginas:
-  // Distribuímos os blocos harmonicamente entre a Página 1 e a Página 2:
-  if (totalBlocksHeight <= maxPage1BodyCapacity + page2Capacity && blocks.length > 1) {
-    const targetP1 = Math.min(maxPage1BodyCapacity, Math.max(blockHeights[0], totalBlocksHeight * 0.52));
-    const page1: BodyBlock[] = [];
-    const page2: BodyBlock[] = [];
-    let acc = 0;
-
-    for (let i = 0; i < blocks.length; i++) {
-      if (acc + blockHeights[i] <= targetP1 || page1.length === 0) {
-        page1.push(blocks[i]);
-        acc += blockHeights[i];
-      } else {
-        page2.push(blocks[i]);
-      }
-    }
-
-    if (page2.length > 0) {
-      return [page1, page2];
-    }
-  }
-
-  // Particionamento geral para documentos de 3 ou mais páginas:
   const pages: BodyBlock[][] = [];
   let currentPageBlocks: BodyBlock[] = [];
   let currentHeight = 0;
-  let currentCapacity = maxPage1BodyCapacity;
+  let currentCapacity = page1BodyCapacity;
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
     const h = blockHeights[i];
 
-    if (currentHeight + h <= currentCapacity) {
+    if (currentPageBlocks.length === 0 || currentHeight + h <= currentCapacity) {
       currentPageBlocks.push(block);
       currentHeight += h;
     } else {
-      if (currentPageBlocks.length > 0) {
-        pages.push(currentPageBlocks);
-      }
+      pages.push(currentPageBlocks);
       currentPageBlocks = [block];
       currentHeight = h;
-      // Nas folhas seguintes: NÃO há cabeçalho e NÃO há rodapé!
-      // Toda a altura útil está disponível para o texto continuado:
       currentCapacity = MULTI_PAGE_MAX_HEIGHT;
     }
   }
 
-  // Verificação de fechamento na folha final:
-  if (currentHeight + closingHeight > currentCapacity) {
-    if (currentPageBlocks.length > 1) {
-      const movedBlock = currentPageBlocks.pop()!;
-      pages.push(currentPageBlocks);
-      pages.push([movedBlock]);
-    } else {
-      if (pages.length > 0) {
-        const lastPage = pages[pages.length - 1];
-        if (lastPage.length > 1) {
-          const borrowed = lastPage.pop()!;
-          currentPageBlocks.unshift(borrowed);
-        }
-      }
-      pages.push(currentPageBlocks);
-    }
-  } else {
+  if (currentPageBlocks.length > 0) {
     pages.push(currentPageBlocks);
+  }
+
+  // Se gerou apenas 1 página de texto, mas o fechamento não coube nela:
+  // Cria a Página 2 para o fechamento.
+  // Regra anti-assinatura órfã: se a Página 1 tiver mais de 1 bloco, empresta o último bloco para a Página 2
+  if (pages.length === 1 && totalBlocksHeight > singlePageBodyCapacity) {
+    if (pages[0].length > 1) {
+      const lastBlock = pages[0].pop()!;
+      pages.push([lastBlock]);
+    } else {
+      pages.push([]);
+    }
+    return pages.filter(p => p.length > 0);
+  }
+
+  // Verificação de fechamento na folha final:
+  const lastPageIndex = pages.length - 1;
+  const lastPageBlocks = pages[lastPageIndex];
+  const lastPageHeight = lastPageBlocks.reduce((acc, b) => acc + estimateBlockHeight(b), 0);
+
+  if (lastPageHeight + closingHeight > MULTI_PAGE_MAX_HEIGHT) {
+    if (lastPageBlocks.length > 1) {
+      const movedBlock = lastPageBlocks.pop()!;
+      pages.push([movedBlock]);
+    }
   }
 
   // Garantia absoluta de integridade: NENHUMA página gerada pode ser vazia!

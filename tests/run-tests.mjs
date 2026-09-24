@@ -541,18 +541,33 @@ test("24. Particionamento Multipágina A4 Dinâmico para Visualização no Drawe
   assert.ok(mediumResult[0].length > 0, "Página 1 do ofício deve conter texto");
   assert.ok(mediumResult[1].length > 0, "Página 2 do ofício DEVE conter texto antes das assinaturas");
 
-  // Ofício com 4 parágrafos também deve quebrar para 2 páginas devido ao fechamento completo com destinatário
+  // 4. Ofício com 4 parágrafos concisos cabe elegantemente em 1 página com fechamento
   const oficio4Text = "Cumprimentando-o cordialmente, encaminhamos para conhecimento desta Diretoria o relatório técnico conclusivo elaborado pela comissão.\n\nDestacamos que as considerações deverão ser analisadas pelas equipes técnicas no prazo de 15 dias.\n\nOutrossim, solicitamos a indicação de representante titular e suplente para o grupo de trabalho.\n\nPermanecemos à disposição para prestar esclarecimentos.";
   const oficio4Blocks = parseTextToBlocks(oficio4Text);
   const oficio4Result = partitionBlocksIntoPages(oficio4Blocks, "oficio", {
     documentNumber: "105/2026",
     subject: "Encaminhamento de relatório técnico conclusivo"
   });
-  assert.strictEqual(oficio4Result.length, 2, "Ofício de 4 parágrafos deve quebrar em 2 páginas");
-  assert.ok(oficio4Result[0].length > 0, "Página 1 do ofício de 4 parágrafos deve conter texto");
-  assert.ok(oficio4Result[1].length > 0, "Página 2 do ofício de 4 parágrafos deve conter texto antes das assinaturas");
+  assert.strictEqual(oficio4Result.length, 1, "Ofício com 4 parágrafos concisos deve caber elegantemente em 1 página");
 
-  // 4. Certificado é sempre página única
+  // 5. Ofício com 3 a 4 parágrafos GRANDES (350-500 caracteres cada) deve quebrar naturalmente em 2 páginas
+  // preenchendo a maior parte da Página 1 e continuando na Página 2 com texto antes do fechamento
+  const p1Grande = "Cumprimentando-o cordialmente, encaminhamos para conhecimento e devidas providências desta Diretoria o relatório técnico conclusivo elaborado pela Comissão Especial de Avaliação Institucional, instituída pela Portaria GR-45/2025, referente ao diagnóstico das rotinas operacionais e fluxos de atendimento ao servidor público docente e técnico-administrativo da Universidade Estadual de Campinas.";
+  const p2Grande = "Destacamos que as considerações e apontamentos constantes do anexo deverão ser minuciosamente analisados pelas equipes técnicas da unidade no prazo improrrogável de 15 (quinze) dias úteis, com foco especial na simplificação dos processos de progressão na carreira, homologação de estágios probatórios e modernização dos canais de atendimento digital disponibilizados no Portal DGRH.";
+  const p3Grande = "Outrossim, solicitamos a tempestiva indicação de representante titular e suplente para compor o grupo de trabalho interdepartamental permanente, que terá a atribuição regimental de acompanhar e validar a implementação gradual das recomendações aprovadas pela Câmara de Administração em sua última sessão ordinária do exercício corrente.";
+  const p4Grande = "Permanecemos à inteira disposição desta conceituada Diretoria para agendamento de reuniões técnicas de alinhamento e para prestar quaisquer esclarecimentos suplementares que se fizerem necessários ao longo de todo o procedimento administrativo em comento.";
+
+  const oficioGrandesBlocks = parseTextToBlocks([p1Grande, p2Grande, p3Grande, p4Grande].join("\n\n"));
+  const oficioGrandesResult = partitionBlocksIntoPages(oficioGrandesBlocks, "oficio", {
+    documentNumber: "105/2026",
+    subject: "Encaminhamento de relatório técnico conclusivo"
+  });
+
+  assert.strictEqual(oficioGrandesResult.length, 2, "Ofício com parágrafos grandes deve quebrar em 2 páginas");
+  assert.ok(oficioGrandesResult[0].length >= 2, "A Página 1 deve ser amplamente preenchida (pelo menos 2 ou 3 parágrafos grandes)");
+  assert.ok(oficioGrandesResult[1].length >= 1, "A Página 2 deve conter texto continuado antes do fechamento");
+
+  // 6. Certificado é sempre página única
   const certResult = partitionBlocksIntoPages(longBlocks, "certificado", {});
   assert.strictEqual(certResult.length, 1, "Certificado deve ser sempre de página única");
 });
