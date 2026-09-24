@@ -42,65 +42,31 @@ export type BodyBlock =
   | { type: "numbered-list"; items: string[]; id: string };
 
 /**
- * Divide parágrafos excepcionalmente longos (> 750 caracteres) em sentenças
- * para permitir que quebras de página ocorram no final de uma frase sem transbordar a folha.
- * Parágrafos normais (até ~750 caracteres) são mantidos 100% íntegros como uma unidade textual coesa.
+ * Divide parágrafo em sentenças ou orações para quando houver quebra no limite da margem
  */
-function splitParagraphIntoSentenceBlocks(text: string, baseId: string, maxChars = 750): BodyBlock[] {
-  if (text.length <= maxChars) {
-    return [{ type: "paragraph", text, id: baseId, isContinuation: false }];
-  }
+export function splitParagraphIntoSentencesOrClauses(text: string): string[] {
+  const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g);
+  if (!sentences) return [text];
 
-  // Dividir por sentenças (. ! ?)
-  const rawParts = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
-
-  // Se alguma sentença ainda for excessivamente longa (> maxChars), dividir por vírgula / ponto-e-vírgula
-  const parts: string[] = [];
-  for (const part of rawParts) {
-    if (part.length <= maxChars) {
-      parts.push(part);
-    } else {
-      const subParts = part.match(/[^,;:]+[,;:]+(\s+|$)|[^,;:]+$/g) || [part];
-      parts.push(...subParts);
+  const units: string[] = [];
+  for (const s of sentences) {
+    if (s.length > 220) {
+      const clauses = s.match(/[^,;:]+[,;:]+(\s+|$)|[^,;:]+$/g);
+      if (clauses && clauses.length > 1) {
+        units.push(...clauses.map(c => c.trim()).filter(Boolean));
+        continue;
+      }
     }
+    units.push(s.trim());
   }
-
-  if (parts.length <= 1) {
-    return [{ type: "paragraph", text, id: baseId, isContinuation: false }];
-  }
-
-  const result: BodyBlock[] = [];
-  let current = "";
-  for (let i = 0; i < parts.length; i++) {
-    const s = parts[i];
-    if (current.length + s.length > maxChars && current.length > 0) {
-      result.push({
-        type: "paragraph",
-        text: current.trim(),
-        id: `${baseId}-c${result.length}`,
-        isContinuation: result.length > 0
-      });
-      current = s;
-    } else {
-      current += s;
-    }
-  }
-  if (current.trim()) {
-    result.push({
-      type: "paragraph",
-      text: current.trim(),
-      id: `${baseId}-c${result.length}`,
-      isContinuation: result.length > 0
-    });
-  }
-  return result.length > 0 ? result : [{ type: "paragraph", text, id: baseId, isContinuation: false }];
+  return units.filter(Boolean);
 }
 
 /**
- * Converte o texto bruto do documento em blocos de parágrafos e listas
+ * Converte o texto bruto do documento em blocos de parágrafos e listas (sem fragmentação prévia)
  */
 export function parseTextToBlocks(text: string): BodyBlock[] {
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const blocks: BodyBlock[] = [];
   let currentList: { type: "bullet-list" | "numbered-list"; items: string[] } | null = null;
 
@@ -133,8 +99,12 @@ export function parseTextToBlocks(text: string): BodyBlock[] {
       currentList.items.push(numMatch[2]);
     } else {
       flushList();
-      const sentenceBlocks = splitParagraphIntoSentenceBlocks(line, `p-${blocks.length}`);
-      blocks.push(...sentenceBlocks);
+      blocks.push({
+        type: "paragraph",
+        text: line,
+        id: `p-${blocks.length}`,
+        isContinuation: false
+      });
     }
   }
   flushList();
@@ -206,22 +176,30 @@ export function FormattedParagraphs({
 }
 
 /**
- * Estimativa analítica realista da altura de um bloco (em pixels @ 96 DPI)
+ * Estimativa realista de altura do texto (em pixels @ 96 DPI)
+ * Fonte: Arial 12px (text-xs) com leading-[1.6] (19.2px) e largura útil de 165mm (~624px)
+ * Capacidade média real de ~85 caracteres por linha
+ */
+export function estimateTextHeight(text: string): number {
+  const lines = Math.max(1, Math.ceil((text || "").length / 85));
+  return lines * 19.2 + 12; // 19.2px por linha + 12px de margem inferior space-y-3
+}
+
+/**
+ * Estimativa analítica de altura de um bloco
  */
 function estimateBlockHeight(block: BodyBlock): number {
   if (block.type === "paragraph") {
-    // ~75 caracteres por linha para largura útil de 165mm com Arial 12px
-    const lines = Math.max(1, Math.ceil((block.text || "").length / 75));
-    return lines * 20 + 12; // linha ~20px + espaçamento inferior space-y-3 ~12px
+    return estimateTextHeight(block.text);
   }
   if (block.type === "bullet-list" || block.type === "numbered-list") {
     const totalLines = (block.items || []).reduce(
-      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 70)),
+      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 75)),
       0
     );
-    return totalLines * 20 + 16;
+    return totalLines * 19.2 + 16;
   }
-  return 32;
+  return 30;
 }
 
 /**
@@ -229,39 +207,39 @@ function estimateBlockHeight(block: BodyBlock): number {
  */
 function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 50; // Título
-    if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 45)) * 20 + 16;
-    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 65)) * 22 + 16;
+    let h = 45; // Título
+    if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 50)) * 19 + 14;
+    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 75)) * 19 + 14;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 145 + (metadata.subject ? 35 : 0);
+    return 140 + (metadata.subject ? 30 : 0);
   }
   if (docType === "carta") {
-    return 160 + (metadata.subject ? 35 : 0);
+    return 150 + (metadata.subject ? 30 : 0);
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 145 + (metadata.subject || metadata.memoAssunto ? 35 : 0);
+    return 140 + (metadata.subject || metadata.memoAssunto ? 30 : 0);
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 270; // Título + Grid da Sessão
+    return 250; // Título + Grid da Sessão
   }
   if (docType === "pauta") {
-    return 150;
-  }
-  if (["parecer", "opinion"].includes(docType)) {
-    return 130;
-  }
-  if (docType === "informacao") {
     return 140;
   }
-  if (["decisao", "despacho"].includes(docType)) {
+  if (["parecer", "opinion"].includes(docType)) {
+    return 120;
+  }
+  if (docType === "informacao") {
     return 130;
   }
-  if (["declaracao", "declaration"].includes(docType)) {
-    return 80;
+  if (["decisao", "despacho"].includes(docType)) {
+    return 120;
   }
-  return 90; // Comunicado, Relatório, Outros
+  if (["declaracao", "declaration"].includes(docType)) {
+    return 75;
+  }
+  return 80; // Comunicado, Relatório, Outros
 }
 
 /**
@@ -269,26 +247,26 @@ function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMe
  */
 function getClosingHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 150; // Data + Assinatura
-    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 65)) * 22 + 16;
+    let h = 130; // Data + Assinatura
+    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 75)) * 19 + 14;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 250; // Fecho + Assinatura + Bloco de Destinatário na base (5 linhas)
+    return 240; // Fecho + Assinatura + Bloco de Destinatário na base (5 linhas)
   }
   if (docType === "carta") {
-    return 145;
+    return 135;
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 130;
+    return 120;
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 150; // Encerramento + Assinaturas duplas
+    return 140; // Encerramento + Assinaturas duplas
   }
   if (docType === "pauta") {
     return 0; // Pauta não possui assinatura na base
   }
-  return 135; // Parecer, Informação, Decisão, Declaração, Outros
+  return 125; // Parecer, Informação, Decisão, Declaração, Outros
 }
 
 /**
@@ -306,76 +284,132 @@ function getParagraphClassName(docType: DocumentType): string {
 }
 
 /**
- * Algoritmo de particionamento estrito em folhas A4 (Natural Fill-First):
- * - A Página 1 acomoda o máximo de parágrafos que couberem naturalmente até a margem segura (~25mm a 30mm),
- *   sem cortes prematuros ou áreas vazias na folha.
- * - Quando o texto exceder a capacidade da primeira folha, ele flui sem sobressaltos para as folhas seguintes.
- * - As folhas seguintes NÃO contêm cabeçalho nem rodapé, aproveitando toda a extensão vertical útil da página.
+ * Algoritmo de particionamento estrito em folhas A4 por Limite de Margem (Margin-Limit Pagination):
+ * - A Página 1 acomoda continuamente todo o texto até a margem física inferior de segurança (~20mm a 25mm).
+ * - Se um parágrafo não couber por completo mas houver espaço útil para parte dele (>= 2 linhas),
+ *   ele é quebrado na fronteira de sentença: a primeira parte fica na página preenchendo até a margem,
+ *   e a segunda parte continua sem recuo (indent-8) na folha seguinte.
+ * - Evita rejeições mecânicas de parágrafos inteiros que deixavam buracos vazios na folha.
  * - Regra anti-assinatura órfã: se todo o texto couber na Página 1 mas as assinaturas exigirem Página 2,
  *   o último parágrafo acompanha o fechamento para a Página 2, garantindo conformidade com a redação oficial.
  */
 export function partitionBlocksIntoPages(
-  blocks: BodyBlock[],
+  rawBlocks: BodyBlock[],
   docType: DocumentType,
   metadata: UniversalDocumentMetadata
 ): BodyBlock[][] {
   const isCertificado = ["certificado"].includes(docType);
   if (isCertificado) {
-    return [blocks];
+    return [rawBlocks];
   }
 
-  // Teto seguro de conteúdo útil por folha A4:
-  // Página única: margem de respiro generosa para fecho + assinaturas (~30mm a 40mm)
-  const SINGLE_PAGE_MAX_HEIGHT = 860;
-  // Multipágina: aproveitamento natural do espaço até a margem segura (~25mm a 30mm)
-  const MULTI_PAGE_MAX_HEIGHT = 940;
+  // Teto seguro de conteúdo útil por folha A4 (1122.5px @ 96 DPI):
+  // 56.7px de padding superior (15mm)
+  // Conteúdo até 980px deixa 85px (22.5mm) de margem inferior de respiro.
+  const MAX_PAGE_CONTENT_HEIGHT = 980;
+  const SINGLE_PAGE_MAX_HEIGHT = 830;
 
   const headerHeight = 105;
   const topMatterHeight = getTopMatterHeight(docType, metadata);
   const closingHeight = getClosingHeight(docType, metadata);
 
-  const blockHeights = blocks.map(b => estimateBlockHeight(b));
+  const blockHeights = rawBlocks.map(b => estimateBlockHeight(b));
   const totalBlocksHeight = blockHeights.reduce((acc, h) => acc + h, 0);
 
-  // Capacidade útil de texto na Página 1 se contiver cabeçalho, top matter, texto e fechamento completo (página única)
+  // Capacidade útil na Página 1 para página única (com cabeçalho, top matter e fechamento)
   const singlePageBodyCapacity = Math.max(80, SINGLE_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - closingHeight);
 
-  // CASO 1: Documento cabe com elegância em página única com fechamento completo
   if (totalBlocksHeight <= singlePageBodyCapacity) {
-    return [blocks];
+    return [rawBlocks];
   }
 
-  // CASO 2: Documento multipágina.
-  // Modelo Natural Fill-First: a Página 1 acomoda o máximo de parágrafos que couberem naturalmente
-  // até a margem inferior de segurança, sem cortes artificiais ou buracos vazios na folha.
-  const page1BodyCapacity = Math.max(150, MULTI_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - 40);
+  // Capacidade da Página 1 (sem fechamento, apenas texto contínuo até a margem inferior)
+  const page1BodyCapacity = Math.max(150, MAX_PAGE_CONTENT_HEIGHT - headerHeight - topMatterHeight - 20);
 
   const pages: BodyBlock[][] = [];
-  let currentPageBlocks: BodyBlock[] = [];
+  let currentPage: BodyBlock[] = [];
   let currentHeight = 0;
   let currentCapacity = page1BodyCapacity;
 
-  for (let i = 0; i < blocks.length; i++) {
-    const block = blocks[i];
-    const h = blockHeights[i];
+  // Fila de blocos a processar (permite dividir um parágrafo no limite da margem)
+  const queue = [...rawBlocks];
 
-    if (currentPageBlocks.length === 0 || currentHeight + h <= currentCapacity) {
-      currentPageBlocks.push(block);
+  while (queue.length > 0) {
+    const block = queue.shift()!;
+    const h = estimateBlockHeight(block);
+
+    // Se o bloco cabe inteiramente na página corrente:
+    if (currentPage.length === 0 || currentHeight + h <= currentCapacity) {
+      currentPage.push(block);
       currentHeight += h;
-    } else {
-      pages.push(currentPageBlocks);
-      currentPageBlocks = [block];
-      currentHeight = h;
-      currentCapacity = MULTI_PAGE_MAX_HEIGHT;
+      continue;
     }
+
+    // O bloco NÃO cabe inteiramente na página corrente.
+    // Espaço remanescente na página até o limite da margem:
+    const remainingSpace = currentCapacity - currentHeight;
+
+    // Se o bloco for um parágrafo e houver espaço para ao menos 2 linhas (~50px),
+    // quebra o parágrafo no limite da margem por sentenças/orações:
+    if (block.type === "paragraph" && remainingSpace >= 50) {
+      const units = splitParagraphIntoSentencesOrClauses(block.text);
+      if (units.length > 1) {
+        let fitUnits: string[] = [];
+        let fitHeight = 0;
+
+        for (let uIdx = 0; uIdx < units.length; uIdx++) {
+          const testText = fitUnits.concat(units[uIdx]).join(" ");
+          const testH = estimateTextHeight(testText);
+          if (testH <= remainingSpace) {
+            fitUnits.push(units[uIdx]);
+            fitHeight = testH;
+          } else {
+            break;
+          }
+        }
+
+        // Se conseguimos encaixar ao menos 1 unidade e sobrou ao menos 1:
+        if (fitUnits.length > 0 && fitUnits.length < units.length) {
+          const firstPartText = fitUnits.join(" ");
+          const secondPartText = units.slice(fitUnits.length).join(" ");
+
+          currentPage.push({
+            type: "paragraph",
+            text: firstPartText,
+            id: `${block.id}-p1`,
+            isContinuation: block.isContinuation
+          });
+
+          // Página cheia: avança para a próxima folha
+          pages.push(currentPage);
+          currentPage = [];
+          currentHeight = 0;
+          currentCapacity = MAX_PAGE_CONTENT_HEIGHT;
+
+          queue.unshift({
+            type: "paragraph",
+            text: secondPartText,
+            id: `${block.id}-p2`,
+            isContinuation: true
+          });
+          continue;
+        }
+      }
+    }
+
+    // Se não couber nada (ou sobrou menos de 50px de margem), fecha a página e abre nova folha:
+    pages.push(currentPage);
+    currentPage = [block];
+    currentHeight = h;
+    currentCapacity = MAX_PAGE_CONTENT_HEIGHT;
   }
 
-  if (currentPageBlocks.length > 0) {
-    pages.push(currentPageBlocks);
+  if (currentPage.length > 0) {
+    pages.push(currentPage);
   }
 
-  // Se gerou apenas 1 página de texto, mas o fechamento não coube nela:
-  // Cria a Página 2 para o fechamento.
+  // Se gerou 1 página mas o fechamento não coube nela:
+  // Cria Página 2 para o fechamento.
   // Regra anti-assinatura órfã: se a Página 1 tiver mais de 1 bloco, empresta o último bloco para a Página 2
   if (pages.length === 1 && totalBlocksHeight > singlePageBodyCapacity) {
     if (pages[0].length > 1) {
@@ -392,16 +426,15 @@ export function partitionBlocksIntoPages(
   const lastPageBlocks = pages[lastPageIndex];
   const lastPageHeight = lastPageBlocks.reduce((acc, b) => acc + estimateBlockHeight(b), 0);
 
-  if (lastPageHeight + closingHeight > MULTI_PAGE_MAX_HEIGHT) {
+  if (lastPageHeight + closingHeight > MAX_PAGE_CONTENT_HEIGHT) {
     if (lastPageBlocks.length > 1) {
       const movedBlock = lastPageBlocks.pop()!;
       pages.push([movedBlock]);
     }
   }
 
-  // Garantia absoluta de integridade: NENHUMA página gerada pode ser vazia!
   const finalPages = pages.filter(p => p.length > 0);
-  return finalPages.length > 0 ? finalPages : [blocks];
+  return finalPages.length > 0 ? finalPages : [rawBlocks];
 }
 
 interface DynamicDocumentSheetProps {

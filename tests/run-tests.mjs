@@ -567,7 +567,26 @@ test("24. Particionamento Multipágina A4 Dinâmico para Visualização no Drawe
   assert.ok(oficioGrandesResult[0].length >= 2, "A Página 1 deve ser amplamente preenchida (pelo menos 2 ou 3 parágrafos grandes)");
   assert.ok(oficioGrandesResult[1].length >= 1, "A Página 2 deve conter texto continuado antes do fechamento");
 
-  // 6. Certificado é sempre página única
+  // 6. Teste de Margem: 5 Parágrafos de Lorem Ipsum (o quarto parágrafo DEVE caber na Página 1)
+  const lorem5Text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed pulvinar est. Morbi at eleifend lacus, at feugiat ante. Nulla mollis velit eu nisl ullamcorper, eget lobortis lectus pretium. Aenean varius lorem sed interdum vulputate. Quisque quis ligula lectus. Vestibulum at odio sapien. Sed ullamcorper nisl risus, non semper sem pretium at. Etiam fringilla purus non purus lobortis, id accumsan erat scelerisque. Curabitur quis pulvinar erat, ut consectetur lectus.
+
+Maecenas ut egestas lorem. Quisque ut magna ultrices, lobortis diam in, ornare mauris. Curabitur vehicula velit vel venenatis mollis. Vivamus venenatis tellus eu pulvinar interdum. Proin in ex porta, imperdiet neque non, consectetur ante. Vivamus cursus, augue ut blandit scelerisque, diam tortor sollicitudin mi, sed feugiat mauris metus et dui. Donec ac urna diam. Vestibulum dictum neque non lacus sagittis, sit amet eleifend lectus auctor. Morbi id dignissim turpis, eu dapibus nibh. Phasellus blandit elementum mauris hendrerit luctus. Integer vitae congue purus.
+
+Fusce vel vestibulum purus, ut aliquet ipsum. Suspendisse volutpat, urna sed interdum facilisis, augue turpis finibus est, eget sodales risus felis a lectus. Sed eleifend nulla ac pharetra semper. Vivamus egestas justo diam, in rutrum nulla lobortis nec. Nam et maximus diam. Nunc varius nec quam id luctus. Sed quis ante tincidunt nisi dignissim tempus at vel nisi. Curabitur sed eleifend diam, at euismod purus.
+
+Nam at efficitur velit. Mauris hendrerit turpis eget magna iaculis ultricies. Nulla sagittis est sit amet odio aliquet mollis et a ex. Nunc blandit dignissim blandit. Ut scelerisque ante et libero bibendum ullamcorper. Ut eu pharetra enim. Mauris scelerisque arcu eget odio ultricies, in tristique est porttitor. Nam eu justo felis. Phasellus tempor efficitur justo quis porttitor. Nulla facilisi. Etiam ultrices varius consectetur. Etiam sed nulla euismod, dignissim sapien vel, posuere ex. Mauris semper erat quis viverra bibendum. Nunc tellus tellus, sodales vel enim quis, ultricies condimentum felis. Sed eget ipsum molestie orci viverra lobortis.
+
+Proin vestibulum tempus dui non consequat. Praesent blandit in urna ut tincidunt. Vivamus sit amet ipsum sed risus fermentum pellentesque convallis cursus massa. Fusce neque velit, interdum sed vehicula ac, posuere non lacus. Maecenas faucibus tincidunt nisi, in imperdiet nunc faucibus in. Suspendisse a justo rhoncus, sollicitudin ipsum ut, lobortis nulla. Duis interdum turpis sit amet sem eleifend, in fringilla diam sagittis. Nulla quis ornare nisi. Curabitur pharetra justo vel dolor feugiat, in aliquam nisl faucibus. Praesent malesuada egestas eros, nec convallis tortor laoreet et. Vestibulum ac posuere felis. Mauris vestibulum urna ut convallis feugiat.`;
+
+  const loremBlocks = parseTextToBlocks(lorem5Text);
+  const loremResult = partitionBlocksIntoPages(loremBlocks, "oficio", {
+    documentNumber: "105/2026",
+    subject: "Teste com 5 parágrafos de Lorem Ipsum"
+  });
+  assert.ok(loremResult.length >= 2, "5 parágrafos de Lorem devem gerar multipágina");
+  assert.ok(loremResult[0].length >= 4, "O quarto parágrafo DEVE caber na primeira página até o limite da margem");
+
+  // 7. Certificado é sempre página única
   const certResult = partitionBlocksIntoPages(longBlocks, "certificado", {});
   assert.strictEqual(certResult.length, 1, "Certificado deve ser sempre de página única");
 });
