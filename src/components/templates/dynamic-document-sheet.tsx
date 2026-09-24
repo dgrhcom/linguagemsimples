@@ -210,18 +210,18 @@ export function FormattedParagraphs({
  */
 function estimateBlockHeight(block: BodyBlock): number {
   if (block.type === "paragraph") {
-    // ~70 caracteres por linha para largura útil de 165mm com Arial 12px
-    const lines = Math.max(1, Math.ceil((block.text || "").length / 70));
-    return lines * 21 + 14; // linha ~21px + margem inferior space-y-3 ~14px
+    // ~65 caracteres por linha para largura útil de 165mm com Arial 12px
+    const lines = Math.max(1, Math.ceil((block.text || "").length / 65));
+    return lines * 22 + 16; // linha ~22px + margem inferior space-y-3 ~16px
   }
   if (block.type === "bullet-list" || block.type === "numbered-list") {
     const totalLines = (block.items || []).reduce(
-      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 65)),
+      (sum, item) => sum + Math.max(1, Math.ceil(item.length / 60)),
       0
     );
-    return totalLines * 21 + 16;
+    return totalLines * 22 + 18;
   }
-  return 35;
+  return 38;
 }
 
 /**
@@ -229,39 +229,39 @@ function estimateBlockHeight(block: BodyBlock): number {
  */
 function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 48; // Título
+    let h = 50; // Título
     if (metadata.ementa) h += Math.max(1, Math.ceil(metadata.ementa.length / 45)) * 20 + 16;
-    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 70)) * 21 + 16;
+    if (metadata.preamble) h += Math.max(1, Math.ceil(metadata.preamble.length / 65)) * 22 + 16;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 135 + (metadata.subject ? 35 : 0);
+    return 145 + (metadata.subject ? 35 : 0);
   }
   if (docType === "carta") {
-    return 155 + (metadata.subject ? 35 : 0);
+    return 160 + (metadata.subject ? 35 : 0);
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 140 + (metadata.subject || metadata.memoAssunto ? 35 : 0);
+    return 145 + (metadata.subject || metadata.memoAssunto ? 35 : 0);
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 260; // Título + Grid da Sessão
+    return 270; // Título + Grid da Sessão
   }
   if (docType === "pauta") {
     return 150;
   }
   if (["parecer", "opinion"].includes(docType)) {
-    return 120;
+    return 130;
   }
   if (docType === "informacao") {
-    return 135;
+    return 140;
   }
   if (["decisao", "despacho"].includes(docType)) {
-    return 120;
+    return 130;
   }
   if (["declaracao", "declaration"].includes(docType)) {
-    return 75;
+    return 80;
   }
-  return 85; // Comunicado, Relatório, Outros
+  return 90; // Comunicado, Relatório, Outros
 }
 
 /**
@@ -269,26 +269,26 @@ function getTopMatterHeight(docType: DocumentType, metadata: UniversalDocumentMe
  */
 function getClosingHeight(docType: DocumentType, metadata: UniversalDocumentMetadata): number {
   if (["portaria", "resolucao", "deliberacao", "instrucao-normativa"].includes(docType)) {
-    let h = 140; // Data + Assinatura
-    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 70)) * 21 + 16;
+    let h = 150; // Data + Assinatura
+    if (metadata.effectiveClause) h += Math.max(1, Math.ceil(metadata.effectiveClause.length / 65)) * 22 + 16;
     return h;
   }
   if (["oficio", "oficio-circular"].includes(docType)) {
-    return 225; // Fecho + Assinatura + Bloco de Destinatário na base
+    return 250; // Fecho + Assinatura + Bloco de Destinatário na base (5 linhas)
   }
   if (docType === "carta") {
-    return 135;
+    return 145;
   }
   if (["memorando", "memo"].includes(docType)) {
-    return 120;
+    return 130;
   }
   if (["ata", "minutes"].includes(docType)) {
-    return 140; // Encerramento + Assinaturas duplas
+    return 150; // Encerramento + Assinaturas duplas
   }
   if (docType === "pauta") {
     return 0; // Pauta não possui assinatura na base
   }
-  return 125; // Parecer, Informação, Decisão, Declaração, Outros
+  return 135; // Parecer, Informação, Decisão, Declaração, Outros
 }
 
 /**
@@ -320,11 +320,9 @@ export function partitionBlocksIntoPages(
     return [blocks];
   }
 
-  // Dimensões físicas A4 a 96 DPI: 297mm = 1122.5px.
-  // Margens: 15mm superior (56.7px) + 15mm inferior (56.7px) = 113.4px.
-  // Altura útil interna total: 1009px.
-  // Adotamos 860px como teto operacional seguro para garantir margem limpa e respiro generoso:
-  const PAGE_MAX_CONTENT_HEIGHT = 860;
+  // Teto seguro para página única com fechamento e margens generosas (~25mm a 35mm):
+  const SINGLE_PAGE_MAX_HEIGHT = 760;
+  const MULTI_PAGE_MAX_HEIGHT = 860;
 
   const headerHeight = 105;
   const topMatterHeight = getTopMatterHeight(docType, metadata);
@@ -333,47 +331,46 @@ export function partitionBlocksIntoPages(
   const blockHeights = blocks.map(b => estimateBlockHeight(b));
   const totalBlocksHeight = blockHeights.reduce((acc, h) => acc + h, 0);
 
-  // Capacidade útil de texto na Página 1 se contiver o fechamento (página única)
-  const singlePageBodyCapacity = Math.max(100, PAGE_MAX_CONTENT_HEIGHT - headerHeight - topMatterHeight - closingHeight);
+  // Capacidade útil de texto na Página 1 se contiver o fechamento completo (página única)
+  const singlePageBodyCapacity = Math.max(80, SINGLE_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - closingHeight);
 
-  // CASO 1: Todo o documento cabe com folga e elegância na Página 1 (corpo + fechamento/assinaturas)
+  // CASO 1: Documento curto que cabe com total elegância em página única
   if (totalBlocksHeight <= singlePageBodyCapacity) {
     return [blocks];
   }
 
-  // CASO 2: Documento multipágina.
-  // Capacidade máxima segura de texto da Página 1 (sem fechamento).
-  // Limitamos estritamente a 440px para garantir que o texto seja interrompido
-  // bem antes do final da folha, respeitando rigorosamente a margem inferior de 15mm:
-  const page1BodyCapacity = Math.min(440, PAGE_MAX_CONTENT_HEIGHT - headerHeight - topMatterHeight - 60);
+  // CASO 2: Documento que requer 2 ou mais páginas.
+  // Capacidade máxima de texto da Página 1 (sem fechamento):
+  const maxPage1BodyCapacity = Math.min(380, MULTI_PAGE_MAX_HEIGHT - headerHeight - topMatterHeight - 60);
+  const page2Capacity = MULTI_PAGE_MAX_HEIGHT - closingHeight;
 
-  // Se o total de blocos couber em page1BodyCapacity, mas ultrapassou singlePageBodyCapacity:
-  // Significa que o documento necessita de uma segunda página devido ao bloco de fechamento/assinaturas.
-  // Para evitar que a Página 2 fique com apenas a assinatura isolada (sem texto):
-  // Dividimos os blocos equilibradamente entre a Página 1 e a Página 2:
-  if (totalBlocksHeight <= page1BodyCapacity && blocks.length > 1) {
-    const halfHeight = totalBlocksHeight / 2;
+  // Se o documento couber em 2 páginas:
+  // Distribuímos os blocos harmonicamente entre a Página 1 e a Página 2:
+  if (totalBlocksHeight <= maxPage1BodyCapacity + page2Capacity && blocks.length > 1) {
+    const targetP1 = Math.min(maxPage1BodyCapacity, Math.max(blockHeights[0], totalBlocksHeight * 0.52));
     const page1: BodyBlock[] = [];
     const page2: BodyBlock[] = [];
     let acc = 0;
+
     for (let i = 0; i < blocks.length; i++) {
-      if (acc + blockHeights[i] <= halfHeight || page1.length === 0) {
+      if (acc + blockHeights[i] <= targetP1 || page1.length === 0) {
         page1.push(blocks[i]);
         acc += blockHeights[i];
       } else {
         page2.push(blocks[i]);
       }
     }
+
     if (page2.length > 0) {
       return [page1, page2];
     }
   }
 
-  // Particionamento padrão em páginas A4:
+  // Particionamento geral para documentos de 3 ou mais páginas:
   const pages: BodyBlock[][] = [];
   let currentPageBlocks: BodyBlock[] = [];
   let currentHeight = 0;
-  let currentCapacity = page1BodyCapacity;
+  let currentCapacity = maxPage1BodyCapacity;
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
@@ -383,7 +380,6 @@ export function partitionBlocksIntoPages(
       currentPageBlocks.push(block);
       currentHeight += h;
     } else {
-      // Interromper a folha no limite seguro e iniciar a folha seguinte
       if (currentPageBlocks.length > 0) {
         pages.push(currentPageBlocks);
       }
@@ -391,19 +387,17 @@ export function partitionBlocksIntoPages(
       currentHeight = h;
       // Nas folhas seguintes: NÃO há cabeçalho e NÃO há rodapé!
       // Toda a altura útil está disponível para o texto continuado:
-      currentCapacity = PAGE_MAX_CONTENT_HEIGHT;
+      currentCapacity = MULTI_PAGE_MAX_HEIGHT;
     }
   }
 
   // Verificação de fechamento na folha final:
   if (currentHeight + closingHeight > currentCapacity) {
     if (currentPageBlocks.length > 1) {
-      // Mover o último bloco para acompanhar a assinatura na folha seguinte
       const movedBlock = currentPageBlocks.pop()!;
       pages.push(currentPageBlocks);
       pages.push([movedBlock]);
     } else {
-      // Se currentPageBlocks só tem 1 bloco, e pages já tem blocos anteriores:
       if (pages.length > 0) {
         const lastPage = pages[pages.length - 1];
         if (lastPage.length > 1) {

@@ -541,6 +541,17 @@ test("24. Particionamento Multipágina A4 Dinâmico para Visualização no Drawe
   assert.ok(mediumResult[0].length > 0, "Página 1 do ofício deve conter texto");
   assert.ok(mediumResult[1].length > 0, "Página 2 do ofício DEVE conter texto antes das assinaturas");
 
+  // Ofício com 4 parágrafos também deve quebrar para 2 páginas devido ao fechamento completo com destinatário
+  const oficio4Text = "Cumprimentando-o cordialmente, encaminhamos para conhecimento desta Diretoria o relatório técnico conclusivo elaborado pela comissão.\n\nDestacamos que as considerações deverão ser analisadas pelas equipes técnicas no prazo de 15 dias.\n\nOutrossim, solicitamos a indicação de representante titular e suplente para o grupo de trabalho.\n\nPermanecemos à disposição para prestar esclarecimentos.";
+  const oficio4Blocks = parseTextToBlocks(oficio4Text);
+  const oficio4Result = partitionBlocksIntoPages(oficio4Blocks, "oficio", {
+    documentNumber: "105/2026",
+    subject: "Encaminhamento de relatório técnico conclusivo"
+  });
+  assert.strictEqual(oficio4Result.length, 2, "Ofício de 4 parágrafos deve quebrar em 2 páginas");
+  assert.ok(oficio4Result[0].length > 0, "Página 1 do ofício de 4 parágrafos deve conter texto");
+  assert.ok(oficio4Result[1].length > 0, "Página 2 do ofício de 4 parágrafos deve conter texto antes das assinaturas");
+
   // 4. Certificado é sempre página única
   const certResult = partitionBlocksIntoPages(longBlocks, "certificado", {});
   assert.strictEqual(certResult.length, 1, "Certificado deve ser sempre de página única");

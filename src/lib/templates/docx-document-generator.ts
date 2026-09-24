@@ -1488,6 +1488,11 @@ export async function generateDocumentDocx(
   }
 
   // 5. Instanciação e Empacotamento do Documento DOCX
+  // O cabeçalho institucional fica posicionado no corpo da Página 1 e NÃO se repete nas folhas seguintes
+  const fullChildren = headerTable
+    ? [headerTable, new Paragraph({ spacing: { after: 200 } }), ...docChildren]
+    : docChildren;
+
   const doc = new Document({
     sections: [
       {
@@ -1498,22 +1503,14 @@ export async function generateDocumentDocx(
               height: 16838
             },
             margin: {
-              top: headerTable ? 2268 : MARGIN_TOP,
+              top: MARGIN_TOP,
               bottom: MARGIN_BOTTOM,
               left: MARGIN_LEFT,
-              right: MARGIN_RIGHT,
-              header: 720
+              right: MARGIN_RIGHT
             }
           }
         },
-        headers: headerTable
-          ? {
-              default: new Header({
-                children: [headerTable]
-              })
-            }
-          : undefined,
-        children: docChildren
+        children: fullChildren
       }
     ]
   });
