@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Heart } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 export function Footer() {
   return (
@@ -81,16 +81,6 @@ export function Footer() {
               </li>
             </ul>
           </div>
-        </div>
-
-        <div className="border-t border-slate-medium mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-cloud-medium gap-4">
-          <p>
-            Universidade Estadual de Campinas • Coordenadoria Geral da Universidade (CGU) & Educorp
-          </p>
-          <p className="flex items-center gap-1.5">
-            <span>Comunicação simples para todas e todos</span>
-            <Heart className="w-3.5 h-3.5 text-clay" />
-          </p>
         </div>
       </div>
     </footer>

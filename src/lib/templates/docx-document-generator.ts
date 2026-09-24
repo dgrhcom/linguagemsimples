@@ -404,7 +404,7 @@ export async function generateDocumentDocx(
         spacing: { before: 180, after: 180 },
         children: [
           new TextRun({
-            text: docType === "portaria" ? `PORTARIA DGRH nº ${metadata.documentNumber || "01/2026"}` :
+            text: docType === "portaria" ? `PORTARIA nº ${metadata.documentNumber || "01/2026"}` :
                   docType === "resolucao" ? `RESOLUÇÃO GR-nº ${metadata.documentNumber || "01/2026"}` :
                   docType === "deliberacao" ? `DELIBERAÇÃO CONSU-A-nº ${metadata.documentNumber || "01/2026"}` :
                   `INSTRUÇÃO NORMATIVA DGRH nº ${metadata.documentNumber || "01/2026"}`,
@@ -419,6 +419,8 @@ export async function generateDocumentDocx(
     if (metadata.ementa) {
       docChildren.push(
         new Paragraph({
+          alignment: docType === "portaria" ? AlignmentType.RIGHT : AlignmentType.LEFT,
+          indent: docType === "portaria" ? { left: 4500 } : undefined,
           spacing: { before: 120, after: 120 },
           children: [
             new TextRun({
@@ -437,7 +439,7 @@ export async function generateDocumentDocx(
       docChildren.push(
         new Paragraph({
           alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
+          indent: docType === "portaria" ? undefined : { firstLine: 567 },
           spacing: { before: 120, after: 120, line: 360 },
           children: [new TextRun({ text: metadata.preamble, size: 22, font: "Arial" })]
         })
@@ -448,7 +450,7 @@ export async function generateDocumentDocx(
     docChildren.push(
       ...parseParagraphsToDocx(text, {
         alignment: AlignmentType.JUSTIFIED,
-        indentFirstLine: 567
+        indentFirstLine: docType === "portaria" ? 0 : 567
       })
     );
 
@@ -456,7 +458,7 @@ export async function generateDocumentDocx(
       docChildren.push(
         new Paragraph({
           alignment: AlignmentType.JUSTIFIED,
-          indent: { firstLine: 567 },
+          indent: docType === "portaria" ? undefined : { firstLine: 567 },
           spacing: { before: 240, after: 120, line: 360 },
           children: [new TextRun({ text: metadata.effectiveClause, size: 22, font: "Arial" })]
         })
@@ -474,43 +476,75 @@ export async function generateDocumentDocx(
             font: "Arial"
           })
         ]
-      }),
-      new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        spacing: { before: 360, after: 40 },
-        children: [
-          new TextRun({
-            text: "___________________________________",
-            size: 22,
-            font: "Arial"
-          })
-        ]
-      }),
-      new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        spacing: { before: 40, after: 20 },
-        children: [
-          new TextRun({
-            text: metadata.authorName || "Reitoria da Unicamp",
-            bold: true,
-            size: 22,
-            font: "Arial"
-          })
-        ]
-      }),
-      new Paragraph({
-        alignment: AlignmentType.RIGHT,
-        spacing: { before: 20 },
-        children: [
-          new TextRun({
-            text: metadata.authorRole || "Reitor(a)",
-            size: 18,
-            font: "Arial",
-            color: "555555"
-          })
-        ]
       })
     );
+
+    if (docType === "portaria") {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 360, after: 20 },
+          children: [
+            new TextRun({
+              text: metadata.authorName || "Reitoria da Unicamp",
+              bold: true,
+              size: 22,
+              font: "Arial"
+            })
+          ]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 20 },
+          children: [
+            new TextRun({
+              text: metadata.authorRole || "Reitor(a)",
+              size: 18,
+              font: "Arial",
+              color: "555555"
+            })
+          ]
+        })
+      );
+    } else {
+      docChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          spacing: { before: 360, after: 40 },
+          children: [
+            new TextRun({
+              text: "___________________________________",
+              size: 22,
+              font: "Arial"
+            })
+          ]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          spacing: { before: 40, after: 20 },
+          children: [
+            new TextRun({
+              text: metadata.authorName || "Reitoria da Unicamp",
+              bold: true,
+              size: 22,
+              font: "Arial"
+            })
+          ]
+        }),
+        new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          spacing: { before: 20 },
+          children: [
+            new TextRun({
+              text: metadata.authorRole || "Reitor(a)",
+              size: 18,
+              font: "Arial",
+              color: "555555"
+            })
+          ]
+        })
+      );
+    }
   }
 
   // B. REGIMENTO E REGULAMENTO
@@ -971,15 +1005,14 @@ export async function generateDocumentDocx(
     docChildren.push(
       ...parseParagraphsToDocx(text, {
         alignment: AlignmentType.JUSTIFIED,
-        indentFirstLine: 567
+        indentFirstLine: 0
       })
     );
 
-    // Data próxima ao parágrafo do corpo com recuo igual ao do parágrafo
+    // Data próxima ao parágrafo do corpo à esquerda e sem recuo
     docChildren.push(
       new Paragraph({
         alignment: AlignmentType.LEFT,
-        indent: { firstLine: 567 },
         spacing: { before: 240, after: 60 },
         children: [
           new TextRun({

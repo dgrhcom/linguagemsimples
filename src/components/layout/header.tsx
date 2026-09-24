@@ -12,7 +12,6 @@ export function Header() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const navItems = [
-    { href: "/analisar", label: "Avaliar Texto" },
     { href: "/como-funciona", label: "Como Funciona" },
     { href: "/criterios", label: "Critérios" },
     { href: "/exemplos", label: "Exemplos" },
@@ -68,9 +67,9 @@ export function Header() {
 
               <Link
                 href="/analisar"
-                className="font-sans text-caption uppercase tracking-caption text-slate-dark hover:text-slate-dark border-b border-slate-dark hover:border-slate-dark pb-px transition-all"
+                className="bg-clay hover:bg-clay-deep text-ivory-light font-sans text-caption font-semibold uppercase tracking-caption px-4 py-2 rounded-lg transition-all shadow-2xs"
               >
-                Avaliar Texto
+                Avaliar texto
               </Link>
             </div>
           </div>

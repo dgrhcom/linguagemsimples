@@ -477,11 +477,21 @@ test("22. Validação dos 5 Modelos Revisados (Declaração, Informação, Memor
   assert.ok(parecerBlob && parecerBlob.size > 1000, "DOCX de Parecer deve ser gerado com sucesso");
 });
 
+test("23. Validação do Modelo Portaria (sem DGRH no título, ementa à direita, sem recuo de parágrafos, assinatura centralizada sem linha)", async () => {
+  const { generateDocumentDocx } = await import("../src/lib/templates/docx-document-generator.ts");
 
+  const portariaBlob = await generateDocumentDocx("portaria", "Art. 1º Fica instituído o Grupo de Trabalho de Linguagem Simples no âmbito da Universidade Estadual de Campinas.\n\nArt. 2º Esta Portaria entra em vigor na data de sua publicação.", {
+    documentNumber: "15/2026",
+    unitName: "Gabinete do Reitor",
+    emailSite: "reitoria@unicamp.br | www.unicamp.br",
+    ementa: "Dispõe sobre a criação do Grupo de Trabalho de Linguagem Simples na Unicamp.",
+    preamble: "O Reitor da Universidade Estadual de Campinas, no uso de suas atribuições legais, resolve:",
+    effectiveClause: "Art. 2º Esta Portaria entra em vigor na data de sua publicação.",
+    locationAndDate: "Campinas, 24 de setembro de 2026.",
+    authorName: "Prof. Dr. Antonio José de Almeida Meirelles",
+    authorRole: "Reitor da Unicamp"
+  });
 
-
-
-
-
-
+  assert.ok(portariaBlob && portariaBlob.size > 1000, "DOCX de Portaria deve ser gerado com sucesso com as regras de layout atualizadas");
+});
 

@@ -156,35 +156,40 @@ export function DynamicDocumentSheet({
             {/* Título do Ato Normativo (conforme modelo timbrado oficial) */}
             <div>
               <h2 className="text-sm font-black text-black tracking-wide uppercase">
-                {docType === "portaria" && `PORTARIA DGRH nº ${metadata.documentNumber || "01/2026"}`}
+                {docType === "portaria" && `PORTARIA nº ${metadata.documentNumber || "01/2026"}`}
                 {docType === "resolucao" && `RESOLUÇÃO GR-nº ${metadata.documentNumber || "01/2026"}`}
                 {docType === "deliberacao" && `DELIBERAÇÃO CONSU-A-nº ${metadata.documentNumber || "01/2026"}`}
                 {docType === "instrucao-normativa" && `INSTRUÇÃO NORMATIVA DGRH nº ${metadata.documentNumber || "01/2026"}`}
               </h2>
             </div>
 
-            {/* Ementa (em itálico, alinhada à esquerda) */}
+            {/* Ementa (em itálico, alinhada à direita na página para Portaria) */}
             {metadata.ementa && (
-              <div className="text-xs text-zinc-800 italic leading-relaxed pt-2">
-                {metadata.ementa}
+              <div className={`text-xs text-zinc-800 italic leading-relaxed pt-2 ${docType === "portaria" ? "flex justify-end" : ""}`}>
+                <div className={docType === "portaria" ? "w-1/2 text-right" : ""}>
+                  {metadata.ementa}
+                </div>
               </div>
             )}
 
             {/* Preâmbulo / Fundamento Legal */}
             {metadata.preamble && (
-              <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8 pt-2">
+              <p className={`text-xs text-zinc-900 leading-relaxed text-justify pt-2 ${docType === "portaria" ? "" : "indent-8"}`}>
                 {metadata.preamble}
               </p>
             )}
 
             {/* Artigos e Parágrafos */}
             <div className="pt-1">
-              <FormattedParagraphs text={text} />
+              <FormattedParagraphs
+                text={text}
+                paragraphClassName={docType === "portaria" ? "text-xs text-zinc-900 leading-[1.6] text-justify font-normal" : "text-xs text-zinc-900 leading-[1.6] text-justify indent-8 font-normal"}
+              />
             </div>
 
             {/* Cláusula de Vigência */}
             {metadata.effectiveClause && (
-              <p className="text-xs text-zinc-900 leading-relaxed text-justify indent-8 pt-2">
+              <p className={`text-xs text-zinc-900 leading-relaxed text-justify pt-2 ${docType === "portaria" ? "" : "indent-8"}`}>
                 <FormattedInline text={metadata.effectiveClause} />
               </p>
             )}
@@ -194,9 +199,9 @@ export function DynamicDocumentSheet({
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
-            {/* Assinatura contígua ao texto e data */}
-            <div className="pt-6 flex flex-col items-end text-right">
-              <div className="w-64 border-t border-zinc-950 pt-1.5">
+            {/* Assinatura contígua ao texto e data (centralizada e sem linha para Portaria) */}
+            <div className={`pt-6 flex flex-col ${docType === "portaria" ? "items-center text-center" : "items-end text-right"}`}>
+              <div className={`w-64 ${docType === "portaria" ? "pt-1.5 text-center" : "border-t border-zinc-950 pt-1.5"}`}>
                 <p className="text-xs font-bold text-black">
                   {metadata.authorName || "Reitoria da Unicamp"}
                 </p>
@@ -597,11 +602,11 @@ export function DynamicDocumentSheet({
 
             {/* Corpo do Parecer */}
             <div className="pt-2">
-              <FormattedParagraphs text={text} />
+              <FormattedParagraphs text={text} paragraphClassName="text-xs text-zinc-900 leading-[1.6] text-justify font-normal" />
             </div>
 
-            {/* Local e Data com recuo igual ao do parágrafo */}
-            <div className="text-left text-xs text-zinc-700 font-medium indent-8 pt-3">
+            {/* Local e Data à esquerda e sem recuo */}
+            <div className="text-left text-xs text-zinc-700 font-medium pt-3">
               {metadata.locationAndDate || "Campinas, 27 de agosto de 2026."}
             </div>
 
